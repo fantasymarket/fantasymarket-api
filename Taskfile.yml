@@ -1,0 +1,24 @@
+version: '2'
+
+tasks:
+  test:
+    cmds:
+      - go test ./... -v -covermode=count -coverprofile=coverage.out
+  lint:
+    cmds:
+      - revive -config .revive.toml -exclude=./vendor/... ./...
+
+  install-linter:
+    env:
+      GO111MODULES: off
+    cmds:
+      - go get -u github.com/mgechev/revive
+
+  ci:
+    cmds:
+      - go mod verify
+      - task install-linter
+      - task lint
+      - task test
+      - GO111MODULE=off go get github.com/mattn/goveralls
+      - $(go env GOPATH)/bin/goveralls -coverprofile=profile.cov -service=github
