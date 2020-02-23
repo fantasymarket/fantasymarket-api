@@ -6,7 +6,7 @@ tasks:
       - go test ./... -v -covermode=count -coverprofile=coverage.out
   lint:
     cmds:
-      - revive -config .revive.toml -exclude=./vendor/... ./...
+      - $(go env GOPATH)/bin/revive -config .revive.toml -exclude=./vendor/... ./...
 
   install-linter:
     env:
