@@ -13,7 +13,7 @@ func main() {
 	cors := cors.New(cors.Options{
 		AllowedOrigins:     []string{"https://fantasymarket.netlify.com/"},
 		//AllowOriginFunc:    nil,
-		AllowedMethods:     []string{"GET"},
+		AllowedMethods:     []string{"GET", "POST", "PUT"},
 		AllowedHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:     []string{"Link"},
 		AllowCredentials:   true,
