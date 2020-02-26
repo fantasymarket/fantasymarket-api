@@ -1,0 +1,20 @@
+{
+    "go.lintTool": "revive",
+    "go.lintFlags": ["-exclude=vendor/...", "-config=${workspaceFolder}/.revive.toml"],
+    "[go]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true,
+        },
+        "editor.snippetSuggestions": "inline",
+    },
+    "go.useLanguageServer": false,
+    "go.formatTool": "goimports",
+    "go.liveErrors": {
+        "enabled": true,
+         "delay": 500
+    },
+    "go.useCodeSnippetsOnFunctionSuggest": true,
+    "go.useCodeSnippetsOnFunctionSuggestWithoutType": true,
+    "liveshare.languages.allowGuestCommandControl": true,
+}
