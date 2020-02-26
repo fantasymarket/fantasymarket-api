@@ -12,7 +12,7 @@ func GetPortfolioNumbers() http.HandlerFunc {
 	}
 }
 
-func GetStockRequest(w http.ResponseWriter, r *http.Request) {
+func GetStockNumber(w http.ResponseWriter, r *http.Request) {
 	stock_name := chi.URLParam(r, "name")
 
 

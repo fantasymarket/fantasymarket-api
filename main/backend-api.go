@@ -29,7 +29,7 @@ func main() {
 
 	// Serve the stock numbers
 	r.Route("/stocknumbers", func(r chi.Router) {
-		r.Get("/{name}", requesthandler.GetStockRequest)
+		r.Get("/{name}", requesthandler.GetStockNumber)
 	})
 
 	http.ListenAndServe(":3000", r)
