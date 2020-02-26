@@ -2,16 +2,17 @@ package main
 
 import (
 	"fantasymarket/requesthandler"
+	"net/http"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
-	"net/http"
 )
 
 func main() {
 	r := chi.NewRouter()
 	cors := cors.New(cors.Options{
-		AllowedOrigins:     []string{"https://fantasymarket.netlify.com/"},
+		AllowedOrigins: []string{"https://fantasymarket.netlify.com/"},
 		//AllowOriginFunc:    nil,
 		AllowedMethods:     []string{"GET", "POST", "PUT"},
 		AllowedHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},

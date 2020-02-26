@@ -2,18 +2,20 @@ package requesthandler
 
 import (
 	"fmt"
-	"github.com/go-chi/chi"
 	"net/http"
+
+	"github.com/go-chi/chi"
 )
 
 func GetPortfolioNumbers() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Alex = Gay"))
+		w.Write([]byte("Test"))
 	}
 }
 
 func GetStockNumber(w http.ResponseWriter, r *http.Request) {
-	stock_name := chi.URLParam(r, "name")
+	stockName := chi.URLParam(r, "name")
 
-
+	fmt.Println(stockName)
+	return
 }
