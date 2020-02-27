@@ -7,7 +7,7 @@ import (
 
 /// Was wir noch nehmen können
 /// SQL:			https://github.com/jmoiron/sqlx
-/// Decimal:		https://github.com/shopspring/decimal
+/// Decimal:	https://github.com/shopspring/decimal
 
 //FantasyMarketOptions manages the Options of the programm
 type FantasyMarketOptions struct {
@@ -49,6 +49,7 @@ type Event struct {
 
 //TagOptions are more indepth settings for specific event tags only
 type TagOptions struct {
+
 	Trend int64 // Note: .2 would be 20 and .02 would be 2
 	//// TimeOffset time.Duration // Optionally offset the event to e.g only affect a tag after x time
 	////Duration time.Duration
@@ -83,8 +84,8 @@ func MainStocks() {
 	}
 
 	events := []Event{
-		{Name: "Virus in Seattle", Tags: map[string]TagOptions{"tech": {Trend: 20}, "china": {Trend: 20}}},
-		{Name: ".com bubble Crash", Tags: map[string]TagOptions{"tech": {Trend: 20}, "china": {Trend: 20}}},
+		{Name: "Virus in Seattle", Tags: map[string]TagOptions{"tech": {Trend: .2}, "china": {Trend: .2}}},
+		{Name: ".com bubble Crash", Tags: map[string]TagOptions{"tech": {Trend: .2}, "china": {Trend: .2}}},
 	}
 
 	s := Service{
@@ -98,11 +99,11 @@ func MainStocks() {
 	}
 	rand.Seed(time.Now().UnixNano())
 
-	go StartLoop(s)
+	go startLoop(s)
 }
 
 // startLoop startsrunningticks indefinitly
-func StartLoop(s Service) {
+func startLoop(s Service) {
 
 	// We need to calculatre the current game date
 	startDate := s.Options.StartDate
@@ -111,7 +112,7 @@ func StartLoop(s Service) {
 	dateNow := startDate.Add(gameTimePerTick * time.Duration(ticksSinceStart))
 
 	for {
-		Tick(s, dateNow)
+		tick(s, dateNow)
 
 		// Sleep for the duration of a single tick (Since we want 1 tick in 10 Seconds)
 		time.Sleep(time.Duration(1 / s.Options.TicksPerSecond))
@@ -123,7 +124,7 @@ func StartLoop(s Service) {
 }
 
 // tick is updating the current state of our system
-func Tick(s Service, dateNow time.Time) {
+func tick(s Service, dateNow time.Time) {
 	// TODO: Get currently Running Events
 	// TODO: Stop Events that are over the max duration
 	e := s.Events
@@ -185,3 +186,4 @@ func ComputeStockNumbers(stocks []Stock, e Event) {
 
 // 	return a;
 // }
+

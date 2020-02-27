@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fantasymarket/requesthandler"
+	"fantasymarket/requesthandler"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -12,9 +12,9 @@ import (
 func main() {
 	r := chi.NewRouter()
 	cors := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
+		AllowedOrigins: []string{"https://fantasymarket.netlify.com/"},
 		//AllowOriginFunc:    nil,
-		AllowedMethods:     []string{"GET"},
+		AllowedMethods:     []string{"GET", "POST", "PUT"},
 		AllowedHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:     []string{"Link"},
 		AllowCredentials:   true,
@@ -26,11 +26,12 @@ func main() {
 	r.Use(middleware.Logger, cors.Handler)
 
 	// Serve the portfolio numbers
-	// r.Get("/portfolionumbers", requesthandler.GetPortfolioNumbers())
+
+	r.Get("/portfolionumbers", requesthandler.GetPortfolioNumbers())
 
 	// Serve the stock numbers
 	r.Route("/stocknumbers", func(r chi.Router) {
-		// r.Get("/{name}", requesthandler.GetStockRequest)
+		r.Get("/{name}", requesthandler.GetStockNumber)
 	})
 
 	http.ListenAndServe(":3000", r)
