@@ -26,6 +26,7 @@ func main() {
 	r.Use(middleware.Logger, cors.Handler)
 
 	// Serve the portfolio numbers
+
 	r.Get("/portfolionumbers", requesthandler.GetPortfolioNumbers())
 
 	// Serve the stock numbers
