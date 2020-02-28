@@ -40,7 +40,7 @@ func main() {
 		r.Post("/sell/{name}", requesthandler.SellStock)
 
 		// Put - Requests
-		r.Put("/update/stocks", requesthandler.UpdateStocks)
+		r.Put("/update", requesthandler.UpdateStocks)
 	})
 
 	http.ListenAndServe(":3000", r)
