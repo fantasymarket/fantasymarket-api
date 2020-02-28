@@ -10,6 +10,8 @@ import (
 
 func main() {
 	r := chi.NewRouter()
+
+	// CORS Header
 	cors := cors.New(cors.Options{
 		AllowedOrigins:     []string{"https://fantasymarket.netlify.com/"},
 		//AllowOriginFunc:    nil,
@@ -22,14 +24,22 @@ func main() {
 		Debug:              false,
 	})
 
+	// Middleware
 	r.Use(middleware.Logger, cors.Handler)
 
-	// Serve the portfolio numbers
-	r.Get("/portfolionumbers", requesthandler.GetPortfolioNumbers())
+	// API-Routes
+	r.Route("/stocks", func(r chi.Router) {
 
-	// Serve the stock numbers
-	r.Route("/stocknumbers", func(r chi.Router) {
-		r.Get("/{name}", requesthandler.GetStockNumber)
+		// Get - Requests
+		r.Get("/", requesthandler.GetStockNumbers)
+		r.Get("/portfolionumbers", requesthandler.GetPortfolioNumbers)
+
+		// Post - Requests
+		r.Post("/buy/{name}", requesthandler.BuyStock)
+		r.Post("/sell/{name}", requesthandler.SellStock)
+
+		// Put - Requests
+		r.Put("/update/stocks", requesthandler.UpdateStocks)
 	})
 
 	http.ListenAndServe(":3000", r)
