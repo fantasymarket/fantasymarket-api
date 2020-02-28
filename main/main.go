@@ -158,14 +158,13 @@ func getAffectedStocks(e Event, s []Stock) (stocks []Stock, unaffected_stocks []
 }
 
 func computeStockNumbers(stocks []Stock, e Event) {
-	affected_stocks, unaffected_stocks := getAffectedStocks(e, stocks)
+	// affected_stocks, unaffected_stocks := getAffectedStocks(e, stocks)
 
-	for _, stock := range unaffected_stocks {
-		tendency := rand.Intn(3)
-	}
+	// for _, stock := range unaffected_stocks {
+	// 	tendency := rand.Intn(3)
+	// }
 
-	for _, stock := range affected_stocks {
+	// for _, stock := range affected_stocks {
 
-	}
+	// }
 }
-
