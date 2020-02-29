@@ -1,7 +1,7 @@
 package main
 
 import (
-	"math/rand"
+	"fantasymarket/utils"
 	"time"
 )
 
@@ -25,11 +25,14 @@ type Service struct {
 
 // Stock is the Stock "Class"
 type Stock struct {
-	ID     string // Stock Symbol e.g GOOG
-	Name   string // Stock NAme e.g Alphabet Inc.
-	Index  int64  // Price per share
-	Shares int64  // Number per share
-	Tags   map[string]bool
+	ID        string // Stock Symbol e.g GOOG
+	Name      string // Stock NAme e.g Alphabet Inc.
+	Index     int64  // Price per share
+	Shares    int64  // Number per share
+	Tags      map[string]bool
+	Stability int64 // Shows how many fluctuations the stock will have
+	Trend     int64 // Shows the generall trend of the Stock
+
 }
 
 // Events happen randomly every game tick
@@ -49,7 +52,6 @@ type Event struct {
 
 //TagOptions are more indepth settings for specific event tags only
 type TagOptions struct {
-
 	Trend int64 // Note: .2 would be 20 and .02 would be 2
 	//// TimeOffset time.Duration // Optionally offset the event to e.g only affect a tag after x time
 	////Duration time.Duration
@@ -84,8 +86,8 @@ func MainStocks() {
 	}
 
 	events := []Event{
-		{Name: "Virus in Seattle", Tags: map[string]TagOptions{"tech": {Trend: .2}, "china": {Trend: .2}}},
-		{Name: ".com bubble Crash", Tags: map[string]TagOptions{"tech": {Trend: .2}, "china": {Trend: .2}}},
+		{Name: "Virus in Seattle", Tags: map[string]TagOptions{"tech": {Trend: 2}, "china": {Trend: 2}}},
+		{Name: ".com bubble Crash", Tags: map[string]TagOptions{"tech": {Trend: 2}, "china": {Trend: 2}}},
 	}
 
 	s := Service{
@@ -97,7 +99,6 @@ func MainStocks() {
 		Stocks: stocks,
 		Events: events,
 	}
-	rand.Seed(time.Now().UnixNano())
 
 	go startLoop(s)
 }
@@ -130,8 +131,8 @@ func tick(s Service, dateNow time.Time) {
 	e := s.Events
 	for i := 0; i < len(e); i++ {
 
-		endDate := e[i].TimeCreated.Add(e[i].Duration)
-		if !dateNow.Before(endDate) {
+		endDate := e[i].TimeCreated.Add(e[i].Duration) //Calculate the endDate by adding the Duration to the time created
+		if !dateNow.Before(endDate) {                  //Check if the current date is after the end date.
 			// TODO: remove event
 		}
 	}
@@ -153,8 +154,8 @@ func isAffected(e Event, stock Stock) (string, bool) {
 }
 
 func ComputeStockNumbers(stocks []Stock, e Event) {
-	max := 1
-	min := -1
+	max := 2
+	min := -2
 	for i := 0; i < len(stocks); i++ {
 		eventTendency := int64(1)
 		tag, flag := isAffected(e, stocks[i])
@@ -163,9 +164,16 @@ func ComputeStockNumbers(stocks []Stock, e Event) {
 
 		}
 
-		tendency := int64(rand.Intn(max-min) + min) // Range of -2 to 2
+		tendency := utils.RandInt64(min, max) // Range of -2 to 2
 		stocks[i].Index = tendency * eventTendency
 	}
+}
+
+func getTendancy(s Stock) int64 {
+	// 	const x = (Math.random() - 0.5) * s.fluctuation + (i / 1000) * s.trend;
+	n := 10
+	var t int64 = utils.RandInt64(0, n-(n/2))*s.Stability + (s.Index/10000)*s.Trend
+	return t
 }
 
 // |func mockGraph() {
@@ -186,4 +194,3 @@ func ComputeStockNumbers(stocks []Stock, e Event) {
 
 // 	return a;
 // }
-
