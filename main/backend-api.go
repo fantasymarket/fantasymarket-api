@@ -33,6 +33,7 @@ func main() {
 
 		// Get - Requests
 		r.Get("/", requesthandler.GetStockNumbers)
+		r.Get("/{name}", requesthandler.GetStockDetails)
 		r.Get("/portfolionumbers", requesthandler.GetPortfolioNumbers)
 
 		// Post - Requests

@@ -16,6 +16,11 @@ func GetStockNumbers(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func GetStockDetails(w http.ResponseWriter, r *http.Request) {
+
+
+}
+
 func BuyStock(w http.ResponseWriter, r *http.Request) {
 	stock_name := chi.URLParam(r, "name")
 
