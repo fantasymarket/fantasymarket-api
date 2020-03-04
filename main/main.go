@@ -1,8 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"fantasymarket/utils"
+	"fmt"
+	"os"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 /// Was wir noch nehmen können
@@ -16,8 +21,13 @@ type FantasyMarketOptions struct {
 	StartDate       time.Time     // The initial ingame time
 }
 
+type Product struct {
+	gorm.Model
+	//db, err := gorm.Open("postgres", "host=myhost port=myport user=gorm dbname=gorm password=mypassword")
+	Code  string
+	Price uint
+}
 type Service struct {
-	//DB Database
 	Options FantasyMarketOptions
 	Stocks  []Stock
 	Events  []Event
@@ -66,22 +76,33 @@ const (
 	Day = Hour * 24
 )
 
+func main() {
+	MainStocks()
+
+}
+
 func MainStocks() {
 	stocks := []Stock{
 		{
-			ID:    "GOOG",
-			Index: int64(10000),
-			Tags:  map[string]bool{"tech": true, "intl": true},
+			ID:        "GOOG",
+			Index:     int64(10530),
+			Tags:      map[string]bool{"tech": true, "intl": true},
+			Stability: 1,
+			Trend:     1,
 		},
 		{
-			ID:    "FRIZ",
-			Index: int64(13969),
-			Tags:  map[string]bool{"food": true, "local": true},
+			ID:        "FRIZ",
+			Index:     int64(13969),
+			Tags:      map[string]bool{"food": true, "local": true},
+			Stability: 1,
+			Trend:     1,
 		},
 		{
-			ID:    "LMAO",
-			Index: int64(13969),
-			Tags:  map[string]bool{"arthur": true, "henry": true},
+			ID:        "LMAO",
+			Index:     int64(12001),
+			Tags:      map[string]bool{"arthur": true, "henry": true},
+			Stability: 1,
+			Trend:     1,
 		},
 	}
 
@@ -101,6 +122,7 @@ func MainStocks() {
 	}
 
 	go startLoop(s)
+	bufio.NewReader(os.Stdin).ReadString('\n')
 }
 
 // startLoop startsrunningticks indefinitly
@@ -116,7 +138,7 @@ func startLoop(s Service) {
 		tick(s, dateNow)
 
 		// Sleep for the duration of a single tick (Since we want 1 tick in 10 Seconds)
-		time.Sleep(time.Duration(1 / s.Options.TicksPerSecond))
+		time.Sleep(time.Duration(1/s.Options.TicksPerSecond) * time.Second)
 
 		// Adding 1 hour every tick(Update) (10 seconds when TicksPerSecond=0.1 ) onto the previously defined Date time
 		dateNow = dateNow.Add(gameTimePerTick)
@@ -126,6 +148,7 @@ func startLoop(s Service) {
 
 // tick is updating the current state of our system
 func tick(s Service, dateNow time.Time) {
+
 	// TODO: Get currently Running Events
 	// TODO: Stop Events that are over the max duration
 	e := s.Events
@@ -136,47 +159,59 @@ func tick(s Service, dateNow time.Time) {
 			// TODO: remove event
 		}
 	}
+
+	ComputeStockNumbers(s.Stocks, s.Events)
 	// TODO: Randomly add new Events to the list of running events that are currently valid (e.g min time between events) @Andre
 	// TODO: Filter Only Currently relevant events @Andre
 	// TODO: Run all events on the stocks @Arthur
 	// TODO: Update Database @Andre
 	// TODO: Update Orderbook @Arthur Andre
+
+	//API:  /user/stats 			 => Worst/Best performer, Total Value, Portfolio Trend
+	//		/news?from=XXX&to=XXXX 	 => Active Events
+	//		/stocks					 => Overview of stocks
+	//		/stocks?from=XXX&to=XXXX => All stocks in Time range
+	//		/stocks/GOOG			 => Specific Stock request
+
+	//Events:	Events have tags: Fixed, Recurring, Random
+	//			Hardcoded Events => Elections, Olympic Games etc
+	//			Definate Date Events (Moon Landing 1969)?
 }
 
-func isAffected(e Event, stock Stock) (string, bool) {
-	for tag := range stock.Tags {
-		if _, ok := e.Tags[tag]; ok {
-
-			return tag, true
+func isAffected(e []Event, stock Stock) (int64, bool) {
+	for i := 0; i < len(e); i++ {
+		for tag := range stock.Tags {
+			if _, ok := e[i].Tags[tag]; ok {
+				return e[i].Tags[tag].Trend, true
+			}
 		}
 	}
-	return "", false
+
+	return 1, false
 }
 
-func ComputeStockNumbers(stocks []Stock, e Event) {
-	max := 2
-	min := -2
+func ComputeStockNumbers(stocks []Stock, e []Event) {
+	eventTendency := int64(1)
 	for i := 0; i < len(stocks); i++ {
-		eventTendency := int64(1)
-		tag, flag := isAffected(e, stocks[i])
+		trend, flag := isAffected(e, stocks[i])
 		if flag {
-			eventTendency = int64(e.Tags[tag].Trend)
-
+			eventTendency = int64(trend)
 		}
 
-		tendency := utils.RandInt64(min, max) // Range of -2 to 2
+		tendency := getTendancy(stocks[i]) // Range of -2 to 2
 		stocks[i].Index = tendency * eventTendency
+		fmt.Println("Name: ", stocks[i].ID, "Index: ", stocks[i].Index)
 	}
+
 }
 
 func getTendancy(s Stock) int64 {
 	// 	const x = (Math.random() - 0.5) * s.fluctuation + (i / 1000) * s.trend;
-	n := 10
-	var t int64 = utils.RandInt64(0, n-(n/2))*s.Stability + (s.Index/10000)*s.Trend
-	return t
+	n := 5
+	return utils.RandInt64(-n, n)*s.Stability + (s.Index/1000)*s.Trend
 }
 
-// |func mockGraph() {
+//func mockGraph() {
 // 	count = 100,
 // 	stock = { index: 173.43, trend: 1.5, fluctuation: 2 },
 // 	startDate = new Date('2019-04-11'), } = {}) => {

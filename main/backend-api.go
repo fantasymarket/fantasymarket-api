@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func main() {
+func APImain() {
 	r := chi.NewRouter()
 	cors := cors.New(cors.Options{
 		AllowedOrigins: []string{"https://fantasymarket.netlify.com/"},
