@@ -6,13 +6,10 @@ import (
 	"net/http"
 )
 
-func GetPortfolioNumbers(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Test"))
-	}
 
 
 func GetStockNumbers(w http.ResponseWriter, r *http.Request) {
-
+	fmt.Println("works")
 
 }
 
@@ -21,20 +18,21 @@ func GetStockDetails(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func BuyStock(w http.ResponseWriter, r *http.Request) {
+func UserStats(w http.ResponseWriter, r *http.Request) {
 	stock_name := chi.URLParam(r, "name")
+	fmt.Println(stock_name)
 
 
 }
 
-func SellStock(w http.ResponseWriter, r *http.Request) {
-	stock_name := chi.URLParam(r, "name")
+func Orders(w http.ResponseWriter, r *http.Request) {
+
 
 
 }
 
-func UpdateStocks(w http.ResponseWriter, r *http.Request) {
-	stock_name := chi.URLParam(r, "name")
+func News(w http.ResponseWriter, r *http.Request) {
+
 
 
 }
