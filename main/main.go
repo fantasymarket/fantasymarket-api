@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os"
 	"time"
-
-	"github.com/jinzhu/gorm"
 )
 
 /// Was wir noch nehmen können
@@ -21,12 +19,6 @@ type FantasyMarketOptions struct {
 	StartDate       time.Time     // The initial ingame time
 }
 
-type Product struct {
-	gorm.Model
-	//db, err := gorm.Open("postgres", "host=myhost port=myport user=gorm dbname=gorm password=mypassword")
-	Code  string
-	Price uint
-}
 type Service struct {
 	Options FantasyMarketOptions
 	Stocks  []Stock
@@ -35,13 +27,13 @@ type Service struct {
 
 // Stock is the Stock "Class"
 type Stock struct {
-	ID        string // Stock Symbol e.g GOOG
-	Name      string // Stock NAme e.g Alphabet Inc.
-	Index     int64  // Price per share
-	Shares    int64  // Number per share
-	Tags      map[string]bool
-	Stability int64 // Shows how many fluctuations the stock will have
-	Trend     int64 // Shows the generall trend of the Stock
+	ID        string          // Stock Symbol e.g GOOG
+	Name      string          // Stock NAme e.g Alphabet Inc.
+	Index     int64           // Price per share
+	Shares    int64           // Number per share
+	Tags      map[string]bool //A stock can have up to 5 tags
+	Stability int64           // Shows how many fluctuations the stock will have
+	Trend     int64           // Shows the generall trend of the Stock
 
 }
 
@@ -85,30 +77,30 @@ func MainStocks() {
 	stocks := []Stock{
 		{
 			ID:        "GOOG",
-			Index:     int64(10530),
-			Tags:      map[string]bool{"tech": true, "intl": true},
+			Index:     int64(10000),
+			Tags:      map[string]bool{"tech": true, "global": true},
 			Stability: 1,
 			Trend:     1,
 		},
 		{
 			ID:        "FRIZ",
-			Index:     int64(13969),
-			Tags:      map[string]bool{"food": true, "local": true},
+			Index:     int64(10000),
+			Tags:      map[string]bool{"food": true, "local": true, "seattle": true},
 			Stability: 1,
 			Trend:     1,
 		},
 		{
-			ID:        "LMAO",
-			Index:     int64(12001),
-			Tags:      map[string]bool{"arthur": true, "henry": true},
+			ID:        "AMZI",
+			Index:     int64(10000),
+			Tags:      map[string]bool{"me": true, "germany": true},
 			Stability: 1,
 			Trend:     1,
 		},
 	}
 
 	events := []Event{
-		{Name: "Virus in Seattle", Tags: map[string]TagOptions{"tech": {Trend: 2}, "china": {Trend: 2}}},
-		{Name: ".com bubble Crash", Tags: map[string]TagOptions{"tech": {Trend: 2}, "china": {Trend: 2}}},
+		{Name: "Virus in Seattle", Tags: map[string]TagOptions{"tech": {Trend: 1}, "usa": {Trend: 1}, "seattle": {Trend: 1}}},
+		{Name: ".com bubble Crash", Tags: map[string]TagOptions{"tech": {Trend: 1}, "global": {Trend: 1}, "china": {Trend: 1}}},
 	}
 
 	s := Service{
@@ -164,68 +156,47 @@ func tick(s Service, dateNow time.Time) {
 	// TODO: Randomly add new Events to the list of running events that are currently valid (e.g min time between events) @Andre
 	// TODO: Filter Only Currently relevant events @Andre
 	// TODO: Run all events on the stocks @Arthur
-	// TODO: Update Database @Andre
 	// TODO: Update Orderbook @Arthur Andre
-
-	//API:  /user/stats 			 => Worst/Best performer, Total Value, Portfolio Trend
-	//		/news?from=XXX&to=XXXX 	 => Active Events
-	//		/stocks					 => Overview of stocks
-	//		/stocks?from=XXX&to=XXXX => All stocks in Time range
-	//		/stocks/GOOG			 => Specific Stock request
 
 	//Events:	Events have tags: Fixed, Recurring, Random
 	//			Hardcoded Events => Elections, Olympic Games etc
 	//			Definate Date Events (Moon Landing 1969)?
 }
 
-func isAffected(e []Event, stock Stock) (int64, bool) {
+func isAffected(e []Event, stock Stock) int64 {
+	//TEST THIS
+	eventTrendNr := int64(0)
 	for i := 0; i < len(e); i++ {
 		for tag := range stock.Tags {
 			if _, ok := e[i].Tags[tag]; ok {
-				return e[i].Tags[tag].Trend, true
+				eventTrendNr += e[i].Tags[tag].Trend
 			}
 		}
 	}
 
-	return 1, false
+	return eventTrendNr
 }
 
 func ComputeStockNumbers(stocks []Stock, e []Event) {
-	eventTendency := int64(1)
+	//This computes the random and own stock, not taking into account other peoples selling
+	//As a stock drops to a % of its value, theres gonna be more buyers or more sellers
 	for i := 0; i < len(stocks); i++ {
-		trend, flag := isAffected(e, stocks[i])
-		if flag {
-			eventTendency = int64(trend)
-		}
-
-		tendency := getTendancy(stocks[i]) // Range of -2 to 2
-		stocks[i].Index = tendency * eventTendency
+		stocks[i].Index += getTendency(stocks[i], isAffected(e, stocks[i])) // Range of -2 to 2
 		fmt.Println("Name: ", stocks[i].ID, "Index: ", stocks[i].Index)
 	}
+	fmt.Println("-----------------------------")
 
 }
 
-func getTendancy(s Stock) int64 {
-	// 	const x = (Math.random() - 0.5) * s.fluctuation + (i / 1000) * s.trend;
-	n := 5
-	return utils.RandInt64(-n, n)*s.Stability + (s.Index/1000)*s.Trend
+func getTendency(s Stock, et int64) int64 {
+	n := 10
+	//Old Index: 10000, Stability: 1, Trend: -1
+	//Rand(-10,10) * 1 + (10000/2000)*1 + (10000/10000)*-1
+	//(3)*1 + (5)*1 + (1)*-1
+	//3 + 5 - 1
+	//7
+	//10000 + 7
+	//New Index: 10007
+	return utils.RandInt64(-n, n)*s.Stability + (s.Index/2000)*s.Trend + (s.Index/10000)*et
+	//Stability indicates how strong the random aspect is evaluated in comparison to the trend
 }
-
-//func mockGraph() {
-// 	count = 100,
-// 	stock = { index: 173.43, trend: 1.5, fluctuation: 2 },
-// 	startDate = new Date('2019-04-11'), } = {}) => {
-// 	const a = [];
-// 	const s = stock;
-
-// 	for (let i = 0; i < count; i++) {
-// 		const x = (Math.random() - 0.5) * s.fluctuation + (i / 1000) * s.trend;
-// 		s.index += x;
-// 		a.push({
-// 			time: addDays(startDate, i).toDateString(),
-// 			value: roundTo(0.01, s.index),
-// 		});
-// 	}
-
-// 	return a;
-// }
