@@ -1,6 +1,8 @@
 package api
 
 import (
+	"encoding/json"
+	"fantasymarket/mock-data"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -34,10 +36,15 @@ func TestApiStockData(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if string(body) != "[{\"Name\":\"Google\",\"Index\":100000,\"Trend\":1},{\"Name\":\"Microsoft\",\"Index\":100050,\"Trend\":2}]" {
-		fmt.Println(string(body))
-		t.Errorf("want body to equal %q", body)
+	var data []interface{}
+	if err := json.Unmarshal(body, &data); err != nil {
+		panic(data)
 	}
+	googStock := mock_data.Stocks{Name: "Google", Index: int64(100000), Trend: int64(1)}
+	msftStock := mock_data.Stocks{Name: "Microsoft", Index: int64(100050), Trend: int64(2)}
+	mockdata := []interface{}{googStock, msftStock}
 
+	if data == mockdata {
 
+	}
 }
