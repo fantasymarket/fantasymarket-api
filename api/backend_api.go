@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fantasymarket/requesthandler"
@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 )
+
 
 func main() {
 	r := chi.NewRouter()
