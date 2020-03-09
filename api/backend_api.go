@@ -1,11 +1,10 @@
 package api
 
 import (
-	"fantasymarket/requesthandler"
-	"net/http"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
+	"net/http"
 )
 
 
@@ -30,22 +29,22 @@ func main() {
 
 
 	// GET user stats
-	r.Get("/user/stats", requesthandler.UserStats)
+	r.Get("/user/stats", UserStats)
 
 	// GET news
-	r.Get("/news", requesthandler.News) // Allow for query parameters
+	r.Get("/news", News) // Allow for query parameters
 
 	// API-Routes
 	r.Route("/stocks", func(r chi.Router) {
 
 		// GET overview of all stocks
-		r.Get("/", requesthandler.GetStockNumbers)
+		r.Get("/", GetStockNumbers)
 
 		// GET data from a specified stock
-		r.Get("/{name}", requesthandler.GetStockDetails) // Allow for query parameters
+		r.Get("/{name}", GetStockDetails) // Allow for query parameters
 
 		// POST data to make an order ( eg. SELL or BUY )
-		r.Post("/orders", requesthandler.Orders)
+		r.Post("/orders", Orders)
 
 	})
 

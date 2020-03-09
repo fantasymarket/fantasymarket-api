@@ -3,15 +3,16 @@ package api
 import (
 	"encoding/json"
 	"fantasymarket/mock-data"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"testing"
 	//"fantasymarket/mock-data"
 	"net/http"
 	"net/http/httptest"
-	"fantasymarket/requesthandler"
 )
+
+
+// TODO: COMPLETELY REFACTOR THIS WHEN API IS READY
 
 func TestApiStockData(t *testing.T) {
 	rr := httptest.NewRecorder()
@@ -21,7 +22,7 @@ func TestApiStockData(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	requesthandler.GetStockNumbers(rr, r)
+	GetStockNumbers(rr, r)
 
 	rs := rr.Result()
 
