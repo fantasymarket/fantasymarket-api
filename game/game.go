@@ -49,10 +49,11 @@ func MainStocks() {
 			Trend:     1,
 		},
 	}
-
+ 
 	eventSettings := map[string]EventSettings{
-		"event1": {Title: "Virus in Seattle", Tags: map[string]TagOptions{"tech": {Trend: 1}, "usa": {Trend: 1}, "seattle": {Trend: 1}}},
-		"event2": {Title: ".com bubble Crash", Tags: map[string]TagOptions{"tech": {Trend: 1}, "global": {Trend: 1}, "china": {Trend: 1}}},
+		"event1": {Title: "Virus in Seattle", Tags: map[string]TagOptions{"tech": {Trend: -1}, "usa": {Trend: -1}, "seattle": {Trend: -1}}},
+		"event2": {Title: ".com bubble Crash", Tags: map[string]TagOptions{"tech": {Trend: -1}, "global": {Trend: -1}, "china": {Trend: -1}}},
+		"event3": {Title: "Quantum Breakthrough", Tags: map[string]TagOptions{"tech": {Trend: 2}, "global": {Trend: -1}, "china": {Trend: -1}}},
 	}
 
 	s := Service{
@@ -166,7 +167,7 @@ func (s Service) GetTendency(stock models.Stock, affectedness int64, dateNow tim
 	randomModifier := utils.RandInt64(-n, n, dateNow.UnixNano())
 	stockTrend := (stock.Index / 2000) * stockSettings.Trend
 	eventTrend := (stock.Index / 10000) * affectedness
-
-	return randomModifier*stockSettings.Stability + stockTrend + eventTrend
+return randomModifier*stockSettings.Stability + stockTrend + eventTrend
 	//Stability indicates how strong the random aspect is evaluated in comparison to the trend
+}
 }
