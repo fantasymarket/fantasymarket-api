@@ -6,15 +6,15 @@ type Stock struct {
 	StockID string
 
 	// Stock Name e.g Alphabet Inc.
-	Name    string
+	Name string
 
 	// Price per share
-	Index   int64
+	Index int64
 
-	// Volume since last tick, we'll have to invent this shit
+	// Volume since last tick, we'll have to invent this
 	//    Calculated based on
-	// 		-	the change of the index from the last tick,
+	// 		- the change of the index from the last tick,
 	// 		- total index (so expensive stocks have larger volume than cheaper ones)
 	// 		- random fluctuation
-	Volume  int64
+	Volume int64
 }

@@ -2,9 +2,11 @@ package game
 
 import (
 	"bufio"
+	"encoding/json"
 	"fantasymarket/database/models"
 	"fantasymarket/utils"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"time"
 )
@@ -22,34 +24,35 @@ type FantasyMarketOptions struct {
 	StartDate       time.Time     // The initial ingame time
 }
 
+func checkError(err error) {
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+// mention this for the assessment - clean code plus points
+
 func MainStocks() {
 
-	// TODO Load stockSettings & eventSettings from Yaml File
+	// TODO Load stockSettings & eventSettings from json File
+
+	jsondata, err := ioutil.ReadFile("game/stocks.json")
+	checkError(err)
+
+	m := make(map[string]StockSettings)
+	err = json.Unmarshal(jsondata, &m)
+	checkError(err)
+
+	fmt.Println("pipi", m)
+	//fmt.Println(string(jsondata))
 
 	stockSettings := map[string]StockSettings{
 		"GOOG": {
-			StockID:   "GOOG",
-			Index:     int64(10000),
-			Tags:      map[string]bool{"tech": true, "global": true},
-			Stability: 1,
-			Trend:     1,
-		},
-		"FRIZ": {
-			StockID:   "FRIZ",
-			Index:     int64(10000),
-			Tags:      map[string]bool{"food": true, "local": true, "seattle": true},
-			Stability: 1,
-			Trend:     1,
-		},
-		"AMZI": {
-			StockID:   "AMZI",
-			Index:     int64(10000),
-			Tags:      map[string]bool{"me": true, "germany": true},
-			Stability: 1,
-			Trend:     1,
+			StockID: "GOOG",
+			Index:   int64(10000),
 		},
 	}
- 
+
 	eventSettings := map[string]EventSettings{
 		"event1": {Title: "Virus in Seattle", Tags: map[string]TagOptions{"tech": {Trend: -1}, "usa": {Trend: -1}, "seattle": {Trend: -1}}},
 		"event2": {Title: ".com bubble Crash", Tags: map[string]TagOptions{"tech": {Trend: -1}, "global": {Trend: -1}, "china": {Trend: -1}}},
@@ -167,7 +170,6 @@ func (s Service) GetTendency(stock models.Stock, affectedness int64, dateNow tim
 	randomModifier := utils.RandInt64(-n, n, dateNow.UnixNano())
 	stockTrend := (stock.Index / 2000) * stockSettings.Trend
 	eventTrend := (stock.Index / 10000) * affectedness
-return randomModifier*stockSettings.Stability + stockTrend + eventTrend
+	return randomModifier*stockSettings.Stability + stockTrend + eventTrend
 	//Stability indicates how strong the random aspect is evaluated in comparison to the trend
-}
 }

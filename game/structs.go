@@ -39,11 +39,11 @@ type TagOptions struct {
 
 // StockSettings is the Stock Data Type for storing Stocks ("Class")
 type StockSettings struct {
-	StockID   string          // Stock Symbol e.g GOOG
-	Name      string          // Stock Name e.g Alphabet Inc.
-	Index     int64           // Price per share
-	Shares    int64           // Number per share
-	Tags      map[string]bool // A stock can have up to 5 tags
-	Stability int64           // Shows how many fluctuations the stock will have
-	Trend     int64           // Shows the generall trend of the Stock
+	StockID   string          `json:"stockID"`    // Stock Symbol e.g GOOG
+	Name      string          `json:"name"`       // Stock Name e.g Alphabet Inc.
+	Index     int64           `json:"startPrice"` // Price per share
+	Shares    int64           `json:"stockCount"` // Number per share
+	Tags      map[string]bool `json:"tags"`       // A stock can have up to 5 tags
+	Stability int64           `json:"stability"`  // Shows how many fluctuations the stock will have
+	Trend     int64           `json:"trend"`      // Shows the generall trend of the Stock
 }
