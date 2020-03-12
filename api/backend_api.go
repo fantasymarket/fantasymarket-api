@@ -28,11 +28,15 @@ func main() {
 	r.Use(middleware.Logger, cors.Handler)
 
 
-	// GET user stats
-	r.Get("/user/stats", UserStats)
-
 	// GET news
 	r.Get("/news", News) // Allow for query parameters
+
+	r.Get("/overview", News) // Some stats for the dashboard
+
+	r.Get("/time", News) // Current time on the server
+
+	// POST requests
+	r.Post("/orders", Orders) // Your currently open positions
 
 	// API-Routes
 	r.Route("/stocks", func(r chi.Router) {
@@ -41,11 +45,27 @@ func main() {
 		r.Get("/", GetStockNumbers)
 
 		// GET data from a specified stock
-		r.Get("/{name}", GetStockDetails) // Allow for query parameters
+		r.Get("/{symbol}", GetStockDetails) // Allow for query parameters
 
 		// POST data to make an order ( eg. SELL or BUY )
 		r.Post("/orders", Orders)
 
+	})
+
+	r.Route("/orders", func(r chi.Router) {
+
+		r.Get("/", Orders)
+		// GET specific order data
+		r.Get("/{orderID}", Orders)
+
+		r.Delete("/{orderID}", Orders)
+	})
+
+	r.Route("/portfolio", func(r chi.Router) {
+
+		r.Get("/", Orders)
+
+		r.Get("/{symbol}", Orders)
 	})
 
 	http.ListenAndServe(":3000", r)
