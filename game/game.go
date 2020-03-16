@@ -2,7 +2,7 @@ package game
 
 import (
 	"bufio"
-	"encoding/json"
+	"gopkg.in/yaml.v2"
 	"fantasymarket/database/models"
 	"fantasymarket/utils"
 	"fmt"
@@ -39,12 +39,11 @@ func MainStocks() {
 	jsondata, err := ioutil.ReadFile("game/stocks.json")
 	checkError(err)
 
-	m := make(map[string]StockSettings)
-	err = json.Unmarshal(jsondata, &m)
+	var m map[string]StockSettings
+	err = yaml.Unmarshal(jsondata, &m)
 	checkError(err)
 
 	fmt.Println("pipi", m)
-	//fmt.Println(string(jsondata))
 
 	stockSettings := map[string]StockSettings{
 		"GOOG": {
@@ -62,7 +61,7 @@ func MainStocks() {
 	s := Service{
 		Options: FantasyMarketOptions{
 			TicksPerSecond:  0.1,
-			StartDate:       time.Now(),
+			StartDate:       time.Date(2020, 1, 1, 0, 0, 0, time.Location.UTC),
 			GameTimePerTick: time.Hour,
 		},
 		StockSettings: stockSettings,

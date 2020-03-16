@@ -1,17 +1,24 @@
-[
-  {
-    "GOOG": {
-      "stockID": "GOOG",
-      "stockCount": 700000000,
-      "startPrice": 60000,
-      "name": "Google",
-      "tags": {
-        "tech": true
-      },
-      "stability": 1,
-      "trend": 1
-
-
-    }
-  }
-]
+{
+  "GOOG": {
+    "stockID": "GOOG",
+    "stockCount": 700000000,
+    "startPrice": 60000,
+    "name": "Google",
+    "tags": {
+      "tech": true
+    },
+    "stability": 1,
+    "trend": 1
+  },
+  "APPL": {
+    "stockID": "APPL",
+    "stockCount": 700000000,
+    "startPrice": 60000,
+    "name": "Google",
+    "tags": {
+      "tech": true
+    },
+    "stability": 1,
+    "trend": 1
+  },
+}

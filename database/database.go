@@ -23,12 +23,10 @@ type StockSettings struct {
 	Volume    int64
 }
 
-var database *gorm.DB
-
 // Connect connects to the database and returns thedatabase object
 func Connect() (*gorm.DB, error) {
 	db, err := gorm.Open("sqlite3", "database.db")
-	//ja eben. jetzt gehts ja instant zu dann
+
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -37,20 +35,35 @@ func Connect() (*gorm.DB, error) {
 	db.AutoMigrate(&models.Stock{})
 	db.AutoMigrate(&models.Event{})
 
-	// db.Exec("DROP TABLE users;")
-
 	// db.Create(&models.Stock{StockID: "GOOG"})
 
 	// hier steht alles wie man daten kriegt http://gorm.io/docs/query.html
-	// so kann man shit lesen
-	// Was mach ich wenn ich alles haben will? - .Find
+
 	var stock models.Stock
 	db.First(&stock, "stock_id = ?", "GOOG") // find product with code l1212
 
 	return db, nil
+}
 
-	//addStocksToDB("GOOG", "GOOGLE", 10000, 2)
-	//getDatabaseData()
+// AddStockToTable takes the stock as input and adds it to the StockDB
+func AddStockToTable(db *gorm.DB, stock models.Stock) {
+	db.Create(models.Stock{
+		StockID: Stock.StockID,
+		Name: Stock.Name
+		Index: Stock.Index
+		Volume: Stock.Volume
+	})
+}
+
+// GetStocks returns all the stocks in the DB as a list
+func GetStocks(db *gorm.DB) ([]models.Stock, error) {
+	var stocks []models.Stock
+	if err := db.Find(&stocks).Error; err != nil {
+		return nil, err
+	}
+
+	stocks = db.Find(&stock)
+	return stocks
 }
 
 // USE DBName;

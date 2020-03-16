@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fantasymarket/database"
-	// "fantasymarket/game"
+	// "fantasymarket/database"
+	"fantasymarket/game"
 	"time"
 )
 
@@ -20,6 +20,6 @@ const (
 )
 
 func main() {
-	// game.MainStocks()
-	database.DatabaseMain()
+	game.MainStocks()
+	// database.DatabaseMain()
 }

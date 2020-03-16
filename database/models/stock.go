@@ -1,7 +1,17 @@
 package models
 
+import (
+	"time"
+
+	"github.com/jinzhu/gorm"
+	uuid "github.com/satori/go.uuid"
+)
+
 // Stock is the Stock "Class"
 type Stock struct {
+	ID        string // A Unique ID for every stock data point (since theres a new entry for each stock ID every tick)
+	CreatedAt time.Time
+
 	// Stock Symbol e.g GOOG
 	StockID string
 
@@ -17,4 +27,9 @@ type Stock struct {
 	// 		- total index (so expensive stocks have larger volume than cheaper ones)
 	// 		- random fluctuation
 	Volume int64
+}
+
+func (s Stock) BeforeCreate(scope *gorm.Scope) error {
+	scope.SetColumn("ID", uuid.New())
+	return nil
 }
