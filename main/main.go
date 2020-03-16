@@ -49,7 +49,8 @@ type Event struct {
 
 //TagOptions are more indepth settings for specific event tags only
 type TagOptions struct {
-	Trend float64
+
+	Trend int64 // Note: .2 would be 20 and .02 would be 2
 	//// TimeOffset time.Duration // Optionally offset the event to e.g only affect a tag after x time
 	////Duration time.Duration
 }
@@ -134,37 +135,55 @@ func tick(s Service, dateNow time.Time) {
 			// TODO: remove event
 		}
 	}
-	// TODO: Randomly add new Events to the list of running events that are currently valid (e.g min time between events)
-	// TODO: Filter Only Currently relevant events
-	// TODO: Run all events on the stocks
-	// TODO: Update Database
-	// TODO: Update Orderbook
+	// TODO: Randomly add new Events to the list of running events that are currently valid (e.g min time between events) @Andre
+	// TODO: Filter Only Currently relevant events @Andre
+	// TODO: Run all events on the stocks @Arthur
+	// TODO: Update Database @Andre
+	// TODO: Update Orderbook @Arthur Andre
 }
 
-func getAffectedStocks(e Event, s []Stock) (stocks []Stock, unaffected_stocks []Stock) {
-	for _, stock := range s {
-		for tag := range stock.Tags {
-			if _, ok := e.Tags[tag]; ok {
-				stocks = append(stocks, stock)
-				break
-			} else {
-				unaffected_stocks = append(unaffected_stocks, stock)
-				break
-			}
+func isAffected(e Event, stock Stock) (string, bool) {
+	for tag := range stock.Tags {
+		if _, ok := e.Tags[tag]; ok {
+
+			return tag, true
 		}
 	}
-
-	return stocks, unaffected_stocks
+	return "", false
 }
 
-func computeStockNumbers(stocks []Stock, e Event) {
-	// affected_stocks, unaffected_stocks := getAffectedStocks(e, stocks)
+func ComputeStockNumbers(stocks []Stock, e Event) {
+	max := 1
+	min := -1
+	for i := 0; i < len(stocks); i++ {
+		eventTendency := int64(1)
+		tag, flag := isAffected(e, stocks[i])
+		if flag {
+			eventTendency = int64(e.Tags[tag].Trend)
 
-	// for _, stock := range unaffected_stocks {
-	// 	tendency := rand.Intn(3)
-	// }
+		}
 
-	// for _, stock := range affected_stocks {
-
-	// }
+		tendency := int64(rand.Intn(max-min) + min) // Range of -2 to 2
+		stocks[i].Index = tendency * eventTendency
+	}
 }
+
+// |func mockGraph() {
+// 	count = 100,
+// 	stock = { index: 173.43, trend: 1.5, fluctuation: 2 },
+// 	startDate = new Date('2019-04-11'), } = {}) => {
+// 	const a = [];
+// 	const s = stock;
+
+// 	for (let i = 0; i < count; i++) {
+// 		const x = (Math.random() - 0.5) * s.fluctuation + (i / 1000) * s.trend;
+// 		s.index += x;
+// 		a.push({
+// 			time: addDays(startDate, i).toDateString(),
+// 			value: roundTo(0.01, s.index),
+// 		});
+// 	}
+
+// 	return a;
+// }
+
