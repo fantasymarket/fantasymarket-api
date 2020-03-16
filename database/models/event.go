@@ -23,6 +23,6 @@ type Event struct {
 }
 
 func (e Event) BeforeCreate(scope *gorm.Scope) error {
-	scope.SetColumn("ID", uuid.New())
+	scope.SetColumn("ID", uuid.NewV4())
 	return nil
 }

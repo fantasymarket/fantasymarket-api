@@ -30,6 +30,6 @@ type Stock struct {
 }
 
 func (s Stock) BeforeCreate(scope *gorm.Scope) error {
-	scope.SetColumn("ID", uuid.New())
+	scope.SetColumn("ID", uuid.NewV4())
 	return nil
 }
