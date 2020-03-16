@@ -14,7 +14,6 @@ func main() {
 	// CORS Header
 	cors := cors.New(cors.Options{
 		AllowedOrigins: []string{"https://fantasymarket.netlify.com/"},
-		//AllowOriginFunc:    nil,
 		AllowedMethods:     []string{"GET", "POST", "PUT"},
 		AllowedHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:     []string{"Link"},
@@ -28,34 +27,30 @@ func main() {
 	r.Use(middleware.Logger, cors.Handler)
 
 
-	// GET news
-	r.Get("/news", News) // Allow for query parameters
+	// Standalone GET Requests
+	r.Get("/news", GetNews) // Allow for query parameters
 
-	r.Get("/overview", News) // Some stats for the dashboard
+	r.Get("/overview", GetOverview) // Some stats for the dashboard
 
-	r.Get("/time", News) // Current time on the server
+	r.Get("/time", GetTime) // Current time on the server
 
-	// POST requests
-	r.Post("/orders", Orders) // Your currently open positions
-
-	// API-Routes
+	// API Routes
 	r.Route("/stocks", func(r chi.Router) {
 
-		// GET overview of all stocks
 		r.Get("/", GetStockNumbers)
 
-		// GET data from a specified stock
-		r.Get("/{symbol}", GetStockDetails) // Allow for query parameters
 
-		// POST data to make an order ( eg. SELL or BUY )
-		r.Post("/orders", Orders)
+		r.Get("/{symbol}", GetStockDetails)
+
+
+		r.Post("/orders", AddOrder)
 
 	})
 
 	r.Route("/orders", func(r chi.Router) {
 
 		r.Get("/", Orders)
-		// GET specific order data
+
 		r.Get("/{orderID}", Orders)
 
 		r.Delete("/{orderID}", Orders)
@@ -63,9 +58,9 @@ func main() {
 
 	r.Route("/portfolio", func(r chi.Router) {
 
-		r.Get("/", Orders)
+		r.Get("/", GetPortfolio)
 
-		r.Get("/{symbol}", Orders)
+		r.Get("/{symbol}", GetPortfolio)
 	})
 
 	http.ListenAndServe(":3000", r)
