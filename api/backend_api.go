@@ -1,19 +1,19 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
-	"net/http"
 )
-
 
 func main() {
 	r := chi.NewRouter()
 
 	// CORS Header
 	cors := cors.New(cors.Options{
-		AllowedOrigins: []string{"https://fantasymarket.netlify.com/"},
+		AllowedOrigins:     []string{"https://fantasymarket.netlify.com/"},
 		AllowedMethods:     []string{"GET", "POST", "PUT"},
 		AllowedHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:     []string{"Link"},
@@ -26,11 +26,12 @@ func main() {
 	// Middleware
 	r.Use(middleware.Logger, cors.Handler)
 
-
 	// Standalone GET Requests
-	r.Get("/news", GetNews) // Allow for query parameters
+	r.Get("/news", GetEvents) // Allow for query parameters
 
 	r.Get("/overview", GetOverview) // Some stats for the dashboard
+	// Top 2 Gainers / Top 2 Loosers
+	// Maybe total + of all stock and things like that in the future
 
 	r.Get("/time", GetTime) // Current time on the server
 
@@ -39,9 +40,7 @@ func main() {
 
 		r.Get("/", GetStockNumbers)
 
-
-		r.Get("/{symbol}", GetStockDetails)
-
+		r.Get("/{stockID}", GetStockDetails)
 
 		r.Post("/orders", AddOrder)
 

@@ -9,7 +9,7 @@ import (
 
 // Stock is the Stock "Class"
 type Stock struct {
-	ID        string // A Unique ID for every stock data point (since theres a new entry for each stock ID every tick)
+	ID        string  `gorm:"primary_key"` // A Unique ID for every stock data point (since theres a new entry for each stock ID every tick)
 	CreatedAt time.Time
 
 	// Stock Symbol e.g GOOG

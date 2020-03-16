@@ -20,7 +20,7 @@ func Orders(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetNews(w http.ResponseWriter, r *http.Request) {
+func GetEvents(w http.ResponseWriter, r *http.Request) {
 
 }
 

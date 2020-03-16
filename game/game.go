@@ -2,11 +2,10 @@ package game
 
 import (
 	"bufio"
-	"gopkg.in/yaml.v2"
+	"fantasymarket/database"
 	"fantasymarket/database/models"
 	"fantasymarket/utils"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 )
@@ -34,16 +33,7 @@ func checkError(err error) {
 
 func MainStocks() {
 
-	// TODO Load stockSettings & eventSettings from json File
-
-	jsondata, err := ioutil.ReadFile("game/stocks.json")
-	checkError(err)
-
-	var m map[string]StockSettings
-	err = yaml.Unmarshal(jsondata, &m)
-	checkError(err)
-
-	fmt.Println("pipi", m)
+	// TODO Load stocks & events from json File
 
 	stockSettings := map[string]StockSettings{
 		"GOOG": {
@@ -61,7 +51,7 @@ func MainStocks() {
 	s := Service{
 		Options: FantasyMarketOptions{
 			TicksPerSecond:  0.1,
-			StartDate:       time.Date(2020, 1, 1, 0, 0, 0, time.Location.UTC),
+			StartDate:       time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
 			GameTimePerTick: time.Hour,
 		},
 		StockSettings: stockSettings,
@@ -75,6 +65,8 @@ func MainStocks() {
 // startLoop startsrunningticks indefinitly
 func startLoop(s Service) {
 
+	db, _ := database.Connect()
+
 	// We need to calculatre the current game date
 	startDate := s.Options.StartDate
 	gameTimePerTick := s.Options.GameTimePerTick
@@ -82,7 +74,7 @@ func startLoop(s Service) {
 	dateNow := startDate.Add(gameTimePerTick * time.Duration(ticksSinceStart))
 
 	for {
-		tick(s, dateNow)
+		tick(s, dateNow, db)
 
 		// Sleep for the duration of a single tick (Since we want 1 tick in 10 Seconds)
 		time.Sleep(time.Duration(1/s.Options.TicksPerSecond) * time.Second)
@@ -94,14 +86,14 @@ func startLoop(s Service) {
 }
 
 // tick is updating the current state of our system
-func tick(s Service, dateNow time.Time) {
-
+func tick(s Service, dateNow time.Time, db *database.DatabaseService) {
 	// TODO: Get currently Running Events from the database (models.Event)
-	var currentlyRunningEvents []models.Event //Sub this for the DB query results
-	// TODO: Get last index of all stocks (models.Stock)
-	var lastStockIndexes []models.Stock //Sub this for the DB query results
 
-	checkEventStillGoing(currentlyRunningEvents, dateNow)
+	currentlyRunningEvents, _ := db.GetEvents() //Sub this for the DB query results
+
+	lastStockIndexes, _ := db.GetStocks() //Sub this for the DB query results
+
+	checkEventStillGoing(db, currentlyRunningEvents, dateNow)
 
 	// TODO: Stop Events that are over the max duration
 
@@ -118,11 +110,11 @@ func tick(s Service, dateNow time.Time) {
 	// saveNextStockIndexes()
 }
 
-func checkEventStillGoing(e []models.Event, dateNow time.Time) {
+func checkEventStillGoing(db *database.DatabaseService, e []models.Event, dateNow time.Time) {
 	for i := 0; i < len(e); i++ {
 		endDate := e[i].CreatedAt.Add(e[i].Duration) //Calculate the endDate by adding the Duration to the time created
 		if !dateNow.Before(endDate) {                //Check if the current date is after the end date.
-			// TODO: remove event
+			db.RemoveEvent(e[i].EventID)
 		}
 	}
 }
@@ -146,8 +138,8 @@ func (s Service) getEventAffectedness(e []models.Event, stock models.Stock) int6
 
 func (s Service) ComputeStockNumbers(stocks []models.Stock, e []models.Event, dateNow time.Time) {
 
-	//This computes the random and own stock, not taking into account other peoples selling
-	//As a stock drops to a % of its value, theres gonna be more buyers or more sellers
+	// This computes the random and own stock, not taking into account other peoples selling
+	// As a stock drops to a % of its value, theres gonna be more buyers or more sellers
 	for _, stock := range stocks {
 		stock.Index += s.GetTendency(stock, s.getEventAffectedness(e, stock), dateNow) // Range of -2 to 2
 		fmt.Println("Name: ", stock.StockID, "Index: ", stock.Index)
@@ -158,17 +150,17 @@ func (s Service) ComputeStockNumbers(stocks []models.Stock, e []models.Event, da
 func (s Service) GetTendency(stock models.Stock, affectedness int64, dateNow time.Time) int64 {
 	const n int64 = 10
 	stockSettings := s.StockSettings[stock.StockID]
-	//Old Index: 10000, Stability: 1, Trend: -1
-	//Rand(-10,10) * 1 + (10000/2000)*1 + (10000/10000)*-1
-	//(3)*1 + (5)*1 + (1)*-1
-	//3 + 5 - 1
-	//7
-	//10000 + 7
-	//New Index: 10007
+	// Old Index: 10000, Stability: 1, Trend: -1
+	// Rand(-10,10) * 1 + (10000/2000)*1 + (10000/10000)*-1
+	// (3)*1 + (5)*1 + (1)*-1
+	// 3 + 5 - 1
+	// 7
+	// 10000 + 7
+	// New Index: 10007
 
 	randomModifier := utils.RandInt64(-n, n, dateNow.UnixNano())
 	stockTrend := (stock.Index / 2000) * stockSettings.Trend
 	eventTrend := (stock.Index / 10000) * affectedness
 	return randomModifier*stockSettings.Stability + stockTrend + eventTrend
-	//Stability indicates how strong the random aspect is evaluated in comparison to the trend
+	// Stability indicates how strong the random aspect is evaluated in comparison to the trend
 }

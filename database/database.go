@@ -11,6 +11,10 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
+type DatabaseService struct {
+	DB *gorm.DB // gorm database instance
+}
+
 // StockSettings TEST STRUCT - DELETE
 type StockSettings struct {
 	StockID   string          // Stock Symbol e.g GOOG
@@ -24,7 +28,7 @@ type StockSettings struct {
 }
 
 // Connect connects to the database and returns thedatabase object
-func Connect() (*gorm.DB, error) {
+func Connect() (*DatabaseService, error) {
 	db, err := gorm.Open("sqlite3", "database.db")
 
 	if err != nil {
@@ -36,34 +40,46 @@ func Connect() (*gorm.DB, error) {
 	db.AutoMigrate(&models.Event{})
 
 	// db.Create(&models.Stock{StockID: "GOOG"})
-
 	// hier steht alles wie man daten kriegt http://gorm.io/docs/query.html
 
 	var stock models.Stock
 	db.First(&stock, "stock_id = ?", "GOOG") // find product with code l1212
 
-	return db, nil
+	return &DatabaseService{
+		DB: db,
+	}, nil
 }
 
 // AddStockToTable takes the stock as input and adds it to the StockDB
-func AddStockToTable(db *gorm.DB, stock models.Stock) {
-	db.Create(models.Stock{
-		StockID: Stock.StockID,
-		Name: Stock.Name
-		Index: Stock.Index
-		Volume: Stock.Volume
-	})
+func (s *DatabaseService) AddStockToTable(stock models.Stock) error {
+	return s.DB.Create(models.Stock{
+		StockID: stock.StockID,
+		Name:    stock.Name,
+		Index:   stock.Index,
+		Volume:  stock.Volume,
+	}).Error
 }
 
-// GetStocks returns all the stocks in the DB as a list
-func GetStocks(db *gorm.DB) ([]models.Stock, error) {
-	var stocks []models.Stock
-	if err := db.Find(&stocks).Error; err != nil {
+func (s *DatabaseService) GetEvents() ([]models.Event, error) {
+	var events []models.Event
+	if err := s.DB.Where(models.Event{Active: true}).Find(&events).Error; err != nil {
 		return nil, err
 	}
 
-	stocks = db.Find(&stock)
-	return stocks
+	return events, nil
+}
+
+func (s *DatabaseService) RemoveEvent(eventID string) error {
+	return s.DB.Where(models.Event{Active: true, EventID: eventID}).Update("active", false).Error
+}
+
+func (s *DatabaseService) GetStocks() ([]models.Stock, error) {
+	var stocks []models.Stock
+	if err := s.DB.Find(&stocks).Error; err != nil {
+		return nil, err
+	}
+
+	return stocks, nil
 }
 
 // USE DBName;

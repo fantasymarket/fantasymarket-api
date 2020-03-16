@@ -1,3 +1,5 @@
+
+# SAMPLE EVENT:
 - eventID: "quantum-breakthrough"
   title: ""
   description: "literally retarded"
@@ -27,7 +29,7 @@
     - affectsStockID: GOOG
       trend: 1.6
 
-- eventID: "CORONA_VIRUS"
+- eventID: "corona-virus-outbreak"
   title: "Corona Virus Prolonged Spread"
   description: "Corona Virus spreads to Q4 2020. No signs of stopping yet."
 
@@ -35,10 +37,15 @@
   fixedDate: "Q4 2020"
   
   dependencies: null
-  effects: "Stock values generally decrease, Fortune 500 stocks take biggest hit due to quick sell-off."
+  effects: "Stock values generally decrease, EXCEPT HEALTHCARE, increases decently; Fortune 500 stocks take biggest hit due to quick sell-off."
 
   runAfter: "0"
 
   duration: "random because of no sign of stopping"
+  
+  tags:
+  - affectsTag: -healthcare
+    trend: -1.1
+  - affectsStockID: -healthcare
   
 
