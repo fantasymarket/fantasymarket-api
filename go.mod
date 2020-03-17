@@ -10,4 +10,5 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	golang.org/x/net v0.0.0-20200219183655-46282727080f // indirect
 	gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )

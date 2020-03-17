@@ -38,7 +38,7 @@ func main() {
 	// API Routes
 	r.Route("/stocks", func(r chi.Router) {
 
-		r.Get("/", GetStockNumbers)
+		r.Get("/", GetAllStocks)
 
 		r.Get("/{stockID}", GetStockDetails)
 

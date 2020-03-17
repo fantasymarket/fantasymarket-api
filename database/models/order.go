@@ -9,7 +9,7 @@ import (
 
 // User created Orders
 type Order struct {
-	ID      string `gorm:"primary_key"` // A Unique ID for every event (since the same event might happen multiple times)
+	ID      string `gorm:"primary_key"` // A Unique ID for every order (since the same event might happen multiple times)
 	CreatedAt time.Time
 
 	// Stuff that affects all tags
