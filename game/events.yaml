@@ -1,0 +1,54 @@
+
+# SAMPLE EVENT:
+- eventID: "quantum-breakthrough"
+  title: ""
+  description: "literally retarded"
+
+  # Type says when the event is run
+  # can be:
+  #	- recurring		- events like ellections that happen every x years
+  # - fixed				- events that happen on a fixed date
+  #	- random			- events that can happen randomly
+  type: "random"
+  fixedDate:   "1/1/2000"        # ONLY EVENT TYPE FIXED: date the event has to be run
+  randomChance:      0.00001  # the chance for the event to occur in a tick [0, 1] (thould be less than .01%)
+  reccuringDuration: "4 Years"
+    
+  dependencies: null # these eventIDs have to have run before this event
+  effects:      null # these eventIDs have to be run after this event is over
+
+  runBefore:  "1/1/2000" # The event has to be run before this tick, GAME STARTS AT JAN 1, 2020
+  runAfter:   "1/1/2000"       # The event has to be run after this tick
+
+  duration: "1000 days"   # Time during which the event is the event is run every tick
+
+  # TagOptions are more indepth settings for specific event tags only
+  tags:
+    - affectsTag: tech
+      trend: 1.2
+    - affectsStockID: GOOG
+      trend: 1.6
+
+- eventID: "corona-virus-outbreak"
+  title: "Corona Virus Prolonged Spread"
+  description: "Corona Virus spreads to Q4 2020. No signs of stopping yet."
+
+  type: "fixed"
+  fixedDate: "Q4 2020"
+  
+  dependencies: null
+  effects: "Stock values generally decrease, EXCEPT HEALTHCARE, increases decently; Fortune 500 stocks take biggest hit due to quick sell-off."
+
+  runAfter: "0"
+
+  duration: "random because of no sign of stopping"
+  
+  tags:
+  - affectsTag: all -healthcare
+    trend: -1.1
+  - affectsStockID: all -healthcare
+  -------------------------------------------------------------------------
+
+  -eventID: ""
+  
+
