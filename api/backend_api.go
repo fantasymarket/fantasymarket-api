@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fantasymarket/database"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -8,7 +9,10 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func main() {
+var db *database.DatabaseService
+
+func Start(database *database.DatabaseService) {
+	db = database
 	r := chi.NewRouter()
 
 	// CORS Header
@@ -62,5 +66,5 @@ func main() {
 		r.Get("/{symbol}", GetPortfolio)
 	})
 
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe("localhost:42069", r)
 }

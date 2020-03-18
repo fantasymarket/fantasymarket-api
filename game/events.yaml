@@ -44,8 +44,11 @@
   duration: "random because of no sign of stopping"
   
   tags:
-  - affectsTag: -healthcare
+  - affectsTag: all -healthcare
     trend: -1.1
-  - affectsStockID: -healthcare
+  - affectsStockID: all -healthcare
+  -------------------------------------------------------------------------
+
+  -eventID: ""
   
 

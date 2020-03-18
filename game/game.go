@@ -10,7 +10,8 @@ import (
 	"time"
 )
 
-type Service struct {
+type GameService struct {
+	DB            *database.DatabaseService
 	Options       FantasyMarketOptions
 	StockSettings map[string]StockSettings
 	EventSettings map[string]EventSettings
@@ -30,25 +31,14 @@ func checkError(err error) {
 }
 
 // mention this for the assessment - clean code plus points
-
-func MainStocks() {
+func Start(db *database.DatabaseService) {
 
 	// TODO Load stocks & events from json File
 
-	stockSettings := map[string]StockSettings{
-		"GOOG": {
-			StockID: "GOOG",
-			Index:   int64(10000),
-		},
-	}
+	stockSettings := map[string]StockSettings{}
+	eventSettings := map[string]EventSettings{}
 
-	eventSettings := map[string]EventSettings{
-		"event1": {Title: "Virus in Seattle", Tags: map[string]TagOptions{"tech": {Trend: -1}, "usa": {Trend: -1}, "seattle": {Trend: -1}}},
-		"event2": {Title: ".com bubble Crash", Tags: map[string]TagOptions{"tech": {Trend: -1}, "global": {Trend: -1}, "china": {Trend: -1}}},
-		"event3": {Title: "Quantum Breakthrough", Tags: map[string]TagOptions{"tech": {Trend: 2}, "global": {Trend: -1}, "china": {Trend: -1}}},
-	}
-
-	s := Service{
+	S := GameService{
 		Options: FantasyMarketOptions{
 			TicksPerSecond:  0.1,
 			StartDate:       time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
@@ -56,14 +46,15 @@ func MainStocks() {
 		},
 		StockSettings: stockSettings,
 		EventSettings: eventSettings,
+		DB:            db,
 	}
 
-	go startLoop(s)
+	go startLoop(S)
 	bufio.NewReader(os.Stdin).ReadString('\n')
 }
 
 // startLoop startsrunningticks indefinitly
-func startLoop(s Service) {
+func startLoop(s GameService) {
 
 	db, _ := database.Connect()
 
@@ -86,7 +77,7 @@ func startLoop(s Service) {
 }
 
 // tick is updating the current state of our system
-func tick(s Service, dateNow time.Time, db *database.DatabaseService) {
+func tick(s GameService, dateNow time.Time, db *database.DatabaseService) {
 	// TODO: Get currently Running Events from the database (models.Event)
 
 	currentlyRunningEvents, _ := db.GetEvents() //Sub this for the DB query results
@@ -106,10 +97,11 @@ func tick(s Service, dateNow time.Time, db *database.DatabaseService) {
 	//			Hardcoded Events => Elections, Olympic Games etc
 	//			Definate Date Events (Moon Landing 1969)?
 
-	s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents, dateNow)
+	s.ComputeStockNumbers(db, lastStockIndexes, currentlyRunningEvents, dateNow)
 	// saveNextStockIndexes()
 }
 
+// checkEventStillGoing calculates if the duration of the event is over and then removes the event
 func checkEventStillGoing(db *database.DatabaseService, e []models.Event, dateNow time.Time) {
 	for i := 0; i < len(e); i++ {
 		endDate := e[i].CreatedAt.Add(e[i].Duration) //Calculate the endDate by adding the Duration to the time created
@@ -119,7 +111,7 @@ func checkEventStillGoing(db *database.DatabaseService, e []models.Event, dateNo
 	}
 }
 
-func (s Service) getEventAffectedness(e []models.Event, stock models.Stock) int64 {
+func (s GameService) getEventAffectedness(e []models.Event, stock models.Stock) int64 {
 
 	affectedness := int64(0)
 	for _, event := range e {
@@ -136,18 +128,19 @@ func (s Service) getEventAffectedness(e []models.Event, stock models.Stock) int6
 	return affectedness
 }
 
-func (s Service) ComputeStockNumbers(stocks []models.Stock, e []models.Event, dateNow time.Time) {
+func (s GameService) ComputeStockNumbers(db *database.DatabaseService, stocks []models.Stock, e []models.Event, dateNow time.Time) {
 
 	// This computes the random and own stock, not taking into account other peoples selling
 	// As a stock drops to a % of its value, theres gonna be more buyers or more sellers
 	for _, stock := range stocks {
 		stock.Index += s.GetTendency(stock, s.getEventAffectedness(e, stock), dateNow) // Range of -2 to 2
 		fmt.Println("Name: ", stock.StockID, "Index: ", stock.Index)
+		db.AddStockToTable(stock)
 	}
 	fmt.Println("-----------------------------")
 }
 
-func (s Service) GetTendency(stock models.Stock, affectedness int64, dateNow time.Time) int64 {
+func (s GameService) GetTendency(stock models.Stock, affectedness int64, dateNow time.Time) int64 {
 	const n int64 = 10
 	stockSettings := s.StockSettings[stock.StockID]
 	// Old Index: 10000, Stability: 1, Trend: -1

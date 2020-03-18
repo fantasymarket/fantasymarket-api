@@ -39,6 +39,9 @@ func Connect() (*DatabaseService, error) {
 	db.AutoMigrate(&models.Stock{})
 	db.AutoMigrate(&models.Event{})
 
+	createStockForTest(db, "GOOG", "Google", 10000, 5)
+	createStockForTest(db, "APPL", "Apple Inc", 10000, 6)
+
 	// db.Create(&models.Stock{StockID: "GOOG"})
 	// hier steht alles wie man daten kriegt http://gorm.io/docs/query.html
 
@@ -50,7 +53,14 @@ func Connect() (*DatabaseService, error) {
 	}, nil
 }
 
-// AddStockToTable takes the stock as input and adds it to the StockDB
+func createStockForTest(db *gorm.DB, stockID string, name string, index int64, volume int64) {
+	stock := models.Stock{StockID: stockID, Name: name, Index: index, Volume: volume}
+
+	db.NewRecord(stock)
+
+	db.Create(&stock)
+}
+
 func (s *DatabaseService) AddStockToTable(stock models.Stock) error {
 	return s.DB.Create(models.Stock{
 		StockID: stock.StockID,

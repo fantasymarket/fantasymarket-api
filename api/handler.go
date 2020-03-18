@@ -1,56 +1,46 @@
 package api
 
 import (
-	"github.com/go-chi/chi"
+	"fantasymarket/game"
+	"fantasymarket/utils/http_responses"
 	"io/ioutil"
 	"net/http"
-	"fantasymarket/database"
-	"fantasymarket/game"
+	"github.com/go-chi/chi"
 	"gopkg.in/yaml.v3"
 )
 
-func CheckInternalError(w http.ResponseWriter, err... error) error {
-	for _, error := range err {
-		if error != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Internal Server Error Occured"))
-			return error
-		}
-	}
-	return nil
-}
-
-
 func GetAllStocks(w http.ResponseWriter, r *http.Request) {
-	yamlData, errOne := ioutil.ReadFile("game/stocks.json")
+	allStocks, err := ioutil.ReadFile("game/stocks.json")
+	if err != nil {
+		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're really fucked")
+	}
 
 	m := make(map[string]game.StockSettings) // Test again if this works, I checked the docs and in theory when the map is already initialized it should still work. If not change it back again
-	errTwo := yaml.Unmarshal(yamlData, &m)
+	err = yaml.Unmarshal(allStocks, &m)
 
-	internalError := CheckInternalError(w, errOne, errTwo)
-
-	if internalError == nil {
-		w.WriteHeader(200)
-		w.Write(yamlData)
+	if err != nil {
+		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're royally fucked")
 	}
 
-
+	http_responses.CustomResponse(w, allStocks, 200)
 }
 
 func GetStockDetails(w http.ResponseWriter, r *http.Request) {
 	stockID := chi.URLParam(r, "stockID")
-	yamlData, errOne := ioutil.ReadFile("game/stocks.json")
+	yamlData, err := ioutil.ReadFile("game/stocks.json")
 
-	var m map[string]game.StockSettings
-	errTwo := yaml.Unmarshal(yamlData, &m)
-
-	stockDetail, errThree := yaml.Marshal(m[stockID])
-	internalError := CheckInternalError(w, errOne, errTwo, errThree)
-
-	if internalError == nil {
-		w.WriteHeader(200)
-		w.Write(stockDetail)
+	if err != nil {
+		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're majorly fucked")
 	}
+
+	var stockDetail map[string]game.StockSettings
+	err = yaml.Unmarshal(yamlData, &stockDetail)
+
+	if err != nil {
+		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're hugely fucked")
+	}
+
+	http_responses.CustomResponse(w, stockDetail[stockID], 200)
 
 }
 
@@ -63,14 +53,15 @@ func Orders(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetEvents(w http.ResponseWriter, r *http.Request) {
-	events, errOne := database.GetEvents() // Check why you can't access events method
+	events, err := db.GetEvents()
 
-	internalError := CheckInternalError(errOne)
-
-	if internalError == nil {
-		w.WriteHeader(200)
-		w.Write([]byte(events))
+	if err != nil {
+		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're hugely fucked")
 	}
+
+	http_responses.CustomResponse(w, events, 200)
+
+
 }
 
 func GetOverview(w http.ResponseWriter, r *http.Request) {
@@ -78,6 +69,15 @@ func GetOverview(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetTime(w http.ResponseWriter, r *http.Request) {
+	time := game.S.StartDate
+
+	if != nil {
+		http_responses.CustomResponse(w, events, 200)
+	} else {
+		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're hugely fucked")
+	}
+
+	
 
 }
 

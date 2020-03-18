@@ -1,14 +1,12 @@
 package main
 
 import (
-	// "fantasymarket/database"
+	"fantasymarket/api"
+	"fantasymarket/database"
 	"fantasymarket/game"
+
 	"time"
 )
-
-/// Was wir noch nehmen können
-/// SQL:			https://github.com/jmoiron/sqlx
-/// Decimal:	https://github.com/shopspring/decimal
 
 const (
 	// Minute is the duration of 60 seconds
@@ -20,6 +18,8 @@ const (
 )
 
 func main() {
-	game.MainStocks()
-	// database.DatabaseMain()
+	db, _ := database.Connect()
+
+	api.Start(db)
+	game.Start(db)
 }
