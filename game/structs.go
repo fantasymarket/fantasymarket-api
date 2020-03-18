@@ -16,7 +16,7 @@ type EventSettings struct {
 
 	FixedDate         time.Time // ONLY EVENT TYPE FIXED: date the event has to be run
 	RandomChance      float64   // the chance for the event to occur in a tick [0, 1] (thould be less than .01%)
-	ReccuringDuration time.Duration
+	RecurringDuration time.Duration
 
 	Dependencies []string // these eventIDs have to have run before this event
 	Effects      []string // these eventIDs have to be run after this event is over
