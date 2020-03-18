@@ -66,7 +66,7 @@ var stockSettings = map[string]StockSettings{
 func TestGetTendency(t *testing.T) {
 	fmt.Println("Testing getTendancy")
 
-	s := Service{
+	s := GameService{
 		StockSettings: stockSettings,
 	}
 

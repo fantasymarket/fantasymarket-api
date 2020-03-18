@@ -11,6 +11,7 @@ import (
 type Stock struct {
 	ID        string  `gorm:"primary_key"` // A Unique ID for every stock data point (since theres a new entry for each stock ID every tick)
 	CreatedAt time.Time
+	Tick			int64
 
 	// Stock Symbol e.g GOOG
 	StockID string
@@ -33,3 +34,4 @@ func (s Stock) BeforeCreate(scope *gorm.Scope) error {
 	scope.SetColumn("ID", uuid.NewV4())
 	return nil
 }
+ 

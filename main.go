@@ -20,6 +20,10 @@ const (
 func main() {
 	db, _ := database.Connect()
 
-	api.Start(db)
-	game.Start(db)
+	game, err := game.Start(db)
+	if err != nil {
+		panic(err)
+	}
+
+	api.Start(db, game)
 }

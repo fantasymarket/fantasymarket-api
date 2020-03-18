@@ -1,20 +1,20 @@
 package game
 
 import (
-	"bufio"
 	"fantasymarket/database"
 	"fantasymarket/database/models"
 	"fantasymarket/utils"
 	"fmt"
-	"os"
+	"strconv"
 	"time"
 )
 
 type GameService struct {
-	DB            *database.DatabaseService
-	Options       FantasyMarketOptions
-	StockSettings map[string]StockSettings
-	EventSettings map[string]EventSettings
+	DB              *database.DatabaseService
+	Options         FantasyMarketOptions
+	StockSettings   map[string]StockSettings
+	EventSettings   map[string]EventSettings
+	TicksSinceStart int64
 }
 
 //FantasyMarketOptions manages the Options of the programm
@@ -31,60 +31,63 @@ func checkError(err error) {
 }
 
 // mention this for the assessment - clean code plus points
-func Start(db *database.DatabaseService) {
-
-	// TODO Load stocks & events from json File
+func Start(db *database.DatabaseService) (*GameService, error) {
 
 	stockSettings := map[string]StockSettings{}
 	eventSettings := map[string]EventSettings{}
 
-	S := GameService{
+	db.CreateStockForTest("GOOG", "Google", 10000, 5)
+	db.CreateStockForTest("APPL", "Apple Inc", 10000, 6)
+
+	s := &GameService{
 		Options: FantasyMarketOptions{
 			TicksPerSecond:  0.1,
 			StartDate:       time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
 			GameTimePerTick: time.Hour,
-		},
 		StockSettings: stockSettings,
 		EventSettings: eventSettings,
 		DB:            db,
 	}
 
-	go startLoop(S)
-	bufio.NewReader(os.Stdin).ReadString('\n')
+	go startLoop(s)
+	fmt.Println("stated game loop :o")
+
+	return s, nil
 }
 
 // startLoop startsrunningticks indefinitly
-func startLoop(s GameService) {
-
-	db, _ := database.Connect()
+func startLoop(s *GameService) {
 
 	// We need to calculatre the current game date
 	startDate := s.Options.StartDate
 	gameTimePerTick := s.Options.GameTimePerTick
-	ticksSinceStart := 0 // TODO persist this number so it doesnt reset after restarting the program
-	dateNow := startDate.Add(gameTimePerTick * time.Duration(ticksSinceStart))
+	s.TicksSinceStart = int64(0) // TODO persist this number so it doesnt reset after restarting the program
+	dateNow := startDate.Add(gameTimePerTick * time.Duration(s.TicksSinceStart))
 
 	for {
-		tick(s, dateNow, db)
+		s.TicksSinceStart++
+		s.tick(dateNow)
 
 		// Sleep for the duration of a single tick (Since we want 1 tick in 10 Seconds)
 		time.Sleep(time.Duration(1/s.Options.TicksPerSecond) * time.Second)
 
 		// Adding 1 hour every tick(Update) (10 seconds when TicksPerSecond=0.1 ) onto the previously defined Date time
 		dateNow = dateNow.Add(gameTimePerTick)
-		ticksSinceStart++
 	}
 }
 
 // tick is updating the current state of our system
-func tick(s GameService, dateNow time.Time, db *database.DatabaseService) {
+func (s *GameService) tick(dateNow time.Time) {
 	// TODO: Get currently Running Events from the database (models.Event)
 
-	currentlyRunningEvents, _ := db.GetEvents() //Sub this for the DB query results
+	fmt.Println("[running tick:  " + strconv.FormatInt(s.TicksSinceStart, 10) + "]")
 
-	lastStockIndexes, _ := db.GetStocks() //Sub this for the DB query results
+	currentlyRunningEvents, _ := s.DB.GetEvents()                      // Sub this for the DB query results
+	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1) // Sub this for the DB query results
 
-	checkEventStillGoing(db, currentlyRunningEvents, dateNow)
+	fmt.Println("last stocks my doods: ", lastStockIndexes)
+
+	s.checkEventStillGoing(currentlyRunningEvents, dateNow)
 
 	// TODO: Stop Events that are over the max duration
 
@@ -93,20 +96,20 @@ func tick(s GameService, dateNow time.Time, db *database.DatabaseService) {
 	// TODO: Run all events on the stocks @Arthur
 	// TODO: Update Orderbook @Arthur Andre
 
-	//Events:	Events have tags: Fixed, Recurring, Random
-	//			Hardcoded Events => Elections, Olympic Games etc
-	//			Definate Date Events (Moon Landing 1969)?
+	// Events: Events have tags: Fixed, Recurring, Random
+	//    Hardcoded Events => Elections, Olympic Games etc
+	//    Definate Date Events (Moon Landing 1969)?
 
-	s.ComputeStockNumbers(db, lastStockIndexes, currentlyRunningEvents, dateNow)
+	s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents, dateNow)
 	// saveNextStockIndexes()
 }
 
 // checkEventStillGoing calculates if the duration of the event is over and then removes the event
-func checkEventStillGoing(db *database.DatabaseService, e []models.Event, dateNow time.Time) {
+func (s GameService) checkEventStillGoing(e []models.Event, dateNow time.Time) {
 	for i := 0; i < len(e); i++ {
-		endDate := e[i].CreatedAt.Add(e[i].Duration) //Calculate the endDate by adding the Duration to the time created
-		if !dateNow.Before(endDate) {                //Check if the current date is after the end date.
-			db.RemoveEvent(e[i].EventID)
+		endDate := e[i].CreatedAt.Add(e[i].Duration) // Calculate the endDate by adding the Duration to the time created
+		if !dateNow.Before(endDate) {                // Check if the current date is after the end date.
+			s.DB.RemoveEvent(e[i].EventID)
 		}
 	}
 }
@@ -128,14 +131,14 @@ func (s GameService) getEventAffectedness(e []models.Event, stock models.Stock) 
 	return affectedness
 }
 
-func (s GameService) ComputeStockNumbers(db *database.DatabaseService, stocks []models.Stock, e []models.Event, dateNow time.Time) {
+func (s GameService) ComputeStockNumbers(stocks []models.Stock, e []models.Event, dateNow time.Time) {
 
 	// This computes the random and own stock, not taking into account other peoples selling
 	// As a stock drops to a % of its value, theres gonna be more buyers or more sellers
 	for _, stock := range stocks {
 		stock.Index += s.GetTendency(stock, s.getEventAffectedness(e, stock), dateNow) // Range of -2 to 2
 		fmt.Println("Name: ", stock.StockID, "Index: ", stock.Index)
-		db.AddStockToTable(stock)
+		s.DB.AddStockToTable(stock, s.TicksSinceStart)
 	}
 	fmt.Println("-----------------------------")
 }
@@ -152,8 +155,11 @@ func (s GameService) GetTendency(stock models.Stock, affectedness int64, dateNow
 	// New Index: 10007
 
 	randomModifier := utils.RandInt64(-n, n, dateNow.UnixNano())
+	fmt.Println("randomModifier: " + strconv.FormatInt(randomModifier, 10))
 	stockTrend := (stock.Index / 2000) * stockSettings.Trend
+	fmt.Println("stockTrend: " + strconv.FormatInt(stockTrend, 10))
 	eventTrend := (stock.Index / 10000) * affectedness
+	fmt.Println("eventTrend: " + strconv.FormatInt(eventTrend, 10))
 	return randomModifier*stockSettings.Stability + stockTrend + eventTrend
 	// Stability indicates how strong the random aspect is evaluated in comparison to the trend
 }

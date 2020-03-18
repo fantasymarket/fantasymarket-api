@@ -39,34 +39,25 @@ func Connect() (*DatabaseService, error) {
 	db.AutoMigrate(&models.Stock{})
 	db.AutoMigrate(&models.Event{})
 
-	createStockForTest(db, "GOOG", "Google", 10000, 5)
-	createStockForTest(db, "APPL", "Apple Inc", 10000, 6)
-
-	// db.Create(&models.Stock{StockID: "GOOG"})
-	// hier steht alles wie man daten kriegt http://gorm.io/docs/query.html
-
-	var stock models.Stock
-	db.First(&stock, "stock_id = ?", "GOOG") // find product with code l1212
+	fmt.Println("connected to da database my doods D:")
 
 	return &DatabaseService{
 		DB: db,
 	}, nil
 }
 
-func createStockForTest(db *gorm.DB, stockID string, name string, index int64, volume int64) {
-	stock := models.Stock{StockID: stockID, Name: name, Index: index, Volume: volume}
-
-	db.NewRecord(stock)
-
-	db.Create(&stock)
+func (s *DatabaseService) CreateStockForTest(stockID string, name string, index int64, volume int64) {
+	stock := models.Stock{StockID: stockID, Name: name, Index: index, Volume: volume, Tick: 0}
+	s.DB.Where(&stock).FirstOrInit(&models.Stock{})
 }
 
-func (s *DatabaseService) AddStockToTable(stock models.Stock) error {
-	return s.DB.Create(models.Stock{
+func (s *DatabaseService) AddStockToTable(stock models.Stock, tick int64) error {
+	return s.DB.Create(&models.Stock{
 		StockID: stock.StockID,
 		Name:    stock.Name,
 		Index:   stock.Index,
 		Volume:  stock.Volume,
+		Tick:    tick,
 	}).Error
 }
 
@@ -83,9 +74,9 @@ func (s *DatabaseService) RemoveEvent(eventID string) error {
 	return s.DB.Where(models.Event{Active: true, EventID: eventID}).Update("active", false).Error
 }
 
-func (s *DatabaseService) GetStocks() ([]models.Stock, error) {
+func (s *DatabaseService) GetStocksAtTick(lastTick int64) ([]models.Stock, error) {
 	var stocks []models.Stock
-	if err := s.DB.Find(&stocks).Error; err != nil {
+	if err := s.DB.Where(models.Stock{Tick: lastTick}).Find(&stocks).Error; err != nil {
 		return nil, err
 	}
 

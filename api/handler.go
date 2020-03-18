@@ -5,6 +5,8 @@ import (
 	"fantasymarket/utils/http_responses"
 	"io/ioutil"
 	"net/http"
+	"time"
+
 	"github.com/go-chi/chi"
 	"gopkg.in/yaml.v3"
 )
@@ -56,11 +58,10 @@ func GetEvents(w http.ResponseWriter, r *http.Request) {
 	events, err := db.GetEvents()
 
 	if err != nil {
-		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're hugely fucked")
+		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're ginormously fucked")
 	}
 
 	http_responses.CustomResponse(w, events, 200)
-
 
 }
 
@@ -69,15 +70,13 @@ func GetOverview(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetTime(w http.ResponseWriter, r *http.Request) {
-	time := game.S.StartDate
+	t := g.Options.StartDate
 
-	if != nil {
-		http_responses.CustomResponse(w, events, 200)
+	if !t.IsZero() {
+		http_responses.CustomResponse(w, t.Format(time.RFC3339), 200)
 	} else {
-		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're hugely fucked")
+		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're absolutely fucked")
 	}
-
-	
 
 }
 

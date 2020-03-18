@@ -2,7 +2,9 @@ package api
 
 import (
 	"fantasymarket/database"
+	"fantasymarket/game"
 	"net/http"
+	"fmt"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -10,14 +12,19 @@ import (
 )
 
 var db *database.DatabaseService
+var g *game.GameService
 
-func Start(database *database.DatabaseService) {
-	db = database
+const addr = "localhost:42069"
+
+func Start(databaseService *database.DatabaseService, gameService *game.GameService) {
+	db = databaseService
+	g = gameService
+
 	r := chi.NewRouter()
 
 	// CORS Header
 	cors := cors.New(cors.Options{
-		AllowedOrigins:     []string{"https://fantasymarket.netlify.com/"},
+		AllowedOrigins:     []string{"https://fantasymarket.netlify.com/", "http://" + addr},
 		AllowedMethods:     []string{"GET", "POST", "PUT"},
 		AllowedHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:     []string{"Link"},
@@ -66,5 +73,6 @@ func Start(database *database.DatabaseService) {
 		r.Get("/{symbol}", GetPortfolio)
 	})
 
-	http.ListenAndServe("localhost:42069", r)
+	fmt.Println("stated http server on " + addr + " :p")
+	http.ListenAndServe(addr, r)
 }
