@@ -44,6 +44,7 @@ func Start(db *database.DatabaseService) (*GameService, error) {
 			TicksPerSecond:  0.1,
 			StartDate:       time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
 			GameTimePerTick: time.Hour,
+		},
 		StockSettings: stockSettings,
 		EventSettings: eventSettings,
 		DB:            db,
