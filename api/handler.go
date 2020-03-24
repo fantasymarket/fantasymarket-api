@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
-
 	"github.com/go-chi/chi"
 	"gopkg.in/yaml.v3"
 )
@@ -51,6 +50,10 @@ func GetPortfolio(w http.ResponseWriter, r *http.Request) {
 }
 
 func Orders(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodDelete {
+
+	}
 
 }
 

@@ -5,7 +5,6 @@ import (
 	"fantasymarket/game"
 	"net/http"
 	"fmt"
-
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
@@ -41,7 +40,7 @@ func Start(databaseService *database.DatabaseService, gameService *game.GameServ
 	r.Get("/news", GetEvents) // Allow for query parameters
 
 	r.Get("/overview", GetOverview) // Some stats for the dashboard
-	// Top 2 Gainers / Top 2 Loosers
+	// Top 2 Gainers / Top 2 Losers
 	// Maybe total + of all stock and things like that in the future
 
 	r.Get("/time", GetTime) // Current time on the server
@@ -53,11 +52,11 @@ func Start(databaseService *database.DatabaseService, gameService *game.GameServ
 
 		r.Get("/{stockID}", GetStockDetails)
 
-		r.Post("/orders", AddOrder)
-
 	})
 
 	r.Route("/orders", func(r chi.Router) {
+
+		r.Post("/", Orders)
 
 		r.Get("/", Orders)
 
