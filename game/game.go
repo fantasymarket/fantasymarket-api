@@ -5,8 +5,11 @@ import (
 	"fantasymarket/database/models"
 	"fantasymarket/utils"
 	"fmt"
+	"io/ioutil"
 	"strconv"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 type GameService struct {
@@ -33,11 +36,26 @@ func checkError(err error) {
 // mention this for the assessment - clean code plus points
 func Start(db *database.DatabaseService) (*GameService, error) {
 
-	stockSettings := map[string]StockSettings{}
-	eventSettings := map[string]EventSettings{}
+	stockSettings := make(map[string]StockSettings{}) // Make initilization should work according to docs, if it doesn't simply remove the "make" call
+	allStocks, err := ioutil.ReadFile("game/stocks.yaml")
+	err = yaml.Unmarshal(allStocks, &stockSettings)
+	checkError(err)
 
-	db.AddStockToTable(db.CreateStockForTest("GOOG", "Google", 10000, 1), 0)
-	db.AddStockToTable(db.CreateStockForTest("APPL", "Apple Inc", 10000, 2), 0)
+	eventSettings := make(map[string]EventSettings{})
+	allEvents, err := ioutil.ReadFile("game/events.yaml")
+	err = yaml.Unmarshal(allEvents, &eventSettings)
+	checkError(err)
+
+	// TODO only create on first start (FirstOrInit?)
+
+	if err := db.CreateInitialStocks(stockSettings); err != nil {
+		return nil, err
+	}
+
+	err = db.CreateStockForTest("APPL", "Apple Inc", 10000, 2)
+	if err != nil {
+		return nil, err
+	}
 
 	s := &GameService{
 		Options: FantasyMarketOptions{
@@ -62,11 +80,10 @@ func startLoop(s *GameService) {
 	// We need to calculatre the current game date
 	startDate := s.Options.StartDate
 	gameTimePerTick := s.Options.GameTimePerTick
-	s.TicksSinceStart = int64(0) // TODO persist this number so it doesnt reset after restarting the program
+	s.TicksSinceStart, _ = s.DB.GetNextTick()
 	dateNow := startDate.Add(gameTimePerTick * time.Duration(s.TicksSinceStart))
 
 	for {
-		s.TicksSinceStart++
 		s.tick(dateNow)
 
 		// Sleep for the duration of a single tick (Since we want 1 tick in 10 Seconds)
@@ -74,6 +91,7 @@ func startLoop(s *GameService) {
 
 		// Adding 1 hour every tick(Update) (10 seconds when TicksPerSecond=0.1 ) onto the previously defined Date time
 		dateNow = dateNow.Add(gameTimePerTick)
+		s.TicksSinceStart++
 	}
 }
 
@@ -86,16 +104,7 @@ func (s *GameService) tick(dateNow time.Time) {
 	currentlyRunningEvents, _ := s.DB.GetEvents()                      // Sub this for the DB query results
 	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1) // Sub this for the DB query results
 
-	fmt.Println("last stocks: ", lastStockIndexes)
-
 	s.checkEventStillGoing(currentlyRunningEvents, dateNow)
-
-	// TODO: Stop Events that are over the max duration
-
-	// TODO: Randomly add new Events to the list of running events that are currently valid (e.g min time between events) @Andre
-	// TODO: Filter Only Currently relevant events @Andre
-	// TODO: Run all events on the stocks @Arthur
-	// TODO: Update Orderbook @Arthur Andre
 
 	// Events: Events have tags: Fixed, Recurring, Random
 	//    Hardcoded Events => Elections, Olympic Games etc
@@ -157,10 +166,11 @@ func (s GameService) GetTendency(stock models.Stock, affectedness int64, dateNow
 
 	randomModifier := utils.RandInt64(-n, n, dateNow.UnixNano())
 	fmt.Println("randomModifier: " + strconv.FormatInt(randomModifier, 10))
+
 	stockTrend := (stock.Index / 2000) * stockSettings.Trend
-	fmt.Println("stockTrend: " + strconv.FormatInt(stockTrend, 10))
 	eventTrend := (stock.Index / 10000) * affectedness
-	fmt.Println("eventTrend: " + strconv.FormatInt(eventTrend, 10))
-	return randomModifier*stockSettings.Stability + stockTrend + eventTrend
+	tendency := randomModifier*stockSettings.Stability + stockTrend + eventTrend
+	fmt.Println("tendency: " + strconv.FormatInt(tendency, 10))
+	return tendency
 	// Stability indicates how strong the random aspect is evaluated in comparison to the trend
 }
