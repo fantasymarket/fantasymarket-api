@@ -3,8 +3,6 @@ package database
 import (
 	"fmt"
 
-	// "fantasymarket/game"
-
 	"fantasymarket/database/models"
 
 	"github.com/jinzhu/gorm"
@@ -13,18 +11,6 @@ import (
 
 type DatabaseService struct {
 	DB *gorm.DB // gorm database instance
-}
-
-// StockSettings TEST STRUCT - DELETE
-type StockSettings struct {
-	StockID   string          // Stock Symbol e.g GOOG
-	Name      string          // Stock Name e.g Alphabet Inc.
-	Index     int64           // Price per share
-	Shares    int64           // Number per share
-	Tags      map[string]bool // A stock can have up to 5 tags
-	Stability int64           // Shows how many fluctuations the stock will have
-	Trend     int64           // Shows the generall trend of the Stock
-	Volume    int64
 }
 
 // Connect connects to the database and returns thedatabase object
@@ -46,9 +32,9 @@ func Connect() (*DatabaseService, error) {
 	}, nil
 }
 
-func (s *DatabaseService) CreateStockForTest(stockID string, name string, index int64, volume int64) {
+func (s *DatabaseService) CreateStockForTest(stockID string, name string, index int64, volume int64) models.Stock {
 	stock := models.Stock{StockID: stockID, Name: name, Index: index, Volume: volume, Tick: 0}
-	s.DB.Where(&stock).FirstOrInit(&models.Stock{})
+	return stock
 }
 
 func (s *DatabaseService) AddStockToTable(stock models.Stock, tick int64) error {

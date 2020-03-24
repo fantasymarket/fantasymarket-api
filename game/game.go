@@ -36,8 +36,8 @@ func Start(db *database.DatabaseService) (*GameService, error) {
 	stockSettings := map[string]StockSettings{}
 	eventSettings := map[string]EventSettings{}
 
-	db.CreateStockForTest("GOOG", "Google", 10000, 5)
-	db.CreateStockForTest("APPL", "Apple Inc", 10000, 6)
+	db.AddStockToTable(db.CreateStockForTest("GOOG", "Google", 10000, 1), 0)
+	db.AddStockToTable(db.CreateStockForTest("APPL", "Apple Inc", 10000, 2), 0)
 
 	s := &GameService{
 		Options: FantasyMarketOptions{
@@ -86,7 +86,7 @@ func (s *GameService) tick(dateNow time.Time) {
 	currentlyRunningEvents, _ := s.DB.GetEvents()                      // Sub this for the DB query results
 	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1) // Sub this for the DB query results
 
-	fmt.Println("last stocks my doods: ", lastStockIndexes)
+	fmt.Println("last stocks: ", lastStockIndexes)
 
 	s.checkEventStillGoing(currentlyRunningEvents, dateNow)
 
