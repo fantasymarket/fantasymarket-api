@@ -60,7 +60,6 @@
     effects: null
 
     runAfter: 4080 ticks (170 days)
-
     duration: 768 ticks (32 days)
 
     tags:
@@ -68,6 +67,27 @@
       trend: 1.6 for IDEXX, ANTM; 1.3 for DVA
       affectsStockID: IDEXX, ANTM, DVA
 
+
+  - eventID: "JPM-to-modernize-access-to-data"
+    title: "JPM modernizes how customers access their data, effective immediately"
+    description: "Global financial services firm JPMorgan Chase & Co has planned to modernize
+    how customers access their data. Effective immediately, the bank institute is beginning to block automated access to customer
+    accounts after July 30, 2020 (today), requiring any fintech apps or aggregators to instead use an API that exposes limited information
+    authorized by the bank customer, which appears to inherently be more secure when accessing data."
+
+    type: "fixed"
+    fixedDate: 30.07.2020 - 14.09.2020
+
+    dependencies: null
+    effects: null
+
+    runAfter: 5040 ticks (210 days)
+    duration: 1056 ticks (44 days)
+
+    tags:
+    - affectsTag: financial
+      trend: 0.2 for first week, 0.8 for second, 1.2 for third, 0.4 for fourth, 0.3 for remaining.
+      affectsStockID: JPM
 
   - eventID: "healthcare-sudden-dive"
     title: "Healthcare revenue drops by more than 50% in less than a month"
@@ -329,6 +349,113 @@
       - affectsTag: tech
         trend: 1.3 for first month, 0.8 for second month, 1.8 for last month (Christmas spending)
         affectsStockID: MSFT
+
+    
+    - eventID: "AXP-releases-crypto-credit-card"
+      title: "American Express to release brand new crypto card"
+      description: "Banking company American Express has been on the planning board to release their own crypto American Express card, to be launched mid-2025.
+      We've seen the success of VISA crypto cards from startups such as Nexo and crypto.com with yearly revenue in the billions, so how will
+      the American Express crypto card stand against the VISA? American Express is also planning
+      to release a 9% APR for the first 10000 users and a credit line starting at $1000."
+
+      type: "fixed"
+      fixedDate: 02.02.2025 - 08.09.2025 (card released 18.06.2025)
+
+      dependencies: null
+      effects: null
+
+      runAfter: 44568 ticks (1857 days)
+      duration: 5184 ticks (216 days)
+
+      tags:
+      - affectsTag: financial
+        trend: 0.8 for first month, 1.4 for second and third, 1.8 for fourth (during release), 1.3 for fifth, 0.6 for sixth.
+        affectsStockID: AXP
+
+    
+    - eventID: "bitcoin-drops-to-2-year-low"
+      title: "Bitcoin dropped to $2355, reaching it's 7-year record low"
+      description: "Leading cryptocurrency Bitcoin has dropped to a mere $2355.02 today 9:30 UTC, reaching a 7-year record low, after 
+      $2814.05 in mid-2018. Analysts and reporters claim that it was due to a bigger sell-off of cryptocurrencies, even bigger than the one in 2018,
+      which made Bitcoin fall 65%."
+
+      type: "fixed"
+      fixedDate: 04.07.2025 - 09.08.2025
+
+      dependencies: null
+      effects: null
+      
+      runAfter: 48936 ticks (2039 days)
+      duration: 840 ticks (35 days)
+
+      tags:
+      - affectsTag: financial
+        trend: -0.6 for JPM, -0.2 for GS and -1.4 for AXP (due to crypto card)
+        affectsStockID: JPM, GS, AXP
+
+    
+    - eventID: "facebook-facing-bankrupcy"
+      title: "Facebook faces bankrupcy after dealing with privacy scandals"
+      description: "In 2018, Facebook was threated by a fallout of a string of data-privacy scandals which made the company
+      subject to increased regulation from government bodies. This year, Facebook faced a huge privacy threat again as 5 attempts throughout the month
+      was made by hackers to dive into their main system and steal information. Many users have felt threatened this time and is deciding to back out from 
+      the social media platform, with investors and business mangates also backing out from their investments."
+
+      type: "fixed"
+      fixedDate: 08.07.2025 - 29.07.2025
+
+      dependencies: null
+      effects: null
+      
+      runAfter: 49032 ticks (2043 days)
+      duration: 504 ticks (21 days)
+
+      tags:
+      - affectsTag: tech
+        trend: -1.2 for first week, -1.6 for second week, -0.4 for remaining
+        affectsStockID: FB (NASDAQ) / FB2A (FRA)
+
+    
+    - eventID: "upcoming-cloud-storm-to-threaten-solar-power-companies"
+      title: "An expected 'cloud storm' to threaten solar power companies"
+      description: "Several solar power companies should wary about the upcoming 'cloud storm' that would severely limit sunlight hours into the Earth's
+      atmosphere, reducing the amount of solar power generated from solar panels. These companies may face less demand for solar panels and therefore would
+      also reduce revenue levels."
+
+      type: "fixed"
+      fixedDate: 12.09.2025 - 18.10.2025
+
+      dependencies: null
+      effects: null
+
+      runAfter: 50568 ticks (2107 days)
+      duration: 864 ticks (36 days)
+
+      tags:
+      - affectsTag: energy
+        trend: -1.4 
+        affectsStockID: NEP, FSLR
+
+
+    - eventID: "buffett-employees-to-sell-davita-shares"
+      title: "Berkshire Hathaway to sell remaining Davita shares of Warren Buffett after his passing"
+      description: "Berkshire Hathaway is planning to sell $350M shares of Davita that was remained by Warren Buffett after his death
+      4 years ago. Investors and entrepreneurs are tracking this movement and may also plan to sell their shares due to an expected
+      downturn in Davita's share after a huge sell-off from Berkshire Hathaway."
+
+      type: "fixed"
+      fixedDate: 29.10.2025 - 08.12.2025
+
+      dependencies: null
+      effects: null
+
+      runAfter: 51696 ticks (2154 days)
+      duration: 936 ticks (39 days)
+
+      tags:
+      - affectsTag: healthcare
+        trend: -1.1 for first few weeks, -0.7 for next few weeks, -0.2 for second last week and 0.1 for last week
+        affectsStockID: DVA
 
 
       
