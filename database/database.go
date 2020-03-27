@@ -43,7 +43,8 @@ func (s *DatabaseService) CreateInitialStocks(stocksettings interface{}) error {
 			if err := s.DB.FirstOrCreate(
 				&models.Stock{},
 				&models.Stock{
-					// TODO
+					// StockID: stockSettings.StockID,
+					// TODO ...
 				},
 			).Error; err != nil {
 				return err
