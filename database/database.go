@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"reflect"
 
 	"fantasymarket/database/models"
 
@@ -33,7 +34,12 @@ func Connect() (*DatabaseService, error) {
 }
 
 func (s *DatabaseService) CreateInitialStocks(stocksettings interface{}) error {
-	for _, stock := range stocksettings {
+
+	switch reflect.TypeOf(stocksettings).Kind() {
+	case reflect.Slice:
+		slice := reflect.ValueOf(stocksettings)
+
+		for i := 0; i < slice.Len(); i++ {
 			if err := s.DB.FirstOrCreate(
 				&models.Stock{},
 				&models.Stock{
@@ -42,7 +48,9 @@ func (s *DatabaseService) CreateInitialStocks(stocksettings interface{}) error {
 			).Error; err != nil {
 				return err
 			}
-		}	
+		}
+	}
+	return nil
 }
 
 func (s *DatabaseService) AddStockToTable(stock models.Stock, tick int64) error {

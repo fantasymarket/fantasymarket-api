@@ -13,10 +13,10 @@ import (
 )
 
 type GameService struct {
+	EventSettings   map[string]EventSettings
+	StockSettings   map[string]StockSettings
 	DB              *database.DatabaseService
 	Options         FantasyMarketOptions
-	StockSettings   map[string]StockSettings
-	EventSettings   map[string]EventSettings
 	TicksSinceStart int64
 }
 
@@ -27,33 +27,31 @@ type FantasyMarketOptions struct {
 	StartDate       time.Time     // The initial ingame time
 }
 
-func checkError(err error) {
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
 // mention this for the assessment - clean code plus points
 func Start(db *database.DatabaseService) (*GameService, error) {
 
-	stockSettings := make(map[string]StockSettings{}) // Make initilization should work according to docs, if it doesn't simply remove the "make" call
-	allStocks, err := ioutil.ReadFile("game/stocks.yaml")
-	err = yaml.Unmarshal(allStocks, &stockSettings)
-	checkError(err)
+	stockSettings := map[string]StockSettings{}
+	// eventSettings := map[string]EventSettings{}
 
-	eventSettings := make(map[string]EventSettings{})
-	allEvents, err := ioutil.ReadFile("game/events.yaml")
-	err = yaml.Unmarshal(allEvents, &eventSettings)
-	checkError(err)
+	stockData, err1 := ioutil.ReadFile("./game/stocks.yaml")
+	// eventData, err2 := ioutil.ReadFile("./game/events.yaml")
+	if err1 != nil {
+		return nil, err1
+	}
+	// if err2 != nil {
+	// 	return nil, err2
+	// }
 
-	// TODO only create on first start (FirstOrInit?)
+	err1 = yaml.Unmarshal(stockData, &stockSettings)
+	// err2 = yaml.Unmarshal(eventData, &eventSettings)
+	if err1 != nil {
+		return nil, err1
+	}
+	// if err2 != nil {
+	// 	return nil, err2
+	// }
 
 	if err := db.CreateInitialStocks(stockSettings); err != nil {
-		return nil, err
-	}
-
-	err = db.CreateStockForTest("APPL", "Apple Inc", 10000, 2)
-	if err != nil {
 		return nil, err
 	}
 
@@ -64,8 +62,8 @@ func Start(db *database.DatabaseService) (*GameService, error) {
 			GameTimePerTick: time.Hour,
 		},
 		StockSettings: stockSettings,
-		EventSettings: eventSettings,
-		DB:            db,
+		// EventSettings: eventSettings.AllEvents,
+		DB: db,
 	}
 
 	go startLoop(s)
@@ -110,7 +108,7 @@ func (s *GameService) tick(dateNow time.Time) {
 	//    Hardcoded Events => Elections, Olympic Games etc
 	//    Definate Date Events (Moon Landing 1969)?
 
-	s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents, dateNow)
+	s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents)
 	// saveNextStockIndexes()
 }
 
@@ -141,20 +139,21 @@ func (s GameService) getEventAffectedness(e []models.Event, stock models.Stock) 
 	return affectedness
 }
 
-func (s GameService) ComputeStockNumbers(stocks []models.Stock, e []models.Event, dateNow time.Time) {
+func (s GameService) ComputeStockNumbers(stocks []models.Stock, e []models.Event) {
 
 	// This computes the random and own stock, not taking into account other peoples selling
 	// As a stock drops to a % of its value, theres gonna be more buyers or more sellers
 	for _, stock := range stocks {
-		stock.Index += s.GetTendency(stock, s.getEventAffectedness(e, stock), dateNow) // Range of -2 to 2
+		stock.Index += s.GetTendency(stock, s.getEventAffectedness(e, stock)) // Range of -2 to 2
 		fmt.Println("Name: ", stock.StockID, "Index: ", stock.Index)
 		s.DB.AddStockToTable(stock, s.TicksSinceStart)
 	}
 	fmt.Println("-----------------------------")
 }
 
-func (s GameService) GetTendency(stock models.Stock, affectedness int64, dateNow time.Time) int64 {
+func (s GameService) GetTendency(stock models.Stock, affectedness int64) int64 {
 	const n int64 = 10
+	const weightOfTrends = 2000
 	stockSettings := s.StockSettings[stock.StockID]
 	// Old Index: 10000, Stability: 1, Trend: -1
 	// Rand(-10,10) * 1 + (10000/2000)*1 + (10000/10000)*-1
@@ -164,13 +163,13 @@ func (s GameService) GetTendency(stock models.Stock, affectedness int64, dateNow
 	// 10000 + 7
 	// New Index: 10007
 
-	randomModifier := utils.RandInt64(-n, n, dateNow.UnixNano())
-	fmt.Println("randomModifier: " + strconv.FormatInt(randomModifier, 10))
+	seed := stock.StockID + strconv.FormatInt(s.TicksSinceStart, 10)
+	randomModifier := utils.RandInt64Range(-n, n, seed) * stockSettings.Stability
 
-	stockTrend := (stock.Index / 2000) * stockSettings.Trend
-	eventTrend := (stock.Index / 10000) * affectedness
-	tendency := randomModifier*stockSettings.Stability + stockTrend + eventTrend
-	fmt.Println("tendency: " + strconv.FormatInt(tendency, 10))
+	stockTrend := (stock.Index / weightOfTrends) * stockSettings.Trend
+	eventTrend := (stock.Index / weightOfTrends) * affectedness
+	tendency := randomModifier + stockTrend + eventTrend
+
 	return tendency
 	// Stability indicates how strong the random aspect is evaluated in comparison to the trend
 }
