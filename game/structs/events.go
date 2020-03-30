@@ -1,6 +1,8 @@
 package structs
 
-import "time"
+import (
+	"fantasymarket/utils/timeutils"
+)
 
 // EventSettings is the type for storing information about events
 type EventSettings struct {
@@ -15,17 +17,17 @@ type EventSettings struct {
 	//	- random			- events that can happen randomly
 	Type string
 
-	FixedDate         time.Time // ONLY EVENT TYPE FIXED: date the event has to be run
-	RandomChance      float64   // the chance for the event to occur in a tick [0, 1] (thould be less than .01%)
-	ReccuringDuration time.Duration
+	FixedDate         timeutils.Time // ONLY EVENT TYPE FIXED: date the event has to be run
+	RandomChance      float64        // the chance for the event to occur in a tick [0, 1] (thould be less than .01%)
+	ReccuringDuration timeutils.Duration
 
 	Dependencies []string // these eventIDs have to have run before this event
 	Effects      []string // these eventIDs have to be run after this event is over
 
-	RunBefore time.Time // The event has to be run before this date
-	RunAfter  time.Time // The event has to be run after this date
+	RunBefore timeutils.Time // The event has to be run before this date
+	RunAfter  timeutils.Time // The event has to be run after this date
 
-	Duration time.Duration // Time during which the event is the event is run every tick
+	Duration timeutils.Duration // Time during which the event is the event is run every tick
 	Tags     map[string]TagOptions
 }
 

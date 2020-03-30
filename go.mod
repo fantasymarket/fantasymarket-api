@@ -11,6 +11,7 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mgechev/revive v1.0.2 // indirect
 	github.com/satori/go.uuid v1.2.0
+	github.com/senseyeio/duration v0.0.0-20180430131211-7c2a214ada46
 	github.com/stretchr/testify v1.5.1
 	golang.org/x/sys v0.0.0-20200327173247-9dae0f8f5775 // indirect
 	golang.org/x/tools v0.0.0-20200330040139-fa3cc9eebcfe // indirect
