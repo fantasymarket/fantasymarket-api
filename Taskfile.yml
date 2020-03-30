@@ -1,20 +1,29 @@
 version: '2'
 
 tasks:
+  default:
+    cmd: task --list
+  help:
+    cmd: task --list
+
   test:
+    desc: "run all tests"
     cmds:
       - go test ./... -v -covermode=count -coverprofile=coverage.out
   lint:
+    desc: "lint all files"
     cmds:
       - $(go env GOPATH)/bin/revive -config .revive.toml -exclude=./vendor/... ./...
 
   install-linter:
+    desc: "install the revive linter"
     env:
       GO111MODULES: off
     cmds:
       - go get -u github.com/mgechev/revive
 
   ci:
+    desc: "run ci scripts (should only be run in ci environments)"
     cmds:
       - go mod verify
       - task install-linter

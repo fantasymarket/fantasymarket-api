@@ -16,6 +16,7 @@ var g *game.GameService
 
 const addr = "localhost:42069"
 
+// Start starts a new instance of our REST API
 func Start(databaseService *database.DatabaseService, gameService *game.GameService) {
 	db = databaseService
 	g = gameService
@@ -38,39 +39,39 @@ func Start(databaseService *database.DatabaseService, gameService *game.GameServ
 	r.Use(middleware.Logger, cors.Handler)
 
 	// Standalone GET Requests
-	r.Get("/news", GetEvents) // Allow for query parameters
+	r.Get("/news", getEvents) // Allow for query parameters
 
-	r.Get("/overview", GetOverview) // Some stats for the dashboard
+	r.Get("/overview", getOverview) // Some stats for the dashboard
 	// Top 2 Gainers / Top 2 Loosers
 	// Maybe total + of all stock and things like that in the future
 
-	r.Get("/time", GetTime) // Current time on the server
+	r.Get("/time", getTime) // Current time on the server
 
 	// API Routes
 	r.Route("/stocks", func(r chi.Router) {
 
-		r.Get("/", GetAllStocks)
+		r.Get("/", getAllStocks)
 
-		r.Get("/{stockID}", GetStockDetails)
+		r.Get("/{stockID}", getStockDetails)
 
-		r.Post("/orders", AddOrder)
+		r.Post("/orders", addOrder)
 
 	})
 
 	r.Route("/orders", func(r chi.Router) {
 
-		r.Get("/", Orders)
+		r.Get("/", orders)
 
-		r.Get("/{orderID}", Orders)
+		r.Get("/{orderID}", orders)
 
-		r.Delete("/{orderID}", Orders)
+		r.Delete("/{orderID}", orders)
 	})
 
 	r.Route("/portfolio", func(r chi.Router) {
 
-		r.Get("/", GetPortfolio)
+		r.Get("/", getPortfolio)
 
-		r.Get("/{symbol}", GetPortfolio)
+		r.Get("/{symbol}", getPortfolio)
 	})
 
 	fmt.Println("stated http server on " + addr + " :p")

@@ -3,7 +3,7 @@ package game
 import (
 	"fantasymarket/database"
 	"fantasymarket/database/models"
-	"fantasymarket/utils"
+	"fantasymarket/utils/hash"
 	"fmt"
 	"io/ioutil"
 	"strconv"
@@ -164,7 +164,7 @@ func (s GameService) GetTendency(stock models.Stock, affectedness int64) int64 {
 	// New Index: 10007
 
 	seed := stock.StockID + strconv.FormatInt(s.TicksSinceStart, 10)
-	randomModifier := utils.RandInt64Range(-n, n, seed) * stockSettings.Stability
+	randomModifier := hash.Int64HashRange(-n, n, seed) * stockSettings.Stability
 
 	stockTrend := (stock.Index / weightOfTrends) * stockSettings.Trend
 	eventTrend := (stock.Index / weightOfTrends) * affectedness

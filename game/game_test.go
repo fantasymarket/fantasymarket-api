@@ -2,9 +2,10 @@ package game
 
 import (
 	"fantasymarket/database/models"
-	"fmt"
+
 	"testing"
-	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type TestData struct {
@@ -64,8 +65,6 @@ var stockSettings = map[string]StockSettings{
 }
 
 func TestGetTendency(t *testing.T) {
-	fmt.Println("Testing getTendancy")
-
 	s := GameService{
 		StockSettings: stockSettings,
 	}
@@ -74,9 +73,8 @@ func TestGetTendency(t *testing.T) {
 		for i, _ := range stockSettings {
 			test.stock.StockID = string(i)
 
-			if result := s.GetTendency(test.stock, test.affectedness, time.Unix(5, 0)); result != test.expectation[i] {
-				t.Fatal("Expected ", test.expectation[i], ", got ", result)
-			}
+			result := s.GetTendency(test.stock, test.affectedness)
+			assert.Equal(t, test.expectation[i], result)
 		}
 	}
 }
