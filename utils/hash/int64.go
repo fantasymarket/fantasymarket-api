@@ -1,7 +1,6 @@
 package hash
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"encoding/binary"
 	"strconv"
@@ -13,6 +12,11 @@ func Int64HashRange(min int64, max int64, seed string) int64 {
 	if min > max {
 		panic("invalid argument to Int64HashRange: min cannot be greater than max")
 	}
+
+	if min == max {
+		return min
+	}
+
 	x := Int64Hashn(max-min, seed) + min
 	return x
 }
@@ -49,10 +53,9 @@ func Int64Hash(seed string) int64 {
 	// While sha256 distribution isn't 100% perfectly random,
 	// it is random enough for our pourposes.
 
-	var n int64
 	hash := sha256.Sum256([]byte(seed))
-	buf := bytes.NewBuffer(hash[:8])
-	binary.Read(buf, binary.LittleEndian, &n)
+	// we use a uint64 since we only care about positive values
+	n := binary.LittleEndian.Uint32(hash[:4])
 
-	return n
+	return int64(n)
 }

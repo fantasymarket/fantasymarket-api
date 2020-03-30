@@ -14,10 +14,11 @@ type IntTestDataRange struct {
 }
 
 var rangeData = []IntTestDataRange{
-	{"test", -10, 10, -7},
-	{"test2", -100, -10, -68},
-	{"test3", -5, 5, -12},
-	{"test4", -99999, 99999, -115385},
+	{"test", -10, 10, 5},
+	{"test2", -100, -10, -62},
+	{"test3", -5, 5, -2},
+	{"test4", -99999, 99999, 78491},
+	{"test5", 10, 10, 10},
 }
 
 func TestInt64HashRangePanics(t *testing.T) {
