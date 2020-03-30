@@ -2,11 +2,13 @@ package database
 
 import (
 	"fmt"
-	"reflect"
 
 	"fantasymarket/database/models"
+	gameStructs "fantasymarket/game/structs"
 
 	"github.com/jinzhu/gorm"
+
+	// load sqlite dialect
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
@@ -23,9 +25,11 @@ func Connect() (*DatabaseService, error) {
 		return nil, err
 	}
 
-	db.AutoMigrate(&models.Stock{})
-	db.AutoMigrate(&models.Event{})
-
+	db.AutoMigrate(
+		&models.Stock{},
+		&models.Event{},
+		&models.Order{},
+	)
 	fmt.Println("connected to da database my doods D:")
 
 	return &DatabaseService{
@@ -33,22 +37,20 @@ func Connect() (*DatabaseService, error) {
 	}, nil
 }
 
-func (s *DatabaseService) CreateInitialStocks(stocksettings interface{}) error {
+func (s *DatabaseService) CreateInitialStocks(stocks []gameStructs.StockSettings) error {
 
-	switch reflect.TypeOf(stocksettings).Kind() {
-	case reflect.Slice:
-		slice := reflect.ValueOf(stocksettings)
-
-		for i := 0; i < slice.Len(); i++ {
-			if err := s.DB.FirstOrCreate(
-				&models.Stock{},
-				&models.Stock{
-					// StockID: stockSettings.StockID,
-					// TODO ...
-				},
-			).Error; err != nil {
-				return err
-			}
+	for _, stock := range stocks {
+		if err := s.DB.FirstOrCreate(
+			&models.Stock{},
+			&models.Stock{
+				StockID: stock.StockID,
+				Index:   stock.Index,
+				Name:    stock.Name,
+				Tick:    0,
+				Volume:  0,
+			},
+		).Error; err != nil {
+			return err
 		}
 	}
 	return nil

@@ -3,6 +3,7 @@ package game
 import (
 	"fantasymarket/database"
 	"fantasymarket/database/models"
+	"fantasymarket/game/structs"
 	"fantasymarket/utils/hash"
 	"fmt"
 	"io/ioutil"
@@ -13,14 +14,14 @@ import (
 )
 
 type GameService struct {
-	EventSettings   map[string]EventSettings
-	StockSettings   map[string]StockSettings
+	EventSettings   map[string]structs.EventSettings
+	StockSettings   map[string]structs.StockSettings
 	DB              *database.DatabaseService
 	Options         FantasyMarketOptions
 	TicksSinceStart int64
 }
 
-//FantasyMarketOptions manages the Options of the programm
+// FantasyMarketOptions manages the Options of the programm
 type FantasyMarketOptions struct {
 	TicksPerSecond  float64       // How many times the game updates per second
 	GameTimePerTick time.Duration // How much ingame time passes between updates
@@ -30,7 +31,7 @@ type FantasyMarketOptions struct {
 // mention this for the assessment - clean code plus points
 func Start(db *database.DatabaseService) (*GameService, error) {
 
-	stockSettings := map[string]StockSettings{}
+	stockSettings := map[string]structs.StockSettings{}
 	// eventSettings := map[string]EventSettings{}
 
 	stockData, err1 := ioutil.ReadFile("./game/stocks.yaml")
