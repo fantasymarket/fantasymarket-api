@@ -3,8 +3,8 @@ package api
 import (
 	"fantasymarket/database"
 	"fantasymarket/game"
-	"net/http"
 	"fmt"
+	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"

@@ -5,15 +5,18 @@ import (
 	"fantasymarket/database/models"
 	"fantasymarket/utils"
 	"fmt"
+	"io/ioutil"
 	"strconv"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 type GameService struct {
+	EventSettings   map[string]EventSettings
+	StockSettings   map[string]StockSettings
 	DB              *database.DatabaseService
 	Options         FantasyMarketOptions
-	StockSettings   map[string]StockSettings
-	EventSettings   map[string]EventSettings
 	TicksSinceStart int64
 }
 
@@ -24,20 +27,33 @@ type FantasyMarketOptions struct {
 	StartDate       time.Time     // The initial ingame time
 }
 
-func checkError(err error) {
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
 // mention this for the assessment - clean code plus points
 func Start(db *database.DatabaseService) (*GameService, error) {
 
 	stockSettings := map[string]StockSettings{}
-	eventSettings := map[string]EventSettings{}
+	// eventSettings := map[string]EventSettings{}
 
-	db.AddStockToTable(db.CreateStockForTest("GOOG", "Google", 10000, 1), 0)
-	db.AddStockToTable(db.CreateStockForTest("APPL", "Apple Inc", 10000, 2), 0)
+	stockData, err1 := ioutil.ReadFile("./game/stocks.yaml")
+	// eventData, err2 := ioutil.ReadFile("./game/events.yaml")
+	if err1 != nil {
+		return nil, err1
+	}
+	// if err2 != nil {
+	// 	return nil, err2
+	// }
+
+	err1 = yaml.Unmarshal(stockData, &stockSettings)
+	// err2 = yaml.Unmarshal(eventData, &eventSettings)
+	if err1 != nil {
+		return nil, err1
+	}
+	// if err2 != nil {
+	// 	return nil, err2
+	// }
+
+	if err := db.CreateInitialStocks(stockSettings); err != nil {
+		return nil, err
+	}
 
 	s := &GameService{
 		Options: FantasyMarketOptions{
@@ -46,8 +62,8 @@ func Start(db *database.DatabaseService) (*GameService, error) {
 			GameTimePerTick: time.Hour,
 		},
 		StockSettings: stockSettings,
-		EventSettings: eventSettings,
-		DB:            db,
+		// EventSettings: eventSettings.AllEvents,
+		DB: db,
 	}
 
 	go startLoop(s)
@@ -62,11 +78,10 @@ func startLoop(s *GameService) {
 	// We need to calculatre the current game date
 	startDate := s.Options.StartDate
 	gameTimePerTick := s.Options.GameTimePerTick
-	s.TicksSinceStart = int64(0) // TODO persist this number so it doesnt reset after restarting the program
+	s.TicksSinceStart, _ = s.DB.GetNextTick()
 	dateNow := startDate.Add(gameTimePerTick * time.Duration(s.TicksSinceStart))
 
 	for {
-		s.TicksSinceStart++
 		s.tick(dateNow)
 
 		// Sleep for the duration of a single tick (Since we want 1 tick in 10 Seconds)
@@ -74,6 +89,7 @@ func startLoop(s *GameService) {
 
 		// Adding 1 hour every tick(Update) (10 seconds when TicksPerSecond=0.1 ) onto the previously defined Date time
 		dateNow = dateNow.Add(gameTimePerTick)
+		s.TicksSinceStart++
 	}
 }
 
@@ -86,22 +102,13 @@ func (s *GameService) tick(dateNow time.Time) {
 	currentlyRunningEvents, _ := s.DB.GetEvents()                      // Sub this for the DB query results
 	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1) // Sub this for the DB query results
 
-	fmt.Println("last stocks: ", lastStockIndexes)
-
 	s.checkEventStillGoing(currentlyRunningEvents, dateNow)
-
-	// TODO: Stop Events that are over the max duration
-
-	// TODO: Randomly add new Events to the list of running events that are currently valid (e.g min time between events) @Andre
-	// TODO: Filter Only Currently relevant events @Andre
-	// TODO: Run all events on the stocks @Arthur
-	// TODO: Update Orderbook @Arthur Andre
 
 	// Events: Events have tags: Fixed, Recurring, Random
 	//    Hardcoded Events => Elections, Olympic Games etc
 	//    Definate Date Events (Moon Landing 1969)?
 
-	s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents, dateNow)
+	s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents)
 	// saveNextStockIndexes()
 }
 
@@ -132,20 +139,21 @@ func (s GameService) getEventAffectedness(e []models.Event, stock models.Stock) 
 	return affectedness
 }
 
-func (s GameService) ComputeStockNumbers(stocks []models.Stock, e []models.Event, dateNow time.Time) {
+func (s GameService) ComputeStockNumbers(stocks []models.Stock, e []models.Event) {
 
 	// This computes the random and own stock, not taking into account other peoples selling
 	// As a stock drops to a % of its value, theres gonna be more buyers or more sellers
 	for _, stock := range stocks {
-		stock.Index += s.GetTendency(stock, s.getEventAffectedness(e, stock), dateNow) // Range of -2 to 2
+		stock.Index += s.GetTendency(stock, s.getEventAffectedness(e, stock)) // Range of -2 to 2
 		fmt.Println("Name: ", stock.StockID, "Index: ", stock.Index)
 		s.DB.AddStockToTable(stock, s.TicksSinceStart)
 	}
 	fmt.Println("-----------------------------")
 }
 
-func (s GameService) GetTendency(stock models.Stock, affectedness int64, dateNow time.Time) int64 {
+func (s GameService) GetTendency(stock models.Stock, affectedness int64) int64 {
 	const n int64 = 10
+	const weightOfTrends = 2000
 	stockSettings := s.StockSettings[stock.StockID]
 	// Old Index: 10000, Stability: 1, Trend: -1
 	// Rand(-10,10) * 1 + (10000/2000)*1 + (10000/10000)*-1
@@ -155,12 +163,13 @@ func (s GameService) GetTendency(stock models.Stock, affectedness int64, dateNow
 	// 10000 + 7
 	// New Index: 10007
 
-	randomModifier := utils.RandInt64(-n, n, dateNow.UnixNano())
-	fmt.Println("randomModifier: " + strconv.FormatInt(randomModifier, 10))
-	stockTrend := (stock.Index / 2000) * stockSettings.Trend
-	fmt.Println("stockTrend: " + strconv.FormatInt(stockTrend, 10))
-	eventTrend := (stock.Index / 10000) * affectedness
-	fmt.Println("eventTrend: " + strconv.FormatInt(eventTrend, 10))
-	return randomModifier*stockSettings.Stability + stockTrend + eventTrend
+	seed := stock.StockID + strconv.FormatInt(s.TicksSinceStart, 10)
+	randomModifier := utils.RandInt64Range(-n, n, seed) * stockSettings.Stability
+
+	stockTrend := (stock.Index / weightOfTrends) * stockSettings.Trend
+	eventTrend := (stock.Index / weightOfTrends) * affectedness
+	tendency := randomModifier + stockTrend + eventTrend
+
+	return tendency
 	// Stability indicates how strong the random aspect is evaluated in comparison to the trend
 }

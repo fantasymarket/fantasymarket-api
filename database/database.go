@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"reflect"
 
 	"fantasymarket/database/models"
 
@@ -32,9 +33,25 @@ func Connect() (*DatabaseService, error) {
 	}, nil
 }
 
-func (s *DatabaseService) CreateStockForTest(stockID string, name string, index int64, volume int64) models.Stock {
-	stock := models.Stock{StockID: stockID, Name: name, Index: index, Volume: volume, Tick: 0}
-	return stock
+func (s *DatabaseService) CreateInitialStocks(stocksettings interface{}) error {
+
+	switch reflect.TypeOf(stocksettings).Kind() {
+	case reflect.Slice:
+		slice := reflect.ValueOf(stocksettings)
+
+		for i := 0; i < slice.Len(); i++ {
+			if err := s.DB.FirstOrCreate(
+				&models.Stock{},
+				&models.Stock{
+					// StockID: stockSettings.StockID,
+					// TODO ...
+				},
+			).Error; err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (s *DatabaseService) AddStockToTable(stock models.Stock, tick int64) error {
@@ -56,8 +73,21 @@ func (s *DatabaseService) GetEvents() ([]models.Event, error) {
 	return events, nil
 }
 
+// RemoveEvent marks an event as inactive so it won't affect stocks in the GameLoop anymore
 func (s *DatabaseService) RemoveEvent(eventID string) error {
 	return s.DB.Where(models.Event{Active: true, EventID: eventID}).Update("active", false).Error
+}
+
+// GetNextTick retrieves the tick number for the next tick from the database,
+// this is used to initialize our GameService when the program restarts
+func (s *DatabaseService) GetNextTick() (int64, error) {
+	var stock models.Stock
+	if err := s.DB.Table("stocks").Select("tick").Order("tick desc").First(&stock).Error; err != nil {
+		return 0, err
+	}
+
+	fmt.Println("Next Tick: ", stock.Tick+1)
+	return stock.Tick + 1, nil
 }
 
 func (s *DatabaseService) GetStocksAtTick(lastTick int64) ([]models.Stock, error) {
@@ -68,6 +98,18 @@ func (s *DatabaseService) GetStocksAtTick(lastTick int64) ([]models.Stock, error
 
 	return stocks, nil
 }
+
+//func (s *DatabaseService) AddOrder(order map[string]string) error {
+
+//}
+
+//func (s *DatabaseService) GetOrder(id int) error {
+
+//}
+
+//func (s *DatabaseService) DeleteOrder(id int) error {
+
+//}
 
 // USE DBName;
 // GO
