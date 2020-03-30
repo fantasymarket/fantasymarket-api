@@ -265,7 +265,7 @@
       duration: 2256 ticks (94 days)
 
       tags: 
-      - affectsTag: airplane
+      - affectsTag: aviation
         trend: -1.8 for first month, -1.5 for second month, -1.1 for third month, 0.2 for fourth month
         affectsStockID: BA
 
@@ -385,7 +385,7 @@
       dependencies: null
       effects: null
       
-      runAfter: 48936 ticks (2039 days)
+      runAfter: 48216 ticks (2009 days)
       duration: 840 ticks (35 days)
 
       tags:
@@ -407,7 +407,7 @@
       dependencies: null
       effects: null
       
-      runAfter: 49032 ticks (2043 days)
+      runAfter: 48312 ticks (2013 days)
       duration: 504 ticks (21 days)
 
       tags:
@@ -428,7 +428,7 @@
       dependencies: null
       effects: null
 
-      runAfter: 50568 ticks (2107 days)
+      runAfter: 49848 ticks (2077 days)
       duration: 864 ticks (36 days)
 
       tags:
@@ -449,13 +449,141 @@
       dependencies: null
       effects: null
 
-      runAfter: 51696 ticks (2154 days)
+      runAfter: 50976 ticks (2124 days)
       duration: 936 ticks (39 days)
 
       tags:
       - affectsTag: healthcare
         trend: -1.1 for first few weeks, -0.7 for next few weeks, -0.2 for second last week and 0.1 for last week
         affectsStockID: DVA
+
+
+    - eventID: "american-express-to-launch-into-tech"
+      title: "American Express plans to jump into tech"
+      description: "Financial and banking company American Express is currently planning to dive into the 
+      tech industry and is planning to build their first line of laptops at the end of this year or latest Spring 2026.
+      These laptops are thought to have implemented Amex apps and technologies to provide support
+      for existing credit cards and can even act as a credit card, with the added card chip at the bottom of the laptop. 
+      With Intel X15 12-core CPUs and a graphics card of up to GTX 4220 Turbo Ti, this laptop is one to have."
+
+      type: "fixed"
+      fixedDate: 11.11.2025 - 02.02.2026 (19.12.2025 launch of laptop)
+
+      dependencies: null
+      effects: null
+
+      runAfter: 51264 ticks (2136 days)
+      duration: 1944 ticks (81 days)
+
+      tags:
+      - affectsTag: financial
+        trend: 0.4 for first week, 0.9 for second, 0.5 for third, 1.2 for first month of launch, 0.2 until end
+        affectsStockID: AXP
+
+    
+    - eventID: "boeing-huge-buy-off-for-fighter-planes"
+      title: "Boeing to sell over 15,000 fighter planes to the U.S army"
+      description: "Boeing Chief David Calhoun has created a deal to sell over 15,000 fighter planes to the U.S army
+      as a 'restock plan'. With a potential end revenue of 1.17 trillion USD (not including expenditure), Boeing is 
+      looking for a sharp incline towards growth. Stock values may increase rapidly during the buy-off."
+
+      type: "fixed"
+      fixedDate: 09.01.2026 - 03.03.2026
+
+      dependencies: null
+      effects: null
+      
+      runAfter: 52776 ticks (2199 days)
+      duration: 1296 ticks (54 days)
+
+      tags:
+      - affectsTag: aviation
+        trend: 0.4 for first 2 weeks, 1.8 for February, -0.3 for March
+        affectsStockID: BA
+      
+
+    - eventID: "microsoft-buys-facebook-amidst-crisis"
+      title: "Microsoft to buy Facebook amidst year-long crisis"
+      description: "After a rough decade for Facebook with the increased amount of data breach, privacy issues,
+      as well as hackers finding their way through the supposedly 'encrypted and secured' main system, Facebook has been suffering through
+      a severe time for investors to trust the tech company. As stocks keep plummeting, Facebook has no other choice but to be 
+      sold off by Microsoft for 1.9B USD."
+
+      type: "fixed"
+      fixedDate: 04.03.2026 - 05.05.2026 
+      
+      dependencies: null
+      effects: null
+      
+      runAfter: 54096 ticks (2254 days)
+      duration: 1464 ticks (61 days)
+
+      tags:
+      - affectsTag: tech
+        trend: -0.9 for FB, 0.8 for MSFT during first month; -0.5 for FB, 1.2 for MSFT for April, 0.2 for FB, 0.8 for MSFT during May
+        affectsStockID: MSFT, FB
+
+    
+    - eventID: "netflix-to-obtain-copyright-permission-from-HBO"
+      title: "Netflix plans to obtain copyright permission from HBO"
+      description: "Streaming company Netflix has negotiated with HBO CEO Richard Plepler to obtain
+      copyright permissions to stream HBO TV shows to provide even more diversity and choices for fellow
+      Netflix streamers."
+
+      type: "fixed"
+      fixedDate: 14.04.2026 - 15.07.2026
+
+      dependencies: null
+      effects: null
+
+      runAfter: 55056 ticks (2294 days)
+      duration: 2184 ticks (91 days)
+
+      tags:
+      - affectsTag: tech
+        trend: 0.3 for first month, 0.9 for second month, 0.5 for third month
+        affectsStockID: NFLX
+
+    
+    - eventID: "apple-new-iphone-huge-issues"
+      title: "Multinational technology company Apple has received plentiful amounts of complains
+      with regards to their newly launched iPhone 18 this summer. Users have reported multi-app crashes,
+      limited functionality to bluetooth and wi-fi support, and even overheating."
+
+      type: "fixed"
+      fixedDate: 19.06.2026 - 21.08.2026
+
+      dependencies: null
+      effects: null
+
+      runAfter: 56616 ticks (2359 days)
+      duration: 1488 ticks (62 days)
+
+      tags:
+      - affectsTag: tech
+        trend: -1.2 for first month, -0.4 for second month, ending with -0.9 on third month.
+        affectsStockID: AAPL
+
+    
+    - eventID: "apple-to-release-quick-fixes"
+      title: "After latest fiasco, Apple plans to provide quick response and fixes to hugely negative critiques."
+      description: "With the huge debacle of the release of the iPhone 18, Apple is planning to release weekly updates for the next
+      5 months to ensure that bugs and crashes will be fixed."
+
+      type: "fixed"
+      fixedDate: 28.06.2026 - 15.11.2026
+
+      dependencies: apple-new-iphone-huge-issues
+      effects: null
+
+      runAfter: 56832 ticks (2368 days)
+      duration: 3240 ticks (135 days)
+
+      tags:
+      - affectsTag: tech
+        trend: -1.2 for first month, -0.4 for second, -0.9 for third, 0.1 for fourth, 0.3 for fifth
+        affectsStockID: AAPL
+
 
 
       
