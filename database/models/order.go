@@ -7,7 +7,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-// User created Orders
+// Order is a Order Struct
 type Order struct {
 	ID         string `gorm:"primary_key"` // A Unique ID for every order (since the same event might happen multiple times)
 	CreatedAt  time.Time
@@ -21,6 +21,7 @@ type Order struct {
 	//// TimeOffset time.Duration // Optionally offset the event to e.g only affect a tag after x time
 }
 
+// BeforeCreate runs before a order is created in the database
 func (o Order) BeforeCreate(scope *gorm.Scope) error {
 	scope.SetColumn("ID", uuid.NewV4())
 	return nil
