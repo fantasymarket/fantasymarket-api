@@ -3,8 +3,10 @@ module fantasymarket
 go 1.13
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-chi/cors v1.0.0
+	github.com/go-chi/jwtauth v4.0.4+incompatible
 	github.com/jinzhu/gorm v1.9.12
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
