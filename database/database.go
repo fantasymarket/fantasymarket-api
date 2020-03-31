@@ -37,7 +37,7 @@ func Connect() (*DatabaseService, error) {
 	}, nil
 }
 
-func (s *DatabaseService) CreateInitialStocks(stocks []gameStructs.StockSettings) error {
+func (s *DatabaseService) CreateInitialStocks(stocks map[string]gameStructs.StockSettings) error {
 
 	for _, stock := range stocks {
 		if err := s.DB.FirstOrCreate(

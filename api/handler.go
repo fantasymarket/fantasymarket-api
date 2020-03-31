@@ -1,7 +1,7 @@
 package api
 
 import (
-	"fantasymarket/game"
+	gameStructs "fantasymarket/game/structs"
 	"fantasymarket/utils/http/responses"
 	"io/ioutil"
 	"net/http"
@@ -17,7 +17,7 @@ func getAllStocks(w http.ResponseWriter, r *http.Request) {
 		responses.ErrorResponse(w, http.StatusInternalServerError, "we're really fucked")
 	}
 
-	m := make(map[string]game.StockSettings) // Test again if this works, I checked the docs and in theory when the map is already initialized it should still work. If not change it back again
+	m := make(map[string]gameStructs.StockSettings) // Test again if this works, I checked the docs and in theory when the map is already initialized it should still work. If not change it back again
 	err = yaml.Unmarshal(allStocks, &m)
 
 	if err != nil {
@@ -35,7 +35,7 @@ func getStockDetails(w http.ResponseWriter, r *http.Request) {
 		responses.ErrorResponse(w, http.StatusInternalServerError, "we're majorly fucked")
 	}
 
-	var stockDetail map[string]game.StockSettings
+	var stockDetail map[string]gameStructs.StockSettings
 	err = yaml.Unmarshal(yamlData, &stockDetail)
 
 	if err != nil {

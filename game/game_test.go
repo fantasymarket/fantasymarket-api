@@ -2,6 +2,7 @@ package game
 
 import (
 	"fantasymarket/database/models"
+	"fantasymarket/game/structs"
 
 	"testing"
 
@@ -57,7 +58,7 @@ var data = []TestData{
 	},
 }
 
-var stockSettings = map[string]StockSettings{
+var stockSettings = map[string]structs.StockSettings{
 	"TEST0": {Stability: 1, Trend: 1},
 	"TEST1": {Stability: 5, Trend: 1},
 	"TEST2": {Stability: 1, Trend: 5},
