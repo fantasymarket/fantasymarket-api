@@ -9,8 +9,10 @@ import (
 
 // User is the User "Class"
 type User struct {
-	userID    string `gorm:"primary_key"` // A Unique ID for every stock data point (since theres a new entry for each stock ID every tick)
+	UserID    uuid.UUID `gorm:"primary_key"` // A Unique ID for every stock data point (since theres a new entry for each stock ID every tick)
 	CreatedAt time.Time
+
+	Portfolio Portfolio `gorm:"foreignkey:UserID;association_foreignkey:UserID"`
 
 	// Stock Name e.g Alphabet Inc.
 	Username string

@@ -43,11 +43,11 @@ func (s *DatabaseService) CreateInitialStocks(stocks map[string]gameStructs.Stoc
 		if err := s.DB.FirstOrCreate(
 			&models.Stock{},
 			&models.Stock{
-				StockID: stock.StockID,
-				Index:   stock.Index,
-				Name:    stock.Name,
-				Tick:    0,
-				Volume:  0,
+				Symbol: stock.Symbol,
+				Index:  stock.Index,
+				Name:   stock.Name,
+				Tick:   0,
+				Volume: 0,
 			},
 		).Error; err != nil {
 			return err
@@ -58,11 +58,11 @@ func (s *DatabaseService) CreateInitialStocks(stocks map[string]gameStructs.Stoc
 
 func (s *DatabaseService) AddStockToTable(stock models.Stock, tick int64) error {
 	return s.DB.Create(&models.Stock{
-		StockID: stock.StockID,
-		Name:    stock.Name,
-		Index:   stock.Index,
-		Volume:  stock.Volume,
-		Tick:    tick,
+		Symbol: stock.Symbol,
+		Name:   stock.Name,
+		Index:  stock.Index,
+		Volume: stock.Volume,
+		Tick:   tick,
 	}).Error
 }
 

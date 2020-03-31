@@ -27,7 +27,7 @@ allEvents:
     tags:
       - affectsTag: tech
         trend: 1.2
-      - affectsStockID: GOOG
+      - affectsStock: GOOG
         trend: 1.6
 
   "corona-virus-outbreak":
@@ -47,5 +47,5 @@ allEvents:
     tags:
     - affectsTag: all -healthcare
       trend: -1.1
-    - affectsStockID: all -healthcare
+    - affectsStock: all -healthcare
   

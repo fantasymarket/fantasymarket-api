@@ -6,11 +6,8 @@ import (
 	"fantasymarket/game/structs"
 	"fantasymarket/utils/hash"
 	"fmt"
-	"io/ioutil"
 	"strconv"
 	"time"
-
-	"gopkg.in/yaml.v2"
 )
 
 type GameService struct {
@@ -28,31 +25,23 @@ type FantasyMarketOptions struct {
 	StartDate       time.Time     // The initial ingame time
 }
 
-// mention this for the assessment - clean code plus points
+// Start starts the game loop
 func Start(db *database.DatabaseService) (*GameService, error) {
 
-	stockSettings := map[string]structs.StockSettings{}
-	// eventSettings := map[string]EventSettings{}
-
-	stockData, err1 := ioutil.ReadFile("./game/stocks.yaml")
-	// eventData, err2 := ioutil.ReadFile("./game/events.yaml")
-	if err1 != nil {
-		return nil, err1
+	stockSettings, err := loadStocks()
+	if err != nil {
+		fmt.Println(1)
+		return nil, err
 	}
-	// if err2 != nil {
-	// 	return nil, err2
-	// }
-
-	err1 = yaml.Unmarshal(stockData, &stockSettings)
-	// err2 = yaml.Unmarshal(eventData, &eventSettings)
-	if err1 != nil {
-		return nil, err1
-	}
-	// if err2 != nil {
-	// 	return nil, err2
-	// }
 
 	if err := db.CreateInitialStocks(stockSettings); err != nil {
+		fmt.Println(2)
+		return nil, err
+	}
+
+	// TODO: right now, this map is empty
+	eventSettings, err := loadEvents()
+	if err != nil {
 		return nil, err
 	}
 
@@ -63,8 +52,8 @@ func Start(db *database.DatabaseService) (*GameService, error) {
 			GameTimePerTick: time.Hour,
 		},
 		StockSettings: stockSettings,
-		// EventSettings: eventSettings.AllEvents,
-		DB: db,
+		EventSettings: eventSettings,
+		DB:            db,
 	}
 
 	go startLoop(s)
@@ -146,7 +135,7 @@ func (s GameService) ComputeStockNumbers(stocks []models.Stock, e []models.Event
 	// As a stock drops to a % of its value, theres gonna be more buyers or more sellers
 	for _, stock := range stocks {
 		stock.Index += s.GetTendency(stock, s.getEventAffectedness(e, stock)) // Range of -2 to 2
-		fmt.Println("Name: ", stock.StockID, "Index: ", stock.Index)
+		fmt.Println("Name: ", stock.Symbol, "Index: ", stock.Index)
 		s.DB.AddStockToTable(stock, s.TicksSinceStart)
 	}
 	fmt.Println("-----------------------------")
@@ -155,7 +144,7 @@ func (s GameService) ComputeStockNumbers(stocks []models.Stock, e []models.Event
 func (s GameService) GetTendency(stock models.Stock, affectedness int64) int64 {
 	const n int64 = 10
 	const weightOfTrends = 2000
-	stockSettings := s.StockSettings[stock.StockID]
+	stockSettings := s.StockSettings[stock.Symbol]
 	// Old Index: 10000, Stability: 1, Trend: -1
 	// Rand(-10,10) * 1 + (10000/2000)*1 + (10000/10000)*-1
 	// (3)*1 + (5)*1 + (1)*-1
@@ -164,7 +153,7 @@ func (s GameService) GetTendency(stock models.Stock, affectedness int64) int64 {
 	// 10000 + 7
 	// New Index: 10007
 
-	seed := stock.StockID + strconv.FormatInt(s.TicksSinceStart, 10)
+	seed := stock.Symbol + strconv.FormatInt(s.TicksSinceStart, 10)
 	randomModifier := hash.Int64HashRange(-n, n, seed) * stockSettings.Stability
 
 	stockTrend := (stock.Index / weightOfTrends) * stockSettings.Trend

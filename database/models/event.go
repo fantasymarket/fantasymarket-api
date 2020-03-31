@@ -9,7 +9,7 @@ import (
 
 // Event are Events that happen randomly every game tick
 type Event struct {
-	ID      string `gorm:"primary_key"` // A Unique ID for every event (since the same event might happen multiple times)
+	ID      uuid.UUID `gorm:"primary_key"` // A Unique ID for every event (since the same event might happen multiple times)
 	EventID string
 	Active  bool
 

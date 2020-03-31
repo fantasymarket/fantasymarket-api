@@ -17,7 +17,7 @@ type TestData struct {
 
 var data = []TestData{
 	{
-		stock:        models.Stock{Index: 10000, StockID: "TEST"},
+		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
 		affectedness: -1,
 		expectation: map[string]int64{
 			"TEST0": 10,
@@ -27,7 +27,7 @@ var data = []TestData{
 		},
 	},
 	{
-		stock:        models.Stock{Index: 10000, StockID: "TEST"},
+		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
 		affectedness: -100,
 		expectation: map[string]int64{
 			"TEST0": -89,
@@ -37,7 +37,7 @@ var data = []TestData{
 		},
 	},
 	{
-		stock:        models.Stock{Index: 10000, StockID: "TEST"},
+		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
 		affectedness: 100,
 		expectation: map[string]int64{
 			"TEST0": 111,
@@ -47,7 +47,7 @@ var data = []TestData{
 		},
 	},
 	{
-		stock:        models.Stock{Index: 10000, StockID: "TEST"},
+		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
 		affectedness: 0,
 		expectation: map[string]int64{
 			"TEST0": 11,
@@ -71,8 +71,8 @@ func TestGetTendency(t *testing.T) {
 	}
 
 	for _, test := range data {
-		for i, _ := range stockSettings {
-			test.stock.StockID = string(i)
+		for i := range stockSettings {
+			test.stock.Symbol = string(i)
 
 			result := s.GetTendency(test.stock, test.affectedness)
 			assert.Equal(t, test.expectation[i], result)

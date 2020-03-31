@@ -1,6 +1,4 @@
-# allStocks:
-GOOG:
-  stockID: "GOOG"
+- symbol: "GOOG"
   stockCount: 700000000
   startPrice: 60000
   name: Google
@@ -8,8 +6,8 @@ GOOG:
     tech: true
   stability: 1
   trend: 1
-APPL:
-  stockID: "APPL"
+
+- symbol: "APPL"
   stockCount: 700000000
   startPrice: 60000
   name: Apple

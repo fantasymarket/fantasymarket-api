@@ -12,38 +12,45 @@ import (
 )
 
 func getAllStocks(w http.ResponseWriter, r *http.Request) {
-	allStocks, err := ioutil.ReadFile("game/stocks.json")
+	allStocks, err := ioutil.ReadFile("game/stocks.yaml")
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "we're really fucked")
+		responses.ErrorResponse(w, http.StatusInternalServerError, "error getting list of stocks")
+		return
 	}
 
-	m := make(map[string]gameStructs.StockSettings) // Test again if this works, I checked the docs and in theory when the map is already initialized it should still work. If not change it back again
+	m := []gameStructs.StockSettings{} // Test again if this works, I checked the docs and in theory when the map is already initialized it should still work. If not change it back again
 	err = yaml.Unmarshal(allStocks, &m)
 
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "we're royally fucked")
+		responses.ErrorResponse(w, http.StatusInternalServerError, "error parsing stocks")
+		return
 	}
 
-	responses.CustomResponse(w, allStocks, 200)
+	responses.CustomResponse(w, m, 200)
 }
 
 func getStockDetails(w http.ResponseWriter, r *http.Request) {
-	stockID := chi.URLParam(r, "stockID")
-	yamlData, err := ioutil.ReadFile("game/stocks.json")
+	symbol := chi.URLParam(r, "symbol")
+	yamlData, err := ioutil.ReadFile("game/stocks.yaml")
 
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "we're majorly fucked")
+		responses.ErrorResponse(w, http.StatusInternalServerError, "error getting list of stocks")
 	}
 
-	var stockDetail map[string]gameStructs.StockSettings
-	err = yaml.Unmarshal(yamlData, &stockDetail)
+	var stocks []gameStructs.StockSettings
 
-	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "we're hugely fucked")
+	if err := yaml.Unmarshal(yamlData, &stocks); err != nil {
+		responses.ErrorResponse(w, http.StatusInternalServerError, "error parsing stock")
 	}
 
-	responses.CustomResponse(w, stockDetail[stockID], 200)
+	for i := range stocks {
+		if stocks[i].Symbol == symbol {
+			responses.CustomResponse(w, stocks[i], 200)
+			return
+		}
+	}
 
+	responses.ErrorResponse(w, http.StatusNotFound, "no stock with symbol available")
 }
 
 func getPortfolio(w http.ResponseWriter, r *http.Request) {

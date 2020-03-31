@@ -52,7 +52,7 @@ func Start(databaseService *database.DatabaseService, gameService *game.GameServ
 
 		r.Get("/", getAllStocks)
 
-		r.Get("/{stockID}", getStockDetails)
+		r.Get("/{symbol}", getStockDetails)
 
 		r.Post("/orders", addOrder)
 
