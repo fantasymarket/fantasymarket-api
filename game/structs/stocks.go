@@ -2,7 +2,7 @@ package structs
 
 // StockSettings is the type for storing information about stocks
 type StockSettings struct {
-	StockID   string          `yaml:"stockID"`    // Stock Symbol e.g GOOG
+	Symbol    string          `yaml:"symbol"`     // Stock Symbol e.g GOOG
 	Name      string          `yaml:"name"`       // Stock Name e.g Alphabet Inc.
 	Index     int64           `yaml:"startPrice"` // Price per share
 	Shares    int64           `yaml:"stockCount"` // Number per share

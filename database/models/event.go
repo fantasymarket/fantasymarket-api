@@ -7,9 +7,9 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-// Events happen randomly every game tick
+// Event are Events that happen randomly every game tick
 type Event struct {
-	ID      string `gorm:"primary_key"` // A Unique ID for every event (since the same event might happen multiple times)
+	ID      uuid.UUID `gorm:"primary_key"` // A Unique ID for every event (since the same event might happen multiple times)
 	EventID string
 	Active  bool
 
@@ -23,6 +23,7 @@ type Event struct {
 	//// TimeOffset time.Duration // Optionally offset the event to e.g only affect a tag after x time
 }
 
+// BeforeCreate runs before an event is created in the database
 func (e Event) BeforeCreate(scope *gorm.Scope) error {
 	scope.SetColumn("ID", uuid.NewV4())
 	return nil
