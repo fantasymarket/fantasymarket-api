@@ -25,7 +25,14 @@ func (t *Time) UnmarshalJSON(b []byte) (err error) {
 		t.Time = time.Time{}
 		return
 	}
-	t.Time, err = time.Parse(time.ANSIC, s)
-	return
 
+	if strings.ContainsAny(s, "TtZz") {
+		fmt.Println("tfff", s)
+		t.Time, err = time.Parse(time.RFC3339, s)
+	} else {
+		fmt.Println("naaa")
+		t.Time, err = time.Parse("2006-01-02 15:04:05", s)
+	}
+
+	return
 }
