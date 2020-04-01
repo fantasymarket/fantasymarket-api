@@ -5,6 +5,7 @@ import (
 	"fantasymarket/utils/http_responses"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 	"github.com/go-chi/chi"
 	"gopkg.in/yaml.v3"
@@ -12,36 +13,43 @@ import (
 
 func GetAllStocks(w http.ResponseWriter, r *http.Request) {
 	allStocks, err := ioutil.ReadFile("game/stocks.json")
+
 	if err != nil {
 		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're really fucked")
+		return
 	}
 
-	m := make(map[string]game.StockSettings) // Test again if this works, I checked the docs and in theory when the map is already initialized it should still work. If not change it back again
-	err = yaml.Unmarshal(allStocks, &m)
+	stockMap := make(map[string]game.StockSettings) // Test again if this works, I checked the docs and in theory when the map is already initialized it should still work. If not change it back again
+	err = yaml.Unmarshal(allStocks, &stockMap)
 
 	if err != nil {
 		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're royally fucked")
+		return
 	}
 
-	http_responses.CustomResponse(w, allStocks, 200)
+	http_responses.CustomResponse(w, stockMap, 200)
 }
 
 func GetStockDetails(w http.ResponseWriter, r *http.Request) {
-	stockID := chi.URLParam(r, "stockID")
+	urlparam := chi.URLParam(r, "stockID")
+	stockID := strings.SplitN(urlparam, "=", 2)[1]
 	yamlData, err := ioutil.ReadFile("game/stocks.json")
+
 
 	if err != nil {
 		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're majorly fucked")
+		return
 	}
 
-	var stockDetail map[string]game.StockSettings
-	err = yaml.Unmarshal(yamlData, &stockDetail)
+	stockMap := make(map[string]game.StockSettings)
+	err = yaml.Unmarshal(yamlData, &stockMap)
 
 	if err != nil {
 		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're hugely fucked")
+		return
 	}
 
-	http_responses.CustomResponse(w, stockDetail[stockID], 200)
+	http_responses.CustomResponse(w, stockMap[stockID], 200)
 
 }
 
@@ -62,6 +70,7 @@ func GetEvents(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http_responses.ErrorResponse(w, http.StatusInternalServerError, "we're ginormously fucked")
+		return
 	}
 
 	http_responses.CustomResponse(w, events, 200)

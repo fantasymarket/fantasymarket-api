@@ -14,7 +14,7 @@
     "stockID": "APPL",
     "stockCount": 700000000,
     "startPrice": 60000,
-    "name": "Google",
+    "name": "Apple",
     "tags": {
       "tech": true
     },
