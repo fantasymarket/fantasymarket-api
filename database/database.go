@@ -12,12 +12,13 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-type DatabaseService struct {
+// Service is the Database Service
+type Service struct {
 	DB *gorm.DB // gorm database instance
 }
 
 // Connect connects to the database and returns thedatabase object
-func Connect() (*DatabaseService, error) {
+func Connect() (*Service, error) {
 	db, err := gorm.Open("sqlite3", "database.db")
 
 	if err != nil {
@@ -32,12 +33,13 @@ func Connect() (*DatabaseService, error) {
 	)
 	fmt.Println("connected to da database my doods D:")
 
-	return &DatabaseService{
+	return &Service{
 		DB: db,
 	}, nil
 }
 
-func (s *DatabaseService) CreateInitialStocks(stocks map[string]gameStructs.StockSettings) error {
+// CreateInitialStocks takes a list of initial stocks and uses them to initialize the database
+func (s *Service) CreateInitialStocks(stocks map[string]gameStructs.StockSettings) error {
 
 	for _, stock := range stocks {
 		if err := s.DB.FirstOrCreate(
@@ -56,7 +58,8 @@ func (s *DatabaseService) CreateInitialStocks(stocks map[string]gameStructs.Stoc
 	return nil
 }
 
-func (s *DatabaseService) AddStockToTable(stock models.Stock, tick int64) error {
+// AddStock adds a Stock to the stock table
+func (s *Service) AddStock(stock models.Stock, tick int64) error {
 	return s.DB.Create(&models.Stock{
 		Symbol: stock.Symbol,
 		Name:   stock.Name,
@@ -66,7 +69,8 @@ func (s *DatabaseService) AddStockToTable(stock models.Stock, tick int64) error 
 	}).Error
 }
 
-func (s *DatabaseService) GetEvents() ([]models.Event, error) {
+// GetEvents fetches all currently active events
+func (s *Service) GetEvents() ([]models.Event, error) {
 	var events []models.Event
 	if err := s.DB.Where(models.Event{Active: true}).Find(&events).Error; err != nil {
 		return nil, err
@@ -76,13 +80,13 @@ func (s *DatabaseService) GetEvents() ([]models.Event, error) {
 }
 
 // RemoveEvent marks an event as inactive so it won't affect stocks in the GameLoop anymore
-func (s *DatabaseService) RemoveEvent(eventID string) error {
+func (s *Service) RemoveEvent(eventID string) error {
 	return s.DB.Where(models.Event{Active: true, EventID: eventID}).Update("active", false).Error
 }
 
 // GetNextTick retrieves the tick number for the next tick from the database,
-// this is used to initialize our GameService when the program restarts
-func (s *DatabaseService) GetNextTick() (int64, error) {
+// this is used to initialize our Service when the program restarts
+func (s *Service) GetNextTick() (int64, error) {
 	var stock models.Stock
 	if err := s.DB.Table("stocks").Select("tick").Order("tick desc").First(&stock).Error; err != nil {
 		return 0, err
@@ -92,7 +96,8 @@ func (s *DatabaseService) GetNextTick() (int64, error) {
 	return stock.Tick + 1, nil
 }
 
-func (s *DatabaseService) GetStocksAtTick(lastTick int64) ([]models.Stock, error) {
+// GetStocksAtTick fetches the value of all stocks at a specific tick
+func (s *Service) GetStocksAtTick(lastTick int64) ([]models.Stock, error) {
 	var stocks []models.Stock
 	if err := s.DB.Where(models.Stock{Tick: lastTick}).Find(&stocks).Error; err != nil {
 		return nil, err
@@ -101,21 +106,14 @@ func (s *DatabaseService) GetStocksAtTick(lastTick int64) ([]models.Stock, error
 	return stocks, nil
 }
 
-//func (s *DatabaseService) AddOrder(order map[string]string) error {
+//func (s *Service) AddOrder(order map[string]string) error {
 
 //}
 
-//func (s *DatabaseService) GetOrder(id int) error {
+//func (s *Service) GetOrder(id int) error {
 
 //}
 
-//func (s *DatabaseService) DeleteOrder(id int) error {
+//func (s *Service) DeleteOrder(id int) error {
 
 //}
-
-// USE DBName;
-// GO
-// DECLARE @MyMsg VARCHAR(50)
-// SELECT @MyMsg = 'Hello, World.'
-// GO -- @MyMsg is not valid after this GO ends the batch.
-// https://sqliteonline.com

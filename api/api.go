@@ -11,13 +11,13 @@ import (
 	"github.com/go-chi/cors"
 )
 
-var db *database.DatabaseService
-var g *game.GameService
+var db *database.Service
+var g *game.Service
 
 const addr = "localhost:42069"
 
 // Start starts a new instance of our REST API
-func Start(databaseService *database.DatabaseService, gameService *game.GameService) {
+func Start(databaseService *database.Service, gameService *game.Service) {
 	db = databaseService
 	g = gameService
 

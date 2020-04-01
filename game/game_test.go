@@ -20,39 +20,39 @@ var data = []TestData{
 		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
 		affectedness: -1,
 		expectation: map[string]int64{
-			"TEST0": 10,
-			"TEST1": 34,
-			"TEST2": 30,
-			"TEST3": -1,
+			"TEST0": 1,
+			"TEST1": 5,
+			"TEST2": 21,
+			"TEST3": -5,
 		},
 	},
 	{
 		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
 		affectedness: -100,
 		expectation: map[string]int64{
-			"TEST0": -89,
-			"TEST1": -65,
-			"TEST2": -69,
-			"TEST3": -100,
+			"TEST0": -494,
+			"TEST1": -490,
+			"TEST2": -474,
+			"TEST3": -500,
 		},
 	},
 	{
 		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
 		affectedness: 100,
 		expectation: map[string]int64{
-			"TEST0": 111,
-			"TEST1": 135,
-			"TEST2": 131,
-			"TEST3": 100,
+			"TEST0": 506,
+			"TEST1": 510,
+			"TEST2": 526,
+			"TEST3": 500,
 		},
 	},
 	{
 		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
 		affectedness: 0,
 		expectation: map[string]int64{
-			"TEST0": 11,
-			"TEST1": 35,
-			"TEST2": 31,
+			"TEST0": 6,
+			"TEST1": 10,
+			"TEST2": 26,
 			"TEST3": 0,
 		},
 	},
@@ -66,7 +66,7 @@ var stockSettings = map[string]structs.StockSettings{
 }
 
 func TestGetTendency(t *testing.T) {
-	s := GameService{
+	s := Service{
 		StockSettings: stockSettings,
 	}
 

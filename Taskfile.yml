@@ -6,10 +6,16 @@ tasks:
   help:
     cmd: task --list
 
+  run:
+    desc: "run fantasymarket"
+    cmds:
+      - go run main.go
+
   test:
     desc: "run all tests"
     cmds:
-      - go test ./... -v -covermode=count -coverprofile=coverage.out
+      - go test ./...
+
   lint:
     desc: "lint all files"
     cmds:
@@ -29,5 +35,3 @@ tasks:
       - task install-linter
       - task lint
       - task test
-      - GO111MODULE=off go get github.com/mattn/goveralls
-      - $(go env GOPATH)/bin/goveralls -coverprofile=coverage.out -service=github

@@ -10,10 +10,11 @@ import (
 	"time"
 )
 
-type GameService struct {
+// Service is the GameService
+type Service struct {
 	EventSettings   map[string]structs.EventSettings
 	StockSettings   map[string]structs.StockSettings
-	DB              *database.DatabaseService
+	DB              *database.Service
 	Options         FantasyMarketOptions
 	TicksSinceStart int64
 }
@@ -26,7 +27,7 @@ type FantasyMarketOptions struct {
 }
 
 // Start starts the game loop
-func Start(db *database.DatabaseService) (*GameService, error) {
+func Start(db *database.Service) (*Service, error) {
 
 	stockSettings, err := loadStocks()
 	if err != nil {
@@ -45,7 +46,7 @@ func Start(db *database.DatabaseService) (*GameService, error) {
 		return nil, err
 	}
 
-	s := &GameService{
+	s := &Service{
 		Options: FantasyMarketOptions{
 			TicksPerSecond:  0.1,
 			StartDate:       time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
@@ -63,7 +64,7 @@ func Start(db *database.DatabaseService) (*GameService, error) {
 }
 
 // startLoop startsrunningticks indefinitly
-func startLoop(s *GameService) {
+func startLoop(s *Service) {
 
 	// We need to calculatre the current game date
 	startDate := s.Options.StartDate
@@ -84,7 +85,7 @@ func startLoop(s *GameService) {
 }
 
 // tick is updating the current state of our system
-func (s *GameService) tick(dateNow time.Time) {
+func (s *Service) tick(dateNow time.Time) {
 	// TODO: Get currently Running Events from the database (models.Event)
 
 	fmt.Println("[running tick:  " + strconv.FormatInt(s.TicksSinceStart, 10) + "]")
@@ -103,7 +104,7 @@ func (s *GameService) tick(dateNow time.Time) {
 }
 
 // checkEventStillGoing calculates if the duration of the event is over and then removes the event
-func (s GameService) checkEventStillGoing(e []models.Event, dateNow time.Time) {
+func (s Service) checkEventStillGoing(e []models.Event, dateNow time.Time) {
 	for i := 0; i < len(e); i++ {
 		endDate := e[i].CreatedAt.Add(e[i].Duration) // Calculate the endDate by adding the Duration to the time created
 		if !dateNow.Before(endDate) {                // Check if the current date is after the end date.
@@ -112,7 +113,7 @@ func (s GameService) checkEventStillGoing(e []models.Event, dateNow time.Time) {
 	}
 }
 
-func (s GameService) getEventAffectedness(e []models.Event, stock models.Stock) int64 {
+func (s Service) getEventAffectedness(e []models.Event, stock models.Stock) int64 {
 
 	affectedness := int64(0)
 	for _, event := range e {
@@ -129,19 +130,21 @@ func (s GameService) getEventAffectedness(e []models.Event, stock models.Stock) 
 	return affectedness
 }
 
-func (s GameService) ComputeStockNumbers(stocks []models.Stock, e []models.Event) {
+// ComputeStockNumbers computes the index at the next tick for a list of stocks
+func (s Service) ComputeStockNumbers(stocks []models.Stock, e []models.Event) {
 
 	// This computes the random and own stock, not taking into account other peoples selling
 	// As a stock drops to a % of its value, theres gonna be more buyers or more sellers
 	for _, stock := range stocks {
 		stock.Index += s.GetTendency(stock, s.getEventAffectedness(e, stock)) // Range of -2 to 2
 		fmt.Println("Name: ", stock.Symbol, "Index: ", stock.Index)
-		s.DB.AddStockToTable(stock, s.TicksSinceStart)
+		s.DB.AddStock(stock, s.TicksSinceStart)
 	}
 	fmt.Println("-----------------------------")
 }
 
-func (s GameService) GetTendency(stock models.Stock, affectedness int64) int64 {
+// GetTendency calculates the tendency of a stock to go up or down
+func (s Service) GetTendency(stock models.Stock, affectedness int64) int64 {
 	const n int64 = 10
 	const weightOfTrends = 2000
 	stockSettings := s.StockSettings[stock.Symbol]
