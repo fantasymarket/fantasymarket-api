@@ -115,14 +115,18 @@ func (s Service) checkEventStillGoing(e []models.Event, dateNow time.Time) {
 
 func (s Service) getEventAffectedness(e []models.Event, stock models.Stock) int64 {
 
+	//TODO: Check if the symbol is actually active too
 	affectedness := int64(0)
+
 	for _, event := range e {
+		activeEvent := s.EventSettings[event.EventID]
+		stockSettings := s.StockSettings[stock.StockID.String()]
 
-		eventSettings := s.EventSettings[event.EventID]
-
-		for tag := range eventSettings.Tags {
-			if _, ok := eventSettings.Tags[tag]; ok {
-				affectedness += eventSettings.Tags[tag].Trend
+		for _, tag := range activeEvent.Tags {
+			if stockSettings.Tags[tag.AffectsTag] {
+				if stockSettings.Symbol == tag.AffectsStock {
+					affectedness += tag.Trend
+				}
 			}
 		}
 	}
@@ -144,23 +148,21 @@ func (s Service) ComputeStockNumbers(stocks []models.Stock, e []models.Event) {
 }
 
 // GetTendency calculates the tendency of a stock to go up or down
-func (s Service) GetTendency(stock models.Stock, affectedness int64) int64 {
-	const n int64 = 10
-	const weightOfTrends = 2000
+func (s Service) GetTendency(stock models.Stock, EventAffectedness int64) int64 {
+	const rangeValue int64 = 10
+	const weighConst = 2000
 	stockSettings := s.StockSettings[stock.Symbol]
-	// Old Index: 10000, Stability: 1, Trend: -1
-	// Rand(-10,10) * 1 + (10000/2000)*1 + (10000/10000)*-1
-	// (3)*1 + (5)*1 + (1)*-1
-	// 3 + 5 - 1
-	// 7
-	// 10000 + 7
-	// New Index: 10007
 
 	seed := stock.Symbol + strconv.FormatInt(s.TicksSinceStart, 10)
-	randomModifier := hash.Int64HashRange(-n, n, seed) * stockSettings.Stability
+	// weightOfTrends is the value that determines how prominent the trends are in the calculation.
+	// the higher the weighConst, the less prominent the trend is
+	weightOfTrends := (stock.Index / weighConst)
 
-	stockTrend := (stock.Index / weightOfTrends) * stockSettings.Trend
-	eventTrend := (stock.Index / weightOfTrends) * affectedness
+	// randomModifier needs a random value in a range multiplied by a variable (depending on the stock) to create spikes in the stock chart
+	randomModifier := hash.Int64HashRange(-rangeValue, rangeValue, seed) * stockSettings.Stability
+	// stockTrend and eventTrend are the inputs to calculate the stock graph trends
+	stockTrend := weightOfTrends * stockSettings.Trend
+	eventTrend := weightOfTrends * EventAffectedness
 	tendency := randomModifier + stockTrend + eventTrend
 
 	return tendency

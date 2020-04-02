@@ -15,7 +15,6 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/senseyeio/duration v0.0.0-20180430131211-7c2a214ada46
 	github.com/stretchr/testify v1.5.1
-	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
 	golang.org/x/sys v0.0.0-20200331124033-c3d80250170d // indirect
 	golang.org/x/tools v0.0.0-20200331202046-9d5940d49312 // indirect
 	gopkg.in/yaml.v2 v2.2.8
