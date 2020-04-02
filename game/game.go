@@ -31,12 +31,10 @@ func Start(db *database.Service) (*Service, error) {
 
 	stockSettings, err := loadStocks()
 	if err != nil {
-		fmt.Println(1)
 		return nil, err
 	}
 
 	if err := db.CreateInitialStocks(stockSettings); err != nil {
-		fmt.Println(2)
 		return nil, err
 	}
 
@@ -113,22 +111,25 @@ func (s Service) checkEventStillGoing(e []models.Event, dateNow time.Time) {
 	}
 }
 
-func (s Service) getEventAffectedness(e []models.Event, stock models.Stock) int64 {
+func (s Service) getEventAffectedness(activeEvents []models.Event, stock models.Stock) int64 {
 
-	//TODO: Check if the symbol is actually active too
-	affectedness := int64(0)
+	var affectedness int64
+	for _, activeEvent := range activeEvents {
 
-	for _, event := range e {
-		activeEvent := s.EventSettings[event.EventID]
-		stockSettings := s.StockSettings[stock.StockID.String()]
+		eventSettings := s.EventSettings[activeEvent.EventID]
+		stockSettings := s.StockSettings[stock.Symbol]
 
-		for _, tag := range activeEvent.Tags {
-			if stockSettings.Tags[tag.AffectsTag] {
-				if stockSettings.Symbol == tag.AffectsStock {
-					affectedness += tag.Trend
-				}
+		for _, tagOptions := range eventSettings.Tags {
+
+			_, affectedByTag := stockSettings.Tags[tagOptions.AffectsTag]
+			affectedBySymbol := stock.Symbol == tagOptions.AffectsStock
+
+			if affectedByTag || affectedBySymbol {
+				affectedness += tagOptions.Trend
 			}
+
 		}
+
 	}
 
 	return affectedness

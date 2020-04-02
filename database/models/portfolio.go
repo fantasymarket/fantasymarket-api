@@ -26,6 +26,7 @@ type PortfolioItem struct {
 	PortfolioID     uuid.UUID `gorm:"not null;unique"`
 
 	Type   string // only stock for now
+	Symbol string
 	Amount int64
 }
 

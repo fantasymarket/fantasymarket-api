@@ -54,7 +54,8 @@ type EventSettings struct {
 	RunAfter  timeutils.Time // The event has to be run after this date
 
 	Duration timeutils.Duration // Time during which the event is the event is run every tick
-	Tags     map[string]TagOptions
+
+	Tags []TagOptions
 }
 
 // EventEffect is a effect that runs after an event is finished
