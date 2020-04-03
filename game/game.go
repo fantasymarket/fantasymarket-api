@@ -149,7 +149,8 @@ func (s Service) getEventAffectedness(activeEvents []models.Event, stock models.
 		stockDetails := s.StockDetails[stock.Symbol]
 		// models.Stock is what we get from the database and is a "lite" version of the "full" stock struct
 		// Hence we take the stock symbol as the key to extract the stock with the full details from the
-		// stock list and call it stockDetails
+		// stock list and call it stockDetails. stockDetails is a slice of stock instances from which we can gather
+		// the needed details for the following computation
 
 		for _, tagOptions := range eventDetails.Tags {
 
