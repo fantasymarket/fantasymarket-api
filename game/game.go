@@ -12,8 +12,8 @@ import (
 
 // Service is the GameService
 type Service struct {
-	EventSettings   map[string]structs.EventSettings
-	StockSettings   map[string]structs.StockSettings
+	EventList       map[string]structs.EventSettings
+	StockList       map[string]structs.StockSettings
 	DB              *database.Service
 	Options         FantasyMarketOptions
 	TicksSinceStart int64
@@ -29,20 +29,22 @@ type FantasyMarketOptions struct {
 // Start starts the game loop
 func Start(db *database.Service) (*Service, error) {
 
-	stockSettings, err := loadStocks()
+	loadedStocks, err := loadStocks()
 	if err != nil {
 		return nil, err
 	}
 
-	if err := db.CreateInitialStocks(stockSettings); err != nil {
+	if err := db.CreateInitialStocks(loadedStocks); err != nil {
 		return nil, err
 	}
 
 	// TODO: right now, this map is empty
-	eventSettings, err := loadEvents()
+	loadedEvents, err := loadEvents()
 	if err != nil {
 		return nil, err
 	}
+
+	// TODO: Take all Fixed events and map them where Key is startDate and value true?
 
 	s := &Service{
 		Options: FantasyMarketOptions{
@@ -50,9 +52,9 @@ func Start(db *database.Service) (*Service, error) {
 			StartDate:       time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
 			GameTimePerTick: time.Hour,
 		},
-		StockSettings: stockSettings,
-		EventSettings: eventSettings,
-		DB:            db,
+		StockList: loadedStocks,
+		EventList: loadedEvents,
+		DB:        db,
 	}
 
 	go startLoop(s)
@@ -111,17 +113,39 @@ func (s Service) checkEventStillGoing(e []models.Event, dateNow time.Time) {
 	}
 }
 
+func (s Service) getNextEventFromProbability(e models.Event) {
+	event := s.EventList[e.EventID]
+	r := hash.Int64HashRange(0, 10, event.EventID)
+	randomFloat := float64(r / 10) // Get the float for computation
+
+	for _, effect := range event.Effects { // 0.4 :: 0.6 :: 1 so r is between 0 - 0.4 (effect.Chance inclusive) and 0.4 - 0.6 and 0.6 - 1
+		lowerBound := float64(0)
+		for i := 0; i < len(event.Effects); i++ {
+			if lowerBound < randomFloat && randomFloat <= effect.Chance {
+				//Next event = effect.Effects
+				break
+			}
+			lowerBound += effect.Chance
+		}
+
+	}
+
+}
+
 func (s Service) getEventAffectedness(activeEvents []models.Event, stock models.Stock) int64 {
 
-	var affectedness int64
+	affectedness := int64(0)
 	for _, activeEvent := range activeEvents {
 
-		eventSettings := s.EventSettings[activeEvent.EventID]
-		stockSettings := s.StockSettings[stock.Symbol]
+		fullEventDetails := s.EventList[activeEvent.EventID]
+		fullStockDetails := s.StockList[stock.Symbol]
+		// models.Stock is what we get from the database and is a "lite" version of the "full" stock struct
+		// Hence we take the stock symbol as the key to extract the stock with the full details from the
+		// stock list and call it fullStockDetails
 
-		for _, tagOptions := range eventSettings.Tags {
+		for _, tagOptions := range fullEventDetails.Tags {
 
-			_, affectedByTag := stockSettings.Tags[tagOptions.AffectsTag]
+			_, affectedByTag := fullStockDetails.Tags[tagOptions.AffectsTag]
 			affectedBySymbol := stock.Symbol == tagOptions.AffectsStock
 
 			if affectedByTag || affectedBySymbol {
@@ -152,7 +176,7 @@ func (s Service) ComputeStockNumbers(stocks []models.Stock, e []models.Event) {
 func (s Service) GetTendency(stock models.Stock, EventAffectedness int64) int64 {
 	const rangeValue int64 = 10
 	const weighConst = 2000
-	stockSettings := s.StockSettings[stock.Symbol]
+	stockSettings := s.StockList[stock.Symbol]
 
 	seed := stock.Symbol + strconv.FormatInt(s.TicksSinceStart, 10)
 	// weightOfTrends is the value that determines how prominent the trends are in the calculation.
