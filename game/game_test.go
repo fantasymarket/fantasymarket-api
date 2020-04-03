@@ -2,7 +2,7 @@ package game
 
 import (
 	"fantasymarket/database/models"
-	"fantasymarket/game/structs"
+	"fantasymarket/game/stocks"
 
 	"testing"
 
@@ -11,7 +11,7 @@ import (
 
 type TestData struct {
 	stock        models.Stock
-	affectedness int64
+	affectedness float64
 	expectation  map[string]int64
 }
 
@@ -58,7 +58,7 @@ var data = []TestData{
 	},
 }
 
-var stockSettings = map[string]structs.StockSettings{
+var stockDetails = map[string]stocks.StockDetails{
 	"TEST0": {Stability: 1, Trend: 1},
 	"TEST1": {Stability: 5, Trend: 1},
 	"TEST2": {Stability: 1, Trend: 5},
@@ -67,11 +67,11 @@ var stockSettings = map[string]structs.StockSettings{
 
 func TestGetTendency(t *testing.T) {
 	s := Service{
-		StockSettings: stockSettings,
+		StockDetails: stockDetails,
 	}
 
 	for _, test := range data {
-		for i := range stockSettings {
+		for i := range stockDetails {
 			test.stock.Symbol = string(i)
 
 			result := s.GetTendency(test.stock, test.affectedness)

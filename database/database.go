@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"fantasymarket/database/models"
-	gameStructs "fantasymarket/game/structs"
+	"fantasymarket/game/stocks"
 
 	"github.com/jinzhu/gorm"
 
@@ -39,9 +39,9 @@ func Connect() (*Service, error) {
 }
 
 // CreateInitialStocks takes a list of initial stocks and uses them to initialize the database
-func (s *Service) CreateInitialStocks(stocks map[string]gameStructs.StockSettings) error {
+func (s *Service) CreateInitialStocks(stockDetails map[string]stocks.StockDetails) error {
 
-	for _, stock := range stocks {
+	for _, stock := range stockDetails {
 		if err := s.DB.FirstOrCreate(
 			&models.Stock{},
 			&models.Stock{

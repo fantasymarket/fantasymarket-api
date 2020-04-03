@@ -1,14 +1,14 @@
-package game
+package stocks
 
 import (
-	"fantasymarket/game/structs"
 	"io/ioutil"
 
 	"gopkg.in/yaml.v2"
 )
 
-func loadStocks() (map[string]structs.StockSettings, error) {
-	stockSettings := []structs.StockSettings{}
+// LoadStockDetails loads all stock details from the stocks.yaml
+func LoadStockDetails() (map[string]StockDetails, error) {
+	stockSettings := []StockDetails{}
 
 	stockData, err := ioutil.ReadFile("./game/stocks.yaml")
 	if err != nil {
@@ -19,7 +19,7 @@ func loadStocks() (map[string]structs.StockSettings, error) {
 		return nil, err
 	}
 
-	stockSettingsMap := map[string]structs.StockSettings{}
+	stockSettingsMap := map[string]StockDetails{}
 	for _, stock := range stockSettings {
 		stockSettingsMap[stock.Symbol] = stock
 	}

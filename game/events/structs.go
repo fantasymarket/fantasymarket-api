@@ -1,10 +1,10 @@
-package structs
+package events
 
 import (
 	"fantasymarket/utils/timeutils"
 )
 
-// EventSettings is the type for storing information about events
+// EventDetails is the type for storing information about events
 //
 //   It supports the following date/duration formats when parsing json/yaml:
 //
@@ -21,7 +21,7 @@ import (
 //      P3Y6M4DT12H30M5S
 //      => three years, six months, four days, twelve hours, thirty minutes, and five seconds
 //
-type EventSettings struct {
+type EventDetails struct {
 	// A unique string ID for an event (e.g `quantum-breakthrough`)
 	EventID string
 
@@ -60,18 +60,26 @@ type EventSettings struct {
 
 // EventEffect is a effect that runs after an event is finished
 type EventEffect struct {
-	// The chance this event is run (0 < chance < 1)
+	// The chance this event is run (0 < chance < 1) (decimal percentage)
 	Chance float64
 
 	// Event that is run directly after the parent event is over
-	NextEventID string
+	EventID string
 }
 
 // TagOptions are more indepth settings for specific event tags only
 type TagOptions struct {
-	AffectsTag   string
-	AffectsStock string // Affects Stock by symbol
-	Trend        int64  // Note: .2 would be 20 and .02 would be 2
-	//// TimeOffset time.Duration // Optionally offset the event to e.g only affect a tag after x time
-	////Duration time.Duration
+	// Can be a list of stock tags tags
+	// "all" is a shortcut for all stocks
+	// You can ignore stocks with `!`, e.g ["all", "!healthcare"]
+	AffectsTags   []string
+	AffectsStocks []string
+
+	// NOTE: An event can only be affected while an event is active
+	// So Offset + Duration cant be larger than EventSettings.Duration
+	Offset   timeutils.Duration // The tag only effects the stock after this duration
+	Duration timeutils.Duration // The tag only effects the stock for this duration
+
+	// How the much the tags are affected, as a decimal percentage
+	Trend float64 // 0.02 => +2% every game-tick
 }
