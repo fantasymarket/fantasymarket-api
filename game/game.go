@@ -1,6 +1,7 @@
 package game
 
 import (
+	"errors"
 	"fantasymarket/database"
 	"fantasymarket/database/models"
 	"fantasymarket/game/structs"
@@ -113,23 +114,22 @@ func (s Service) checkEventStillGoing(e []models.Event, dateNow time.Time) {
 	}
 }
 
-func (s Service) getNextEventFromProbability(e models.Event) {
+func (s Service) getNextEventFromProbability(e models.Event) (string, error) {
 	event := s.EventList[e.EventID]
 	r := hash.Int64HashRange(0, 10, event.EventID)
 	randomFloat := float64(r / 10) // Get the float for computation
 
+	// [EventEffect, EventEffect, EventEffect]
+	// EventEffect.Chance
+	lowerBound := float64(0)
 	for _, effect := range event.Effects { // 0.4 :: 0.6 :: 1 so r is between 0 - 0.4 (effect.Chance inclusive) and 0.4 - 0.6 and 0.6 - 1
-		lowerBound := float64(0)
-		for i := 0; i < len(event.Effects); i++ {
-			if lowerBound < randomFloat && randomFloat <= effect.Chance {
-				//Next event = effect.Effects
-				break
-			}
-			lowerBound += effect.Chance
+		if lowerBound < randomFloat && randomFloat <= effect.Chance || randomFloat == 0 {
+			return effect.NextEventID, nil
+			// TODO: Ask alex again how the details work
 		}
-
+		lowerBound += effect.Chance
 	}
-
+	return "", errors.New("Empty Event Effect Error")
 }
 
 func (s Service) getEventAffectedness(activeEvents []models.Event, stock models.Stock) int64 {

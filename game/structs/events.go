@@ -63,8 +63,8 @@ type EventEffect struct {
 	// The chance this event is run (0 < chance < 1)
 	Chance float64
 
-	// Events that are run directly after the parent event is over
-	Effects []string
+	// Event that is run directly after the parent event is over
+	NextEventID string
 }
 
 // TagOptions are more indepth settings for specific event tags only
