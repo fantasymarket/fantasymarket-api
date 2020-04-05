@@ -4,7 +4,6 @@ import (
 	"context"
 	"fantasymarket/utils/http/responses"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -49,12 +48,10 @@ func authenticator(next http.Handler, optional bool) http.Handler {
 
 		// Set userID context to the user_id
 		userID, userOk := claims["user_id"]
-		guest, guestOk := claims["guest"]
 
-		if userOk && guestOk {
+		if userOk {
 			ctx := context.WithValue(r.Context(), UserKey, Claims{
 				UserID: userID.(string),
-				Guest:  guest.(bool),
 			})
 
 			// Token is authenticated, pass it through
@@ -71,7 +68,6 @@ func authenticator(next http.Handler, optional bool) http.Handler {
 
 // Claims is our custom claims type
 type Claims struct {
-	Guest  bool   `json:"guest"`
 	UserID string `json:"user_id"`
 	jwt.StandardClaims
 }
@@ -79,14 +75,11 @@ type Claims struct {
 // CreateToken issues a new jwt token
 func CreateToken(secret string, username string, userID string) (string, error) {
 
-	isGuest := strings.HasPrefix(username, "guest-")
-
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
 
 	// Create the Claims
 	claims := Claims{
-		Guest: isGuest,
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  time.Now().Unix(),
 			ExpiresAt: time.Now().Add(time.Minute * 5).Unix(),

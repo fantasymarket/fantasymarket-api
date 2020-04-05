@@ -3,7 +3,9 @@ module fantasymarket
 go 1.13
 
 require (
+	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/dustinkirkland/golang-petname v0.0.0-20191129215211-8e5a1ed0cff0
 	github.com/go-chi/chi v4.0.4+incompatible
 	github.com/go-chi/cors v1.0.1
 	github.com/go-chi/jwtauth v4.0.4+incompatible
@@ -15,6 +17,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/senseyeio/duration v0.0.0-20180430131211-7c2a214ada46
 	github.com/stretchr/testify v1.5.1
+	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
 	golang.org/x/sys v0.0.0-20200331124033-c3d80250170d // indirect
 	golang.org/x/tools v0.0.0-20200331202046-9d5940d49312 // indirect
 	gopkg.in/yaml.v2 v2.2.8
