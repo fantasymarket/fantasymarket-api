@@ -1,17 +1,16 @@
-package api
+package v1
 
 import (
 	"fantasymarket/game/stocks"
 	"fantasymarket/utils/http/responses"
 	"io/ioutil"
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi"
 	"gopkg.in/yaml.v3"
 )
 
-func getAllStocks(w http.ResponseWriter, r *http.Request) {
+func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 	allStocks, err := ioutil.ReadFile("game/stocks.yaml")
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, "error getting list of stocks")
@@ -29,7 +28,7 @@ func getAllStocks(w http.ResponseWriter, r *http.Request) {
 	responses.CustomResponse(w, m, 200)
 }
 
-func getStockDetails(w http.ResponseWriter, r *http.Request) {
+func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 	symbol := chi.URLParam(r, "symbol")
 	yamlData, err := ioutil.ReadFile("game/stocks.yaml")
 
@@ -51,42 +50,4 @@ func getStockDetails(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responses.ErrorResponse(w, http.StatusNotFound, "no stock with symbol available")
-}
-
-func getPortfolio(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func orders(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func getEvents(w http.ResponseWriter, r *http.Request) {
-	events, err := db.GetEvents()
-
-	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "we're ginormously fucked")
-	}
-
-	responses.CustomResponse(w, events, 200)
-
-}
-
-func getOverview(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func getTime(w http.ResponseWriter, r *http.Request) {
-	t := g.Options.StartDate
-
-	if !t.IsZero() {
-		responses.CustomResponse(w, t.Format(time.RFC3339), 200)
-	} else {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "we're absolutely fucked")
-	}
-
-}
-
-func addOrder(w http.ResponseWriter, r *http.Request) {
-
 }
