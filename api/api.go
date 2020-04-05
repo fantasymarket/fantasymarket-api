@@ -1,6 +1,7 @@
 package api
 
 import (
+	v1 "fantasymarket/api/v1"
 	"fantasymarket/database"
 	"fantasymarket/game"
 	"fmt"
@@ -11,15 +12,10 @@ import (
 	"github.com/go-chi/cors"
 )
 
-var db *database.Service
-var g *game.Service
-
 const addr = "localhost:42069"
 
 // Start starts a new instance of our REST API
-func Start(databaseService *database.Service, gameService *game.Service) {
-	db = databaseService
-	g = gameService
+func Start(db *database.Service, game *game.Service) {
 
 	r := chi.NewRouter()
 
@@ -38,41 +34,10 @@ func Start(databaseService *database.Service, gameService *game.Service) {
 	// Middleware
 	r.Use(middleware.Logger, cors.Handler)
 
-	// Standalone GET Requests
-	r.Get("/news", getEvents) // Allow for query parameters
+	v1Handler := v1.NewAPIRouter(db, game)
 
-	r.Get("/overview", getOverview) // Some stats for the dashboard
-	// Top 2 Gainers / Top 2 Loosers
-	// Maybe total + of all stock and things like that in the future
-
-	r.Get("/time", getTime) // Current time on the server
-
-	// API Routes
-	r.Route("/stocks", func(r chi.Router) {
-
-		r.Get("/", getAllStocks)
-
-		r.Get("/{symbol}", getStockDetails)
-
-		r.Post("/orders", addOrder)
-
-	})
-
-	r.Route("/orders", func(r chi.Router) {
-
-		r.Get("/", orders)
-
-		r.Get("/{orderID}", orders)
-
-		r.Delete("/{orderID}", orders)
-	})
-
-	r.Route("/portfolio", func(r chi.Router) {
-
-		r.Get("/", getPortfolio)
-
-		r.Get("/{symbol}", getPortfolio)
-	})
+	r.Mount("/v1", v1Handler)
+	r.Mount("/", v1Handler)
 
 	fmt.Println("stated http server on " + addr + " :p")
 	http.ListenAndServe(addr, r)
