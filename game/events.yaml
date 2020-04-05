@@ -83,7 +83,7 @@
   type: "fixed"
   fixedDate: 31.06.2020 
 
-  dependencies: corona-virus-outbreak
+  dependencies: ["corona-virus-outbreak"]
   effects: null
 
   runAfter: 4080 ticks #(170 days)
@@ -159,21 +159,25 @@
 
   tags:
   - affectsTag: healthcare
-    trend: -0.6 #Create event chain here
+    trend: -0.6 
     affectsStockID: IDEXX, ANTM, DVA
-    fixedDate: 2020-08-08 09:22:42 #takes time for trends to set in
+    offset: PT2H1M55S
+    duration: P7D 
   - affectsTag: healthcare
     trend: -1.4
     affectsStockID: IDEXX, ANTM, DVA
-    fixedDate: 2020-15-08 02:44:42
+    offset: P7DT2H1M55S
+    duration: P7D 
   - affectsTag: healthcare
     trend: -0.5
     affectsStockID: IDEXX, ANTM, DVA
-    fixedDate: 2020-22-08 00:46:58
+    offset: P14DT2H1M55S
+    duration: P7D 
   - affectsTag: healthcare
     trend: 0.2
     affectsStockID: IDEXX, ANTM, DVA
-    fixedDate: 2020-27-08 00:46:58
+    offset: P21DT2H1M55S
+    duration: P7D 
     endDate: 2020-29-08 15:22:03 #event ends with this trend in mind
 
 
@@ -188,20 +192,21 @@
   # TODO: Create event chain with different parties
 
   effects: [
-    {chance: 0.4, effects: ["presidential-election-us-potential-republican-win"]}, #0.4
+    {chance: 0.4, effects: ["presidential-election-us-potential-republicans-win"]}, #0.4
     {chance: 0.9, effects: ["presidential-election-us-potential-democrats-win"]}, #0.5
-    {chance: 1, effects: ["presidential-election-us-potential-neutral-win"]}, #0.1
+    {chance: 1, effects: ["presidential-election-us-potential-neutrals-win"]}, #0.1
   ] # IF(0 <= rand <= 0.4) choose event1 then IF(0.4 <= rand <= 0.9) choose event2 then IF(0.9 <= rand <= 1) choose event3
 
   tags:
-  - affectsTag: all
-    trend: #random, but healthcare should be affected less
-    affectsStockID: all
+  - affectsTag: ["all"]
+    minTrend: -2  #todo
+    maxTrend: 2   #todo
+    affectsStockID: ["all"]
 
 
-- eventID: "presidential-election-us-potential-republican-win"
+- eventID: "presidential-election-us-potential-republicans-win"
   title: "Republicans winning Poland over"
-  description: "As the presidential election of Year {} is happening, the votes may favor the Republicans. The mock election in Tennessee is in favor of"
+  description: "As the presidential election of Year {} is happening, the votes may favor the Republicans." #todo (placeholder for description)
 
   duration: 1440 ticks
 
@@ -215,7 +220,7 @@
 
 - eventID: "presidential-election-us-potential-democrats-win"
   title: "Democrats are looking to win"
-  description: "As the presidential election of Year {} is happening, the votes may favor the Democrats"
+  description: "As the presidential election of Year {} is happening, the votes may favor the Democrats." #todo (placeholder for description)
 
   duration: 1440 ticks
 
@@ -226,7 +231,7 @@
   ]
 
 
-- eventID: "presidential-election-us-potential-neutral-win"
+- eventID: "presidential-election-us-potential-neutrals-win"
   title: "Republicans and Democrats losing, Neutrals are taking the stage it seems"
   description: "As the presidential election of Year {} is happening, the votes may favor the Neutrals."
 
@@ -238,9 +243,59 @@
     {chance: 1, effects: ["presidential-election-us-neutral-win"]}
   ]
 
+
 - eventID: "presidential-election-us-republican-win"
   title: "President {} to represent the winning Republican party as a win"
-  description: "With the awaited final results for the "
+  description: "With the awaited final results for the US presidential election of year {}, the Republicans have shown to be in favor of the majority."
+
+  fixedDate: random date between 1 Nov and 31 Nov {year} #todo
+
+  dependencies: "presidential-election-us-potential-republicans-win"
+  effects: null
+
+  tags:
+  - affectsTag: ["all"]
+    minTrend: -2  #todo
+    maxTrend: 2
+    affectsStockID: ["all"]
+    offset: PT1H2M55S
+    duration: P7D
+
+
+- eventID: "presidential-election-us-democrats-win"
+  title: "President {} to represent the winning Democratic party as a win"
+  description: "With the awaited final results for the US presidential election of year {}, the Democrats have shown to be in favor of the majority."
+
+  fixedDate: random date between 1 Nov and 31 Nov {year} #todo
+
+  dependencies: "presidential-election-us-potential-republicans-win"
+  effects: null
+
+  tags:
+  - affectsTag: ["all"]
+    minTrend: -2  #todo
+    maxTrend: 2
+    affectsStockID: ["all"]
+    offset: PT1H2M55S
+    duration: P7D
+
+
+- eventID: "presidential-election-us-neutrals-win"
+  title: "President {} to represent the winning Neutral party as a win"
+  description: "With the awaited final results for the US presidential election of year {}, the Neutrals have shown to be in favor of the majority."
+
+  fixedDate: random date between 1 Nov and 31 Nov {year} #todo
+
+  dependencies: "presidential-election-us-potential-neutrals-win"
+  effects: null
+
+  tags:
+  - affectsTag: ["all"]
+    minTrend: -2  #todo
+    maxTrend: 2
+    affectsStockID: ["all"]
+    offset: PT1H2M55S
+    duration: P7D
 
 
 
@@ -250,18 +305,20 @@
                 resuscitation beforehand."
   
   type: "fixed"
-  fixedDate: 04.04.2021
+  fixedDate: 2021-04-04 11:40:29
 
   dependencies: null
   effects: null
 
-  runAfter: 11016 ticks (459 days)
-  duration: unknown
+  runAfter: 11016 ticks
 
   tags:
-  - affectsTag: financial
-    trend: -0.2 to -0.9 (fluctuates for a few months)
-    affectsStockID: GS
+  - affectsTag: ["financial"]
+    minTrend: -0.9   
+    maxTrend: -0.2  
+    affectsStockID: ["GS"]
+    offset: PT4H44M18S
+    duration: P3M
 
 
 - eventID: "banking-companies-help-GS"
@@ -272,28 +329,47 @@
                 value of each bank."
 
   type: "fixed"
-  fixedDate: 18.05.2021 - 02.06.2021
+  fixedDate: 2021-18-05 09:10:04
 
   dependencies: buffett-sudden-death
   effects: null
 
-  runAfter: 12072 ticks (503 days)
-  duration: 360 ticks (15 days)
+  runAfter: 12072 ticks
 
   tags:
   - affectsTag: financial
-    trend: -0.9 for first week for GS, -0.1 for AXP and JPM; -0.4 until 02.06.2021 afterwards for GS, -0.6 for AXP and JPM.
-    affectsStockID: GS, AXP, JPM
+    trend: -0.9
+    affectsStockID: ["GS"]
+    offset: P2DT33M24S
+    duration: P7D
 
+  - affectsTag: financial
+    trend: -0.1
+    affectsStockID: ["AXP, JPM"]
+    offset: P2DT33M24S
+    duration: P7D
+
+  - affectsTag: financial
+    trend: -0.4
+    affectsStockID: ["GS"]
+    offset: P9DT33M24S
+    duration: P8D
+
+  - affectsTag: financial
+    trend: -0.6
+    affectsStockID: ["AXP, JPM"]
+    offset: P9DT33M24S
+    duration: P8D
+    
 
 - eventID: "db-complete-collapse"
   title: "Deutsche Bank reaches a complete collapse with record low value per share"
   description: "With a value of less than 5 USD per share, banking company Deutsche Bank is unable to retain position to attract investors
                 and is suffering from 265B EUR of debt. Capital Group uses their last strand of effort to help Deutsche Bank but is unable to succeed.
-                Following a few months, Deutsche Bank received a final value per share of 7.22 USD but was unable to maintain its value. Stock closes."
+                Following a few months, Deutsche Bank received a final value per share of 7.22 USD but was unable to maintain its value. Stock closes." #as of 18.01.2022
 
   type: "fixed"
-  fixedDate: 22.09.2021 - 18.01.2022
+  fixedDate: 2021-22-09 16:02:58
 
   dependencies: null
   effects: null
@@ -302,9 +378,27 @@
   duration: 2784 ticks (116 days)
 
   tags:
-  - affectsTag: financial
-    trend: -1.2 for first month (until value per share is 5.11 USD), 0.8 for the next 2 months until end of Dec, -1.8 until stock closes at 18.01.2020.
-    affectsStockID: DB
+  - affectsTag: ["financial"]
+    trend: -1.2
+    affectsStockID: ["DB"]
+    offset: PT43M40S
+    duration: P30D
+
+  tags:
+  - affectsTag: ["financial"]
+    trend: 0.8
+    affectsStockID: ["DB"]
+    offset: P30DT43M40S
+    duration: P60D
+  
+   tags:
+  - affectsTag: ["financial"]
+    trend: -1.8
+    affectsStockID: ["DB"]
+    offset: P90DT43M40S
+    duration: P28D
+    #stockCloses after this
+
 
 - eventID: "anonymous-hacker-finds-way"
   title: "Anonymous hacker finds way into main data feeds"
