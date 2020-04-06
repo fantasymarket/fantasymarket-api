@@ -1,7 +1,6 @@
 package game
 
 import (
-	"errors"
 	"fantasymarket/database"
 	"fantasymarket/database/models"
 	"fantasymarket/game/events"
@@ -67,7 +66,7 @@ func Start(db *database.Service) (*Service, error) {
 	}
 
 	go startLoop(s)
-	fmt.Println("stated game loop :o")
+	fmt.Println("stated game loop 😋")
 
 	return s, nil
 }
@@ -87,6 +86,19 @@ func startLoop(s *Service) {
 	}
 }
 
+// GetRandomEventEffect selects a random effect from an event
+func (s *Service) GetRandomEventEffect(e models.Event) (string, error) {
+	event := s.EventDetails[e.EventID]
+
+	effects := make(map[string]float64)
+	for _, e := range event.Effects {
+		effects[e.EventID] = e.Chance
+	}
+
+	seed := e.EventID + strconv.FormatInt(s.TicksSinceStart, 10)
+	return utils.SelectRandomWeightedItem(effects, seed)
+}
+
 // tick is updating the current state of our system
 func (s *Service) tick() error {
 	fmt.Println("\n> tick: " + strconv.FormatInt(s.TicksSinceStart, 10))
@@ -95,9 +107,9 @@ func (s *Service) tick() error {
 	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1) // Sub this for the DB query results
 
 	// TODO: add new events to database:
-	//        - fixed events that need to be added at a fixed date
-	//				- random events
-	// 				- reccuring events
+	//      - fixed events that need to be added at a fixed date
+	//		- random events
+	// 		- reccuring events
 
 	s.checkEventStillActive(currentlyRunningEvents)
 	newStocks := s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents)
@@ -126,25 +138,7 @@ func (s Service) checkEventStillActive(events []models.Event) {
 	}
 }
 
-func (s Service) getNextEventFromProbability(e models.Event) (string, error) {
-	event := s.EventDetails[e.EventID]
-	r := hash.Int64HashRange(0, 10, event.EventID)
-	randomFloat := float64(r / 10) // Get the float for computation
-
-	// [EventEffect, EventEffect, EventEffect]
-	// EventEffect.Chance
-	lowerBound := float64(0)
-	for _, effect := range event.Effects { // 0.4 :: 0.6 :: 1 so r is between 0 - 0.4 (effect.Chance inclusive) and 0.4 - 0.6 and 0.6 - 1
-		if lowerBound < randomFloat && randomFloat <= effect.Chance || randomFloat == 0 {
-			return effect.EventID, nil
-			// TODO: Ask alex again how the details work
-		}
-		lowerBound += effect.Chance
-	}
-	return "", errors.New("Empty Event Effect Error")
-}
-
-// GetEventAffectedness calculates how much a stock is affected by all curfrently running events
+// GetEventAffectedness calculates how much a stock is affected by all currently running events
 func (s Service) GetEventAffectedness(activeEvents []models.Event, stock models.Stock) float64 {
 
 	var affectedness float64
@@ -154,8 +148,7 @@ func (s Service) GetEventAffectedness(activeEvents []models.Event, stock models.
 		stockDetails := s.StockDetails[stock.Symbol]
 		// models.Stock is what we get from the database and is a "lite" version of the "full" stock struct
 		// Hence we take the stock symbol as the key to extract the stock with the full details from the
-		// stock list and call it stockDetails. stockDetails is a slice of stock instances from which we can gather
-		// the needed details for the following computation
+		// stock list and call it stockDetails. stockDetails is a single stock instance from which we can gather the details we want
 
 		for _, tagOptions := range eventDetails.Tags {
 

@@ -83,6 +83,7 @@ func (s *Service) AddStocks(stocks []models.Stock, tick int64) error {
 // GetEvents fetches all currently active events
 func (s *Service) GetEvents() ([]models.Event, error) {
 	var events []models.Event
+	// TODO: createdAt > currentGameTime
 	if err := s.DB.Where(models.Event{Active: true}).Find(&events).Error; err != nil {
 		return nil, err
 	}
