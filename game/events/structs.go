@@ -31,15 +31,18 @@ type EventDetails struct {
 
 	// Type says when the event is run
 	// can be:
-	//	- recurring		- events like ellections that happen every x years
 	// 	- fixed				- events that happen on a fixed date
+	//	- recurring		- events like ellections that happen every x years
+	//                  note: these also need the same options as a fixed date
 	//	- random			- events that can happen randomly
 	//
 	// Properties like `FixedDate` can only be used when the
 	// type is actually set to `fixed`
 	Type string
 
-	FixedDate         timeutils.Time     // date the event has to be run
+	FixedDate             timeutils.Time     // date the event has to be run
+	FixedDateRandomOffset timeutils.Duration // Offset from 0-n added to the fixed date
+
 	RandomChance      float64            // the chance for the event to occur in a tick [0, 1] (thould be less than .01%)
 	ReccuringDuration timeutils.Duration // When an event has to happen e.g yearly
 

@@ -7,6 +7,7 @@ import (
 	"fantasymarket/game/stocks"
 
 	"github.com/jinzhu/gorm"
+	uuid "github.com/satori/go.uuid"
 
 	// load sqlite dialect
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -58,7 +59,7 @@ func (s *Service) CreateInitialStocks(stockDetails map[string]stocks.StockDetail
 	return nil
 }
 
-// AddStock adds a Stock to the stock table
+// AddStock adds a stock to the stock table
 func (s *Service) AddStock(stock models.Stock, tick int64) error {
 	return s.DB.Create(&models.Stock{
 		Symbol: stock.Symbol,
@@ -67,6 +68,16 @@ func (s *Service) AddStock(stock models.Stock, tick int64) error {
 		Volume: stock.Volume,
 		Tick:   tick,
 	}).Error
+}
+
+// AddStocks adds a slice of stocks to the stock table
+func (s *Service) AddStocks(stocks []models.Stock, tick int64) error {
+	for _, stock := range stocks {
+		if err := s.AddStock(stock, tick); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // GetEvents fetches all currently active events
@@ -80,8 +91,8 @@ func (s *Service) GetEvents() ([]models.Event, error) {
 }
 
 // RemoveEvent marks an event as inactive so it won't affect stocks in the GameLoop anymore
-func (s *Service) RemoveEvent(eventID string) error {
-	return s.DB.Where(models.Event{Active: true, EventID: eventID}).Update("active", false).Error
+func (s *Service) RemoveEvent(uniqueEventID uuid.UUID) error {
+	return s.DB.Where(models.Event{Active: true, ID: uniqueEventID}).Update("active", false).Error
 }
 
 // GetNextTick retrieves the tick number for the next tick from the database,
@@ -92,7 +103,6 @@ func (s *Service) GetNextTick() (int64, error) {
 		return 0, err
 	}
 
-	fmt.Println("Next Tick: ", stock.Tick+1)
 	return stock.Tick + 1, nil
 }
 

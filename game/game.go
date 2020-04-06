@@ -74,50 +74,54 @@ func Start(db *database.Service) (*Service, error) {
 
 // startLoop startsrunningticks indefinitly
 func startLoop(s *Service) {
-
-	// We need to calculatre the current game date
-	startDate := s.Options.StartDate
-	gameTimePerTick := s.Options.GameTimePerTick
 	s.TicksSinceStart, _ = s.DB.GetNextTick()
-	dateNow := startDate.Add(gameTimePerTick * time.Duration(s.TicksSinceStart))
+	fmt.Println("loaded ticksSinceStart from database:", s.TicksSinceStart, "ticks")
 
 	for {
-		s.tick(dateNow)
+		s.tick()
 
 		// Sleep for the duration of a single tick (Since we want 1 tick in 10 Seconds)
 		time.Sleep(time.Duration(1/s.Options.TicksPerSecond) * time.Second)
 
-		// Adding 1 hour every tick(Update) (10 seconds when TicksPerSecond=0.1 ) onto the previously defined Date time
-		dateNow = dateNow.Add(gameTimePerTick)
 		s.TicksSinceStart++
 	}
 }
 
 // tick is updating the current state of our system
-func (s *Service) tick(dateNow time.Time) {
-	// TODO: Get currently Running Events from the database (models.Event)
-
-	fmt.Println("[running tick:  " + strconv.FormatInt(s.TicksSinceStart, 10) + "]")
+func (s *Service) tick() error {
+	fmt.Println("\n> tick: " + strconv.FormatInt(s.TicksSinceStart, 10))
 
 	currentlyRunningEvents, _ := s.DB.GetEvents()                      // Sub this for the DB query results
 	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1) // Sub this for the DB query results
 
-	s.checkEventStillGoing(currentlyRunningEvents, dateNow)
+	// TODO: add new events to database:
+	//        - fixed events that need to be added at a fixed date
+	//				- random events
+	// 				- reccuring events
 
-	// Events: Events have tags: Fixed, Recurring, Random
-	//    Hardcoded Events => Elections, Olympic Games etc
-	//    Definate Date Events (Moon Landing 1969)?
+	s.checkEventStillActive(currentlyRunningEvents)
+	newStocks := s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents)
+	if err := s.DB.AddStocks(newStocks, s.TicksSinceStart); err != nil {
+		return err
+	}
 
-	s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents)
-	// saveNextStockIndexes()
+	// TODO: process current orderbook
+
+	return nil
 }
 
-// checkEventStillGoing calculates if the duration of the event is over and then removes the event
-func (s Service) checkEventStillGoing(e []models.Event, dateNow time.Time) {
-	for i := 0; i < len(e); i++ {
-		endDate := e[i].CreatedAt.Add(e[i].Duration) // Calculate the endDate by adding the Duration to the time created
-		if !dateNow.Before(endDate) {                // Check if the current date is after the end date.
-			s.DB.RemoveEvent(e[i].EventID)
+// checkEventStillActive calculates if the duration of the event is over and then removes the event
+func (s Service) checkEventStillActive(events []models.Event) {
+
+	currentDate := s.GetCurrentDate()
+
+	for _, event := range events {
+
+		eventDetails := s.EventDetails[event.EventID]
+		endDate := eventDetails.Duration.Shift(event.CreatedAt)
+
+		if !currentDate.Before(endDate) {
+			s.DB.RemoveEvent(event.ID)
 		}
 	}
 }
@@ -140,7 +144,8 @@ func (s Service) getNextEventFromProbability(e models.Event) (string, error) {
 	return "", errors.New("Empty Event Effect Error")
 }
 
-func (s Service) getEventAffectedness(activeEvents []models.Event, stock models.Stock) float64 {
+// GetEventAffectedness calculates how much a stock is affected by all curfrently running events
+func (s Service) GetEventAffectedness(activeEvents []models.Event, stock models.Stock) float64 {
 
 	var affectedness float64
 	for _, activeEvent := range activeEvents {
@@ -154,13 +159,7 @@ func (s Service) getEventAffectedness(activeEvents []models.Event, stock models.
 
 		for _, tagOptions := range eventDetails.Tags {
 
-			affectedByTag := false
-			for _, tag := range tagOptions.AffectsTags {
-				if utils.Includes(stockDetails.Tags, tag) {
-					affectedByTag = true
-				}
-			}
-
+			affectedByTag := utils.Some(stockDetails.Tags, tagOptions.AffectsTags)
 			affectedBySymbol := utils.Includes(tagOptions.AffectsStocks, stock.Symbol)
 
 			if affectedByTag || affectedBySymbol {
@@ -173,16 +172,18 @@ func (s Service) getEventAffectedness(activeEvents []models.Event, stock models.
 }
 
 // ComputeStockNumbers computes the index at the next tick for a list of stocks
-func (s Service) ComputeStockNumbers(stocks []models.Stock, e []models.Event) {
+func (s Service) ComputeStockNumbers(stocks []models.Stock, e []models.Event) []models.Stock {
 
 	// This computes the random and own stock, not taking into account other peoples selling
 	// As a stock drops to a % of its value, theres gonna be more buyers or more sellers
 	for _, stock := range stocks {
-		stock.Index += s.GetTendency(stock, s.getEventAffectedness(e, stock)) // Range of -2 to 2
+		affectedness := s.GetEventAffectedness(e, stock)
+		stock.Index += s.GetTendency(stock, affectedness)
+
 		fmt.Println("Name: ", stock.Symbol, "Index: ", stock.Index)
-		s.DB.AddStock(stock, s.TicksSinceStart)
 	}
-	fmt.Println("-----------------------------")
+
+	return stocks
 }
 
 // GetTendency calculates the tendency of a stock to go up or down
