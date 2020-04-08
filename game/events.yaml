@@ -1,3 +1,7 @@
+# Functions:  Random Date in a Month / Range of days
+#             Function for frontend to get year instead of placeholder in description
+#             Function that starts events (taking into consideration that dependencies cant be run without the even they are depending on)              
+
 # SAMPLE EVENT:
 - eventID: "quantum-breakthrough"
   title: ""
@@ -21,11 +25,11 @@
 
   duration: "1000 days"   # Time during which the event is the event is run every tick
 
-  # TagOptions are more indepth settings for specific event tags only
+  # TagOptions are more in-depth settings for specific event tags only
   tags:
-    - affectsTag: tech
+    - affectsTags: tech
       trend: 1.2
-    - affectsStockID: GOOG
+    - affectsStockIDs: GOOG
       trend: 1.6
 
 - eventID: "corona-virus-outbreak"
@@ -36,40 +40,36 @@
   fixedDate: 2020-01-01 00:00:01
   
   dependencies: null
-  effects: [ {chance: 1, effects: ["healthcare-receive-huge-boost"]}]
+  effects: [ 
+    {chance: 1, effects: ["healthcare-receive-huge-boost"]}]
 
   runAfter: "0"
 
   duration: "random" #(because of no signs of stopping)
   
   tags:
-  - affectsTag: ["all", "!healthcare"]
+  - affectsTags: ["all", "!healthcare"]
     trend: -1.1
-    affectsStockID: ["all", "!healthcare_stocks"] #for !healthcare_stocks, create a list in GO where it puts all the healthcare stocks inside
     offset: PT1H5M22S 
     duration: P3M10D 
     # endDate: 2020-03-11
-  - affectsTag: ["all", "!healthcare"]
+  - affectsTags: ["all", "!healthcare"]
     trend: -0.4
-    affectsStockID: ["all", "!healthcare_stocks"] #for !healthcare_stocks, create a list in GO where it puts all the healthcare stocks inside
     offset: P3M10DT1H5M22S
     duration: P5M29D 
     # endDate: 2020-09-10
-  - affectsTag: ["all", "!healthcare"]
+  - affectsTags: ["all", "!healthcare"]
     trend: -0.8
-    affectsStockID: ["all", "!healthcare_stocks"] #for !healthcare_stocks, create a list in GO where it puts all the healthcare stocks inside
     offset: P9M9DT1H5M22S
     duration: P1M9D 
     # endDate: 2020-10-09
-  - affectsTag: ["healthcare"]
+  - affectsTags: ["healthcare"]
     trend: 0.7
-    affectsStockID: ["all", "healthcare"]
     offset: PT1H2M44S
     duration: P9M15D
     # endDate: 2020-10-15
-  - affectsTag: ["healthcare"]
+  - affectsTags: ["healthcare"]
     trend: 0.2
-    affectsStockID: ["all", "healthcare"]
     offset: P10M1DT1H2M44S
     duration: P27D
     # endDate: 2020-11-02
@@ -90,12 +90,12 @@
   duration: 768 ticks #(32 days)
 
   tags:
-  - affectsTag: ["healthcare"] #Tags for Events and Tags for Stocks are the same. If yes, they might be affected
+  - affectsTags: ["healthcare"] #Tags for Events and Tags for Stocks are the same. If yes, they might be affected
     trend: 1.3
-    affectsStockID: ["IDEXX, ANTM"] #If the affectsStockID is the same as the StockID, the stock IS affected by the number given by the trend -If affectsStockID is empty, ignore it
-  - affectsTag: ["healthcare"]
+    affectsStockIDs: ["IDEXX, ANTM"] #If the affectsStockIDs is the same as the StockID, the stock IS affected by the number given by the trend -If affectsStockIDs is empty, ignore it
+  - affectsTags: ["healthcare"]
     trend: 1.1
-    affectsStockID: ["DVA"]
+    affectsStockIDs: ["DVA"]
 
 
 - eventID: "JPM-to-modernize-access-to-data"
@@ -115,29 +115,29 @@
   duration: 1056 ticks #(44 days)
 
   tags:
-  - affectsTag: ["financial"]
+  - affectsTags: ["financial"]
     trend: 0.2 
-    affectsStockID: ["JPM"]
+    affectsStockIDs: ["JPM"]
     offset: PT39M22S
     duration: P7D 
-  - affectsTag: ["financial"]
+  - affectsTags: ["financial"]
     trend: 0.8 
-    affectsStockID: ["JPM"]
+    affectsStockIDs: ["JPM"]
     offset: P7DT39M22S
     duration: P7D 
-  - affectsTag: ["financial"]
+  - affectsTags: ["financial"]
     trend: 1.2  
-    affectsStockID: ["JPM"]
+    affectsStockIDs: ["JPM"]
     offset: P14DT39M22S
     duration: P7D 
-  - affectsTag: ["financial"]
+  - affectsTags: ["financial"]
     trend: 0.4
-    affectsStockID: ["JPM"]
+    affectsStockIDs: ["JPM"]
     offset: P21DT39M22S
     duration: P7D 
-  - affectsTag: ["financial"]
+  - affectsTags: ["financial"]
     trend: 0.5
-    affectsStockID: ["JPM"]
+    affectsStockIDs: ["JPM"]
     offset: P28DT39M22S
     duration: P16D
 
@@ -158,24 +158,24 @@
   duration: 456 ticks (19 days)
 
   tags:
-  - affectsTag: healthcare
+  - affectsTags: healthcare
     trend: -0.6 
-    affectsStockID: IDEXX, ANTM, DVA
+    affectsStockIDs: IDEXX, ANTM, DVA
     offset: PT2H1M55S
     duration: P7D 
-  - affectsTag: healthcare
+  - affectsTags: healthcare
     trend: -1.4
-    affectsStockID: IDEXX, ANTM, DVA
+    affectsStockIDs: IDEXX, ANTM, DVA
     offset: P7DT2H1M55S
     duration: P7D 
-  - affectsTag: healthcare
+  - affectsTags: healthcare
     trend: -0.5
-    affectsStockID: IDEXX, ANTM, DVA
+    affectsStockIDs: IDEXX, ANTM, DVA
     offset: P14DT2H1M55S
     duration: P7D 
-  - affectsTag: healthcare
+  - affectsTags: healthcare
     trend: 0.2
-    affectsStockID: IDEXX, ANTM, DVA
+    affectsStockIDs: IDEXX, ANTM, DVA
     offset: P21DT2H1M55S
     duration: P7D 
     endDate: 2020-29-08 15:22:03 #event ends with this trend in mind
@@ -185,8 +185,10 @@
   title: "Presidential elections are around the corner. What will happen to stocks?"
   description: "With the presidential election about to occur, what will analysts and investors think of the impact it will bring to the stock market?"
 
+  fixedDate: 2020-11-03 12:22:22 #todo
+  fixedDateRandomOffset: P29D
   type: "recurring"
-  recurringDuration: 35040 ticks #4 in years -> next one is 03.11.2020. Usually around November. TODO: Create function to randomize November Date
+  recurringDuration: P4Y #4 in years -> next one is 03.11.2020. Usually around November. TODO: Create function to randomize November Date
   
   # Could make it more complicated by having effects of different parties that would change the stocks
   # TODO: Create event chain with different parties
@@ -198,18 +200,18 @@
   ] # IF(0 <= rand <= 0.4) choose event1 then IF(0.4 <= rand <= 0.9) choose event2 then IF(0.9 <= rand <= 1) choose event3
 
   tags:
-  - affectsTag: ["all"]
+  - affectsTags: ["all"]
     minTrend: -2  #todo
     maxTrend: 2   #todo
-    affectsStockID: ["all"]
+    affectsStockIDs: ["all"]
 
 
 - eventID: "presidential-election-us-potential-republicans-win"
+  type: custom
   title: "Republicans winning Poland over"
   description: "As the presidential election of Year {} is happening, the votes may favor the Republicans." #todo (placeholder for description)
 
-  duration: 1440 ticks
-
+  duration: P5D 
 
   effects: [
     {chance: 0.45, effects: ["presidential-election-us-republican-win"]}
@@ -219,10 +221,11 @@
     
 
 - eventID: "presidential-election-us-potential-democrats-win"
+  type: custom
   title: "Democrats are looking to win"
   description: "As the presidential election of Year {} is happening, the votes may favor the Democrats." #todo (placeholder for description)
 
-  duration: 1440 ticks
+  duration: P5D
 
   effects: [
     {chance: 0.35, effects: ["presidential-election-us-republican-win"]}
@@ -232,10 +235,11 @@
 
 
 - eventID: "presidential-election-us-potential-neutrals-win"
+  type: custom
   title: "Republicans and Democrats losing, Neutrals are taking the stage it seems"
   description: "As the presidential election of Year {} is happening, the votes may favor the Neutrals."
 
-  duration: 1440 ticks
+  duration: P5D
 
   effects: [
     {chance: 0.35, effects: ["presidential-election-us-republican-win"]}
@@ -248,16 +252,16 @@
   title: "President {} to represent the winning Republican party as a win"
   description: "With the awaited final results for the US presidential election of year {}, the Republicans have shown to be in favor of the majority."
 
-  fixedDate: random date between 1 Nov and 31 Nov {year} #todo
+  fixedDate: random date between 1 Nov and 31 Nov {year} #todo We need to change this to random range in Nov
 
-  dependencies: "presidential-election-us-potential-republicans-win"
+  dependencies: "presidential-election-us-potential-republicans-win" #We need to start writing the func that starts events I feel. helps with thinking about it
   effects: null
 
   tags:
-  - affectsTag: ["all"]
+  - affectsTags: ["all"]
     minTrend: -2  #todo
     maxTrend: 2
-    affectsStockID: ["all"]
+    affectsStockIDs: ["all"]
     offset: PT1H2M55S
     duration: P7D
 
@@ -272,10 +276,10 @@
   effects: null
 
   tags:
-  - affectsTag: ["all"]
+  - affectsTags: ["all"]
     minTrend: -2  #todo
     maxTrend: 2
-    affectsStockID: ["all"]
+    affectsStockIDs: ["all"]
     offset: PT1H2M55S
     duration: P7D
 
@@ -290,10 +294,10 @@
   effects: null
 
   tags:
-  - affectsTag: ["all"]
+  - affectsTags: ["all"]
     minTrend: -2  #todo
     maxTrend: 2
-    affectsStockID: ["all"]
+    affectsStockIDs: ["all"]
     offset: PT1H2M55S
     duration: P7D
 
@@ -313,10 +317,10 @@
   runAfter: 11016 ticks
 
   tags:
-  - affectsTag: ["financial"]
+  - affectsTags: ["financial"]
     minTrend: -0.9   
     maxTrend: -0.2  
-    affectsStockID: ["GS"]
+    affectsStockIDs: ["GS"]
     offset: PT4H44M18S
     duration: P3M
 
@@ -337,27 +341,27 @@
   runAfter: 12072 ticks
 
   tags:
-  - affectsTag: financial
+  - affectsTags: financial
     trend: -0.9
-    affectsStockID: ["GS"]
+    affectsStockIDs: ["GS"]
     offset: P2DT33M24S
     duration: P7D
 
-  - affectsTag: financial
+  - affectsTags: financial
     trend: -0.1
-    affectsStockID: ["AXP, JPM"]
+    affectsStockIDs: ["AXP, JPM"]
     offset: P2DT33M24S
     duration: P7D
 
-  - affectsTag: financial
+  - affectsTags: financial
     trend: -0.4
-    affectsStockID: ["GS"]
+    affectsStockIDs: ["GS"]
     offset: P9DT33M24S
     duration: P8D
 
-  - affectsTag: financial
+  - affectsTags: financial
     trend: -0.6
-    affectsStockID: ["AXP, JPM"]
+    affectsStockIDs: ["AXP, JPM"]
     offset: P9DT33M24S
     duration: P8D
     
@@ -378,23 +382,23 @@
   duration: 2784 ticks (116 days)
 
   tags:
-  - affectsTag: ["financial"]
+  - affectsTags: ["financial"]
     trend: -1.2
-    affectsStockID: ["DB"]
+    affectsStockIDs: ["DB"]
     offset: PT43M40S
     duration: P30D
 
   tags:
-  - affectsTag: ["financial"]
+  - affectsTags: ["financial"]
     trend: 0.8
-    affectsStockID: ["DB"]
+    affectsStockIDs: ["DB"]
     offset: P30DT43M40S
     duration: P60D
   
    tags:
-  - affectsTag: ["financial"]
+  - affectsTags: ["financial"]
     trend: -1.8
-    affectsStockID: ["DB"]
+    affectsStockIDs: ["DB"]
     offset: P90DT43M40S
     duration: P28D
     #stockCloses after this
@@ -415,9 +419,9 @@
   duration: 48 ticks (2 days)
 
   tags:
-  - affectsTag: financial, tech
+  - affectsTags: financial, tech
     trend: -0.5 to -1.4 (fluctuates)
-    affectsStockID: JPM, AXP (financial), FB, AAPL, MSFT (tech)
+    affectsStockIDs: JPM, AXP (financial), FB, AAPL, MSFT (tech)
 
 
 - eventID: "tesla-successful-breakthrough"
@@ -436,9 +440,9 @@
   duration: 1368 ticks (57 days)
 
   tags:
-  - affectsTag: energy
+  - affectsTags: energy
     trend: 1.5 (for first month), 0.8 (the next following weeks)
-    affectsStockID: TSLA
+    affectsStockIDs: TSLA
 
 
 - eventID: "microsoft-declares-war-against-apple"
@@ -457,9 +461,9 @@
   duration: 8688 ticks (362 days)
 
   tags:
-  - affectsTag: tech
+  - affectsTags: tech
     trend: 0.2 to 1.1 (fluctuates, MSFT should have a higher stock value than AAPL)
-    affectsStockID: MSFT, AAPL
+    affectsStockIDs: MSFT, AAPL
 
 
 - eventID: "boeing-huge-airplane-crash"
@@ -477,9 +481,9 @@
   duration: 2256 ticks (94 days)
 
   tags: 
-  - affectsTag: aviation
+  - affectsTags: aviation
     trend: -1.8 for first month, -1.5 for second month, -1.1 for third month, 0.2 for fourth month
-    affectsStockID: BA
+    affectsStockIDs: BA
 
 
 - eventID: "global-pandemic"
@@ -497,9 +501,9 @@
   duration: 4032 ticks (168 days)
 
   tags:
-  - affectsTag: all
+  - affectsTags: all
     trend: -1.4 for airplane, -0.3 for tech, 0.9 for health, -0.8 for rest
-    affectsStockID: all
+    affectsStockIDs: all
 
 
 - eventID: "new-streaming-platform"
@@ -518,9 +522,9 @@
   duration: 1536 ticks (64 days)
 
   tags:
-  - affectsTag: tech
+  - affectsTags: tech
     trend: 1.8 for first few weeks, 1.2 for next weeks, 0.4 for last week
-    affectsStockID: AAPL
+    affectsStockIDs: AAPL
 
 
 - eventID: "microsoft-releases-new-car"
@@ -539,9 +543,9 @@
   duration: 2040 ticks (85 days)
 
   tags:
-  - affectsTag: tech
+  - affectsTags: tech
     trend: MSFT - 1.7 for first month, 0.4 for second month, -0.1 for third month; AAPL - -0.2 for first month, -0.6 for second month, 0.2 for third month 
-    affectsStockID: MSFT, AAPL
+    affectsStockIDs: MSFT, AAPL
 
 - eventID: "microsoft-releases-new-car"
   title: "Microsoft to release new console in Q4 2024"
@@ -558,9 +562,9 @@
   duration: 1992 ticks (83 days)
 
   tags: 
-  - affectsTag: tech
+  - affectsTags: tech
     trend: 1.3 for first month, 0.8 for second month, 1.8 for last month (Christmas spending)
-    affectsStockID: MSFT
+    affectsStockIDs: MSFT
 
 
 - eventID: "AXP-releases-crypto-credit-card"
@@ -580,9 +584,9 @@
   duration: 5184 ticks (216 days)
 
   tags:
-  - affectsTag: financial
+  - affectsTags: financial
     trend: 0.8 for first month, 1.4 for second and third, 1.8 for fourth (during release), 1.3 for fifth, 0.6 for sixth.
-    affectsStockID: AXP
+    affectsStockIDs: AXP
 
 
 - eventID: "bitcoin-drops-to-2-year-low"
@@ -601,9 +605,9 @@
   duration: 840 ticks (35 days)
 
   tags:
-  - affectsTag: financial
+  - affectsTags: financial
     trend: -0.6 for JPM, -0.2 for GS and -1.4 for AXP (due to crypto card)
-    affectsStockID: JPM, GS, AXP
+    affectsStockIDs: JPM, GS, AXP
 
 
 - eventID: "facebook-facing-bankrupcy"
@@ -623,9 +627,9 @@
   duration: 504 ticks (21 days)
 
   tags:
-  - affectsTag: tech
+  - affectsTags: tech
     trend: -1.2 for first week, -1.6 for second week, -0.4 for remaining
-    affectsStockID: FB (NASDAQ) / FB2A (FRA)
+    affectsStockIDs: FB (NASDAQ) / FB2A (FRA)
 
 
 - eventID: "upcoming-cloud-storm-to-threaten-solar-power-companies"
@@ -644,9 +648,9 @@
   duration: 864 ticks (36 days)
 
   tags:
-  - affectsTag: energy
+  - affectsTags: energy
     trend: -1.4 
-    affectsStockID: NEP, FSLR
+    affectsStockIDs: NEP, FSLR
 
 
 - eventID: "buffett-employees-to-sell-davita-shares"
@@ -665,9 +669,9 @@
   duration: 936 ticks (39 days)
 
   tags:
-  - affectsTag: healthcare
+  - affectsTags: healthcare
     trend: -1.1 for first few weeks, -0.7 for next few weeks, -0.2 for second last week and 0.1 for last week
-    affectsStockID: DVA
+    affectsStockIDs: DVA
 
 
 - eventID: "american-express-to-launch-into-tech"
@@ -688,9 +692,9 @@
   duration: 1944 ticks (81 days)
 
   tags:
-  - affectsTag: financial
+  - affectsTags: financial
     trend: 0.4 for first week, 0.9 for second, 0.5 for third, 1.2 for first month of launch, 0.2 until end
-    affectsStockID: AXP
+    affectsStockIDs: AXP
 
 
 - eventID: "boeing-huge-buy-off-for-fighter-planes"
@@ -709,9 +713,9 @@
   duration: 1296 ticks (54 days)
 
   tags:
-  - affectsTag: aviation
+  - affectsTags: aviation
     trend: 0.4 for first 2 weeks, 1.8 for February, -0.3 for March
-    affectsStockID: BA
+    affectsStockIDs: BA
   
 
 - eventID: "microsoft-buys-facebook-amidst-crisis"
@@ -731,9 +735,9 @@
   duration: 1464 ticks (61 days)
 
   tags:
-  - affectsTag: tech
+  - affectsTags: tech
     trend: -0.9 for FB, 0.8 for MSFT during first month; -0.5 for FB, 1.2 for MSFT for April, 0.2 for FB, 0.8 for MSFT during May
-    affectsStockID: MSFT, FB
+    affectsStockIDs: MSFT, FB
 
 
 - eventID: "netflix-to-obtain-copyright-permission-from-HBO"
@@ -752,9 +756,9 @@
   duration: 2184 ticks (91 days)
 
   tags:
-  - affectsTag: tech
+  - affectsTags: tech
     trend: 0.3 for first month, 0.9 for second month, 0.5 for third month
-    affectsStockID: NFLX
+    affectsStockIDs: NFLX
 
 
 - eventID: "apple-new-iphone-huge-issues"
@@ -772,9 +776,9 @@
   duration: 1488 ticks (62 days)
 
   tags:
-  - affectsTag: tech
+  - affectsTags: tech
     trend: -1.2 for first month, -0.4 for second month, ending with -0.9 on third month.
-    affectsStockID: AAPL
+    affectsStockIDs: AAPL
 
 
 - eventID: "apple-to-release-quick-fixes"
@@ -792,9 +796,9 @@
   duration: 3240 ticks (135 days)
 
   tags:
-  - affectsTag: tech
+  - affectsTags: tech
     trend: -1.2 for first month, -0.4 for second, -0.9 for third, 0.1 for fourth, 0.3 for fifth
-    affectsStockID: AAPL
+    affectsStockIDs: AAPL
 
 
 
