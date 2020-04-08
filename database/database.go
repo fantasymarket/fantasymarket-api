@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"time"
 
 	"fantasymarket/database/models"
 	"fantasymarket/game/stocks"
@@ -81,10 +82,12 @@ func (s *Service) AddStocks(stocks []models.Stock, tick int64) error {
 }
 
 // GetEvents fetches all currently active events
-func (s *Service) GetEvents() ([]models.Event, error) {
+func (s *Service) GetEvents(currentDate time.Time) ([]models.Event, error) {
 	var events []models.Event
-	// TODO: createdAt > currentGameTime
-	if err := s.DB.Where(models.Event{Active: true}).Find(&events).Error; err != nil {
+
+	if err := s.DB.Where(models.Event{
+		Active: true,
+	}).Where("created_at > ?", currentDate).Find(&events).Error; err != nil {
 		return nil, err
 	}
 

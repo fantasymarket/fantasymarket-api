@@ -66,7 +66,7 @@ func Start(db *database.Service) (*Service, error) {
 	}
 
 	go startLoop(s)
-	fmt.Println("stated game loop 😋")
+	fmt.Println("stated game loop")
 
 	return s, nil
 }
@@ -103,15 +103,16 @@ func (s *Service) GetRandomEventEffect(e models.Event) (string, error) {
 func (s *Service) tick() error {
 	fmt.Println("\n> tick: " + strconv.FormatInt(s.TicksSinceStart, 10))
 
-	currentlyRunningEvents, _ := s.DB.GetEvents()                      // Sub this for the DB query results
+	currentlyRunningEvents, _ := s.DB.GetEvents(s.GetCurrentDate())    // Sub this for the DB query results
 	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1) // Sub this for the DB query results
 
+	s.checkEventStillActive(currentlyRunningEvents)
+
 	// TODO: add new events to database:
-	//      - fixed events that need to be added at a fixed date
+	//    - fixed events that need to be added at a fixed date
 	//		- random events
 	// 		- reccuring events
 
-	s.checkEventStillActive(currentlyRunningEvents)
 	newStocks := s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents)
 	if err := s.DB.AddStocks(newStocks, s.TicksSinceStart); err != nil {
 		return err
