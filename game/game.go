@@ -138,26 +138,32 @@ func (s Service) checkEventStillActive(events []models.Event) {
 	}
 }
 
-// GetEventAffectedness calculates how much a stock is affected by all currently running events
-func (s Service) GetEventAffectedness(activeEvents []models.Event, stock models.Stock) float64 {
+// CalcutaleAffectedness calculates how much a stock is affected by all currently running events
+func (s Service) CalcutaleAffectedness(stocks []models.Stock, activeEvents []models.Event) map[string]float64 {
+	var affectedness map[string]float64
 
-	var affectedness float64
 	for _, activeEvent := range activeEvents {
+		for _, tagOptions := range s.EventDetails[activeEvent.EventID].Tags {
 
-		eventDetails := s.EventDetails[activeEvent.EventID]
-		stockDetails := s.StockDetails[stock.Symbol]
-		// models.Stock is what we get from the database and is a "lite" version of the "full" stock struct
-		// Hence we take the stock symbol as the key to extract the stock with the full details from the
-		// stock list and call it stockDetails. stockDetails is a single stock instance from which we can gather the details we want
+			for _, stock := range stocks {
+				stockDetails := s.StockDetails[stock.Symbol]
 
-		for _, tagOptions := range eventDetails.Tags {
+				affectedByTag := utils.Some(stockDetails.Tags, tagOptions.AffectsTags)
+				affectedBySymbol := utils.Includes(tagOptions.AffectsStocks, stock.Symbol)
 
-			affectedByTag := utils.Some(stockDetails.Tags, tagOptions.AffectsTags)
-			affectedBySymbol := utils.Includes(tagOptions.AffectsStocks, stock.Symbol)
+				if affectedByTag || affectedBySymbol {
 
-			if affectedByTag || affectedBySymbol {
-				affectedness += tagOptions.Trend
+					if tagOptions.MinTrend != tagOptions.MaxTrend {
+						seed := stock.Symbol + strconv.FormatInt(s.TicksSinceStart, 10)
+						trend := hash.Int64HashRange(int64(tagOptions.MinTrend*1000), int64(tagOptions.MaxTrend*1000), seed)
+						affectedness[stock.Symbol] += float64(trend) / 1000
+						continue
+					}
+
+					affectedness[stock.Symbol] += tagOptions.Trend
+				}
 			}
+
 		}
 	}
 
@@ -165,12 +171,14 @@ func (s Service) GetEventAffectedness(activeEvents []models.Event, stock models.
 }
 
 // ComputeStockNumbers computes the index at the next tick for a list of stocks
-func (s Service) ComputeStockNumbers(stocks []models.Stock, e []models.Event) []models.Stock {
+func (s Service) ComputeStockNumbers(stocks []models.Stock, events []models.Event) []models.Stock {
+
+	affectedness := s.CalcutaleAffectedness(stocks, events)
 
 	// This computes the random and own stock, not taking into account other peoples selling
 	// As a stock drops to a % of its value, theres gonna be more buyers or more sellers
 	for _, stock := range stocks {
-		affectedness := s.GetEventAffectedness(e, stock)
+		affectedness := affectedness[stock.Symbol]
 		stock.Index += s.GetTendency(stock, affectedness)
 
 		fmt.Println("Name: ", stock.Symbol, "Index: ", stock.Index)

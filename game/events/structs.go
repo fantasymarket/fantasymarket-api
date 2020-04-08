@@ -35,6 +35,7 @@ type EventDetails struct {
 	//	- recurring		- events like ellections that happen every x years
 	//                  note: these also need the same options as a fixed date
 	//	- random			- events that can happen randomly
+	//  - custom			- event isn't run automatically
 	//
 	// Properties like `FixedDate` can only be used when the
 	// type is actually set to `fixed`
@@ -44,7 +45,7 @@ type EventDetails struct {
 	FixedDateRandomOffset timeutils.Duration // Offset from 0-n added to the fixed date
 
 	RandomChance      float64            // the chance for the event to occur in a tick [0, 1] (thould be less than .01%)
-	ReccuringDuration timeutils.Duration // When an event has to happen e.g yearly
+	RecurringDuration timeutils.Duration // When an event has to happen e.g yearly
 
 	// these eventIDs have to have run before this event
 	// can be prefixed with `!` if the event should only be run if an event hasn't happened yet
@@ -85,4 +86,8 @@ type TagOptions struct {
 
 	// How the much the tags are affected, as a decimal percentage
 	Trend float64 // 0.02 => +2% every game-tick
+
+	// If these are set, Trend is ignored and a number in between MinTrend and MaxTrend is chosen
+	MinTrend float64
+	MaxTrend float64
 }
