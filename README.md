@@ -1,7 +1,23 @@
 # fantasymarket-api
 
 ![CI](https://github.com/explodingcamera/fantasymarket-api/workflows/CI/badge.svg?branch=develop)
-[![Coverage Status](https://coveralls.io/repos/github/explodingcamera/fantasymarket-api/badge.svg?t=6NwsIo)](https://coveralls.io/github/explodingcamera/fantasymarket-api)
+
+## Table of Contents
+
+- [Project Structure](#structure)
+- [Installation](#installation)
+- [Development](#development)
+  - [Recommended Tools](#recommended-tools)
+  - [Testing](#testing)
+
+## Structure
+
+<big><pre>
+**fantasymarket-app**
+├── [api](api/)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _# rest api service_
+├── [database](database/) &nbsp; _# database service_
+├── [game](game/) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _# game service_
+└── [utils](utils/) &nbsp;&nbsp;&nbsp;&nbsp; _# utility functions_</pre></big>
 
 ## Installation
 
@@ -9,15 +25,22 @@
 
 - [go >=1.13](https://golang.org/dl/)
 - [Task](https://taskfile.dev/#/installation)
-- Revive (optional) To install, run `$ task install-linter` after installing task. 
+- Revive (optional) To install, you can also run `$ task install-linter` after installing task. 
 
 ### 2. Clone Repo
 
 ```bash
-$ git clone https://github.com/explodingcamera/fantasymarket-app.git && cd fantasymarket-app
+$ git clone https://github.com/explodingcamera/fantasymarket-app.git
+$ cd fantasymarket-app
 ```
 
-## Testing
+## Development
+
+### Recommended Tools
+
+VSCode with the official GO extension or goland 
+
+### Testing
 
 ```bash
 $ task test # run tests

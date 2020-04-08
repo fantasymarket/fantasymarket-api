@@ -9,12 +9,12 @@ import (
 
 // Stock is the Stock "Class"
 type Stock struct {
-	ID        string  `gorm:"primary_key"` // A Unique ID for every stock data point (since theres a new entry for each stock ID every tick)
+	StockID   uuid.UUID `gorm:"primary_key"` // A Unique ID for every stock data point (since theres a new entry for each stock ID every tick)
 	CreatedAt time.Time
-	Tick			int64
+	Tick      int64
 
 	// Stock Symbol e.g GOOG
-	StockID string
+	Symbol string
 
 	// Stock Name e.g Alphabet Inc.
 	Name string
@@ -30,8 +30,8 @@ type Stock struct {
 	Volume int64
 }
 
+// BeforeCreate runs before a stock is created in the database
 func (s Stock) BeforeCreate(scope *gorm.Scope) error {
-	scope.SetColumn("ID", uuid.NewV4())
+	scope.SetColumn("StockID", uuid.NewV4())
 	return nil
 }
- 

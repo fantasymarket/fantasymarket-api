@@ -16,3 +16,6 @@
 
 coverage.out
 database.db
+.vs
+.DS_Store
+.idea

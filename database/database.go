@@ -3,32 +3,23 @@ package database
 import (
 	"fmt"
 
-	// "fantasymarket/game"
-
 	"fantasymarket/database/models"
+	"fantasymarket/game/stocks"
 
 	"github.com/jinzhu/gorm"
+	uuid "github.com/satori/go.uuid"
+
+	// load sqlite dialect
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-type DatabaseService struct {
+// Service is the Database Service
+type Service struct {
 	DB *gorm.DB // gorm database instance
 }
 
-// StockSettings TEST STRUCT - DELETE
-type StockSettings struct {
-	StockID   string          // Stock Symbol e.g GOOG
-	Name      string          // Stock Name e.g Alphabet Inc.
-	Index     int64           // Price per share
-	Shares    int64           // Number per share
-	Tags      map[string]bool // A stock can have up to 5 tags
-	Stability int64           // Shows how many fluctuations the stock will have
-	Trend     int64           // Shows the generall trend of the Stock
-	Volume    int64
-}
-
 // Connect connects to the database and returns thedatabase object
-func Connect() (*DatabaseService, error) {
+func Connect() (*Service, error) {
 	db, err := gorm.Open("sqlite3", "database.db")
 
 	if err != nil {
@@ -36,33 +27,63 @@ func Connect() (*DatabaseService, error) {
 		return nil, err
 	}
 
-	db.AutoMigrate(&models.Stock{})
-	db.AutoMigrate(&models.Event{})
-
+	db.AutoMigrate(
+		&models.Stock{},
+		&models.Event{},
+		&models.Order{},
+	)
 	fmt.Println("connected to da database my doods D:")
 
-	return &DatabaseService{
+	return &Service{
 		DB: db,
 	}, nil
 }
 
-func (s *DatabaseService) CreateStockForTest(stockID string, name string, index int64, volume int64) {
-	stock := models.Stock{StockID: stockID, Name: name, Index: index, Volume: volume, Tick: 0}
-	s.DB.Where(&stock).FirstOrInit(&models.Stock{})
+// CreateInitialStocks takes a list of initial stocks and uses them to initialize the database
+func (s *Service) CreateInitialStocks(stockDetails map[string]stocks.StockDetails) error {
+
+	for _, stock := range stockDetails {
+		if err := s.DB.FirstOrCreate(
+			&models.Stock{},
+			&models.Stock{
+				Symbol: stock.Symbol,
+				Index:  stock.Index,
+				Name:   stock.Name,
+				Tick:   0,
+				Volume: 0,
+			},
+		).Error; err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (s *DatabaseService) AddStockToTable(stock models.Stock, tick int64) error {
+// AddStock adds a stock to the stock table
+func (s *Service) AddStock(stock models.Stock, tick int64) error {
 	return s.DB.Create(&models.Stock{
-		StockID: stock.StockID,
-		Name:    stock.Name,
-		Index:   stock.Index,
-		Volume:  stock.Volume,
-		Tick:    tick,
+		Symbol: stock.Symbol,
+		Name:   stock.Name,
+		Index:  stock.Index,
+		Volume: stock.Volume,
+		Tick:   tick,
 	}).Error
 }
 
-func (s *DatabaseService) GetEvents() ([]models.Event, error) {
+// AddStocks adds a slice of stocks to the stock table
+func (s *Service) AddStocks(stocks []models.Stock, tick int64) error {
+	for _, stock := range stocks {
+		if err := s.AddStock(stock, tick); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// GetEvents fetches all currently active events
+func (s *Service) GetEvents() ([]models.Event, error) {
 	var events []models.Event
+	// TODO: createdAt > currentGameTime
 	if err := s.DB.Where(models.Event{Active: true}).Find(&events).Error; err != nil {
 		return nil, err
 	}
@@ -70,11 +91,24 @@ func (s *DatabaseService) GetEvents() ([]models.Event, error) {
 	return events, nil
 }
 
-func (s *DatabaseService) RemoveEvent(eventID string) error {
-	return s.DB.Where(models.Event{Active: true, EventID: eventID}).Update("active", false).Error
+// RemoveEvent marks an event as inactive so it won't affect stocks in the GameLoop anymore
+func (s *Service) RemoveEvent(uniqueEventID uuid.UUID) error {
+	return s.DB.Where(models.Event{Active: true, ID: uniqueEventID}).Update("active", false).Error
 }
 
-func (s *DatabaseService) GetStocksAtTick(lastTick int64) ([]models.Stock, error) {
+// GetNextTick retrieves the tick number for the next tick from the database,
+// this is used to initialize our Service when the program restarts
+func (s *Service) GetNextTick() (int64, error) {
+	var stock models.Stock
+	if err := s.DB.Table("stocks").Select("tick").Order("tick desc").First(&stock).Error; err != nil {
+		return 0, err
+	}
+
+	return stock.Tick + 1, nil
+}
+
+// GetStocksAtTick fetches the value of all stocks at a specific tick
+func (s *Service) GetStocksAtTick(lastTick int64) ([]models.Stock, error) {
 	var stocks []models.Stock
 	if err := s.DB.Where(models.Stock{Tick: lastTick}).Find(&stocks).Error; err != nil {
 		return nil, err
@@ -83,9 +117,14 @@ func (s *DatabaseService) GetStocksAtTick(lastTick int64) ([]models.Stock, error
 	return stocks, nil
 }
 
-// USE DBName;
-// GO
-// DECLARE @MyMsg VARCHAR(50)
-// SELECT @MyMsg = 'Hello, World.'
-// GO -- @MyMsg is not valid after this GO ends the batch.
-// https://sqliteonline.com
+//func (s *Service) AddOrder(order map[string]string) error {
+
+//}
+
+//func (s *Service) GetOrder(id int) error {
+
+//}
+
+//func (s *Service) DeleteOrder(id int) error {
+
+//}
