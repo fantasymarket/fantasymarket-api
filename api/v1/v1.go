@@ -3,6 +3,7 @@ package v1
 import (
 	"fantasymarket/database"
 	"fantasymarket/game"
+	"fantasymarket/utils/http/middleware/jwt"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -57,6 +58,20 @@ func NewAPIRouter(db *database.Service, game *game.Service) http.Handler {
 		r.Get("/", api.getPortfolio)
 
 		r.Get("/{symbol}", api.getPortfolio)
+	})
+
+	r.Route("/user", func(r chi.Router) {
+		r.Group(func(r chi.Router) {
+			r.Use(jwt.Middleware("secret", true))
+			r.Get("/{user}", api.getUser)
+			r.Post("/", api.createUser)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(jwt.Middleware("secret", false))
+			r.Get("/", api.getSelf)
+			r.Post("/", api.updateSelf)
+		})
 	})
 
 	return r

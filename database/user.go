@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fantasymarket/database/models"
 	"fantasymarket/utils/hash"
+	"fmt"
 
 	"github.com/jinzhu/gorm"
 
@@ -110,7 +111,8 @@ func (s *Service) LoginUser(username, password string) (*models.User, error) {
 			return nil, errors.New("couldn't find user")
 		}
 
-		return nil, err
+		fmt.Println("error loging in:", err)
+		return nil, errors.New("could't find user in database")
 	}
 
 	if user.Password != "" {
@@ -120,5 +122,9 @@ func (s *Service) LoginUser(username, password string) (*models.User, error) {
 		}
 	}
 
-	return &user, nil
+	return &models.User{
+		CreatedAt: user.CreatedAt,
+		UserID:    user.UserID,
+		Username:  user.Username,
+	}, nil
 }
