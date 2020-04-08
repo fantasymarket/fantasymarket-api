@@ -1,0 +1,15 @@
+- symbol: "GOOG"
+  stockCount: 700000000
+  startPrice: 60000
+  name: Google
+  tags: ["tech"]
+  stability: 1
+  trend: 1
+
+- symbol: "APPL"
+  stockCount: 700000000
+  startPrice: 60000
+  name: Apple
+  tags: ["tech"]
+  stability: 1
+  trend: 1

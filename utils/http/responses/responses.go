@@ -1,4 +1,4 @@
-package http_responses
+package responses
 
 import (
 	"encoding/json"
@@ -14,6 +14,7 @@ type error struct {
 	Message string `json:"message"`
 }
 
+// CustomResponse encodes a custom message and sends a HTTP json response
 func CustomResponse(w http.ResponseWriter, response interface{}, status int) {
 
 	w.Header().Set("Content-Type", "application/json")
