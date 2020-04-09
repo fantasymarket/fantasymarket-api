@@ -1,7 +1,9 @@
 package events
 
 import (
+	"fantasymarket/utils/hash"
 	"fantasymarket/utils/timeutils"
+	"strconv"
 )
 
 // EventDetails is the type for storing information about events
@@ -90,4 +92,19 @@ type TagOptions struct {
 	// If these are set, Trend is ignored and a number in between MinTrend and MaxTrend is chosen
 	MinTrend float64
 	MaxTrend float64
+}
+
+// CalculateTrend calculates the trend for a tag
+// If Min and MaxTrend are defined, these take precedent over Trend
+func (t *TagOptions) CalculateTrend(ticksSinceStart int64, stockSymbol string) float64 {
+	if t.MinTrend == t.MaxTrend {
+		if t.MinTrend != 0 {
+			return t.MinTrend
+		}
+		return t.Trend
+	}
+
+	seed := stockSymbol + strconv.FormatInt(ticksSinceStart, 10)
+	trend := hash.Int64HashRange(int64(t.MinTrend*1000), int64(t.MaxTrend*1000), seed)
+	return float64(trend) / 1000
 }

@@ -40,7 +40,11 @@ func (s *Service) CreateGuest() (*models.User, error) {
 		return nil, err
 	}
 
-	return &user, nil
+	return &models.User{
+		CreatedAt: user.CreatedAt,
+		UserID:    user.UserID,
+		Username:  user.Username,
+	}, nil
 }
 
 // ChangePassword changes the password of an existing or
@@ -51,7 +55,7 @@ func (s *Service) ChangePassword(username, currentPassword string, newPassword s
 	var user models.User
 	if err := s.DB.Where(models.User{
 		Username: username,
-	}).Select("username. password").First(&user).Error; err != nil {
+	}).Select("username, password").First(&user).Error; err != nil {
 		return err
 	}
 
@@ -84,7 +88,7 @@ func (s *Service) RenameUser(username, newUsername string) error {
 	var newUser models.User
 	if err := s.DB.Where(models.User{
 		Username: newUsername,
-	}).Select("username. password").First(&user).Error; err != nil && !gorm.IsRecordNotFoundError(err) {
+	}).Select("username, password").First(&user).Error; err != nil && !gorm.IsRecordNotFoundError(err) {
 		return err
 	}
 

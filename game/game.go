@@ -17,12 +17,12 @@ type Service struct {
 	EventDetails    map[string]events.EventDetails
 	StockDetails    map[string]stocks.StockDetails
 	DB              *database.Service
-	Options         FantasyMarketOptions
+	Options         Options
 	TicksSinceStart int64
 }
 
-// FantasyMarketOptions manages the Options of the programm
-type FantasyMarketOptions struct {
+// Options are specific settings for the game mechanics
+type Options struct {
 	TicksPerSecond  float64       // How many times the game updates per second
 	GameTimePerTick time.Duration // How much ingame time passes between updates
 	StartDate       time.Time     // The initial ingame time
@@ -55,7 +55,7 @@ func Start(db *database.Service) (*Service, error) {
 	// TODO: Take all Fixed events and map them where Key is startDate and value true?
 
 	s := &Service{
-		Options: FantasyMarketOptions{
+		Options: Options{
 			TicksPerSecond:  0.1,
 			StartDate:       time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
 			GameTimePerTick: time.Hour,
@@ -111,7 +111,7 @@ func (s *Service) tick() error {
 	//		- random events
 	// 		- reccuring events
 
-	s.checkEventStillActive(currentlyRunningEvents)
+	s.removeInactiveEvents(currentlyRunningEvents)
 	newStocks := s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents)
 	if err := s.DB.AddStocks(newStocks, s.TicksSinceStart); err != nil {
 		return err
@@ -122,8 +122,8 @@ func (s *Service) tick() error {
 	return nil
 }
 
-// checkEventStillActive calculates if the duration of the event is over and then removes the event
-func (s Service) checkEventStillActive(events []models.Event) {
+// removeInactiveEvents calculates if the duration of the event is over and then removes the event
+func (s Service) removeInactiveEvents(events []models.Event) {
 
 	currentDate := s.GetCurrentDate()
 
@@ -142,28 +142,21 @@ func (s Service) checkEventStillActive(events []models.Event) {
 func (s Service) CalcutaleAffectedness(stocks []models.Stock, activeEvents []models.Event) map[string]float64 {
 	var affectedness map[string]float64
 
+	var tagOptions []events.TagOptions
 	for _, activeEvent := range activeEvents {
-		for _, tagOptions := range s.EventDetails[activeEvent.EventID].Tags {
+		tagOptions = append(tagOptions, s.EventDetails[activeEvent.EventID].Tags...)
+	}
 
-			for _, stock := range stocks {
-				stockDetails := s.StockDetails[stock.Symbol]
+	for _, tagOption := range tagOptions {
+		for _, stock := range stocks {
+			stockDetails := s.StockDetails[stock.Symbol]
 
-				affectedByTag := utils.Some(stockDetails.Tags, tagOptions.AffectsTags)
-				affectedBySymbol := utils.Includes(tagOptions.AffectsStocks, stock.Symbol)
+			affectedByTag := utils.Some(stockDetails.Tags, tagOption.AffectsTags)
+			affectedBySymbol := utils.Includes(tagOption.AffectsStocks, stock.Symbol)
 
-				if affectedByTag || affectedBySymbol {
-
-					if tagOptions.MinTrend != tagOptions.MaxTrend {
-						seed := stock.Symbol + strconv.FormatInt(s.TicksSinceStart, 10)
-						trend := hash.Int64HashRange(int64(tagOptions.MinTrend*1000), int64(tagOptions.MaxTrend*1000), seed)
-						affectedness[stock.Symbol] += float64(trend) / 1000
-						continue
-					}
-
-					affectedness[stock.Symbol] += tagOptions.Trend
-				}
+			if affectedByTag || affectedBySymbol {
+				affectedness[stock.Symbol] += tagOption.CalculateTrend(s.TicksSinceStart, stock.Symbol)
 			}
-
 		}
 	}
 
