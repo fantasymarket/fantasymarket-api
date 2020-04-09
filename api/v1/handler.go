@@ -22,7 +22,7 @@ func (api *APIHandler) getOverview(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *APIHandler) getTime(w http.ResponseWriter, r *http.Request) {
-	t := api.Game.Options.StartDate
+	t := api.Config.Game.StartDate
 
 	if !t.IsZero() {
 		responses.CustomResponse(w, t.Format(time.RFC3339), 200)

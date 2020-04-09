@@ -24,6 +24,7 @@ func Int64HashRange(min int64, max int64, seed string) int64 {
 // Int64Hashn hashes a string to an int64 in [0,n).
 // It panics if n <= 0.
 // Based on https://golang.org/src/math/rand/rand.go?s=10421:10447#L317
+// originlly written and licensed by The Go Autor under The 3-Clause BSD License
 func Int64Hashn(n int64, seed string) int64 {
 	if n <= 0 {
 		panic("invalid argument to Int64Hashn: n can't be less than 0")
