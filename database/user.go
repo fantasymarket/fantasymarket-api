@@ -132,3 +132,45 @@ func (s *Service) LoginUser(username, password string) (*models.User, error) {
 		Username:  user.Username,
 	}, nil
 }
+
+// GetUser searches the db for a user
+func (s *Service) GetUser(username string) (*models.User, error) {
+
+	var user models.User
+	if err := s.DB.Where(models.User{
+		Username: username,
+	}).Preload("Portfolio.Items").First(&user).Error; err != nil {
+		return nil, errors.New("couldn't find user")
+	}
+
+	return &models.User{
+		CreatedAt: user.CreatedAt,
+		UserID:    user.UserID,
+		Username:  user.Username,
+		Portfolio: models.Portfolio{
+			Balance: user.Portfolio.Balance,
+			Items:   user.Portfolio.Items,
+		},
+	}, nil
+}
+
+// GetSelf searches the db for a user (includes private information`)
+func (s *Service) GetSelf(username string) (*models.User, error) {
+
+	var user models.User
+	if err := s.DB.Where(models.User{
+		Username: username,
+	}).Preload("Portfolio.Items").First(&user).Error; err != nil {
+		return nil, errors.New("couldn't find user")
+	}
+
+	return &models.User{
+		CreatedAt: user.CreatedAt,
+		UserID:    user.UserID,
+		Username:  user.Username,
+		Portfolio: models.Portfolio{
+			Balance: user.Portfolio.Balance,
+			Items:   user.Portfolio.Items,
+		},
+	}, nil
+}

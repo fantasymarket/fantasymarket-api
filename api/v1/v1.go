@@ -3,6 +3,7 @@ package v1
 import (
 	"fantasymarket/database"
 	"fantasymarket/game"
+	"fantasymarket/utils/config"
 	"fantasymarket/utils/http/middleware/jwt"
 	"net/http"
 
@@ -11,12 +12,13 @@ import (
 
 // APIHandler holds the dependencies for http handlers
 type APIHandler struct {
-	DB   *database.Service
-	Game *game.Service
+	DB     *database.Service
+	Game   *game.Service
+	Config *config.Config
 }
 
 // NewAPIRouter creates a new API HTTP handler
-func NewAPIRouter(db *database.Service, game *game.Service) http.Handler {
+func NewAPIRouter(db *database.Service, game *game.Service, config *config.Config) http.Handler {
 	api := &APIHandler{
 		DB:   db,
 		Game: game,
@@ -63,7 +65,7 @@ func NewAPIRouter(db *database.Service, game *game.Service) http.Handler {
 	r.Route("/user", func(r chi.Router) {
 		r.Group(func(r chi.Router) {
 			r.Use(jwt.Middleware("secret", true))
-			r.Get("/{user}", api.getUser)
+			r.Get("/{username}", api.getUser)
 			r.Post("/", api.createUser)
 		})
 

@@ -6,10 +6,13 @@ import (
 	"fantasymarket/game/events"
 	"fantasymarket/game/stocks"
 	"fantasymarket/utils"
+	"fantasymarket/utils/config"
 	"fantasymarket/utils/hash"
-	"fmt"
+
 	"strconv"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 // Service is the GameService
@@ -17,25 +20,18 @@ type Service struct {
 	EventDetails    map[string]events.EventDetails
 	StockDetails    map[string]stocks.StockDetails
 	DB              *database.Service
-	Options         Options
+	Config          *config.Config
 	TicksSinceStart int64
-}
-
-// Options are specific settings for the game mechanics
-type Options struct {
-	TicksPerSecond  float64       // How many times the game updates per second
-	GameTimePerTick time.Duration // How much ingame time passes between updates
-	StartDate       time.Time     // The initial ingame time
 }
 
 // GetCurrentDate returns the current in-game date
 func (s *Service) GetCurrentDate() time.Time {
-	timeSinceStart := time.Duration(s.TicksSinceStart) * s.Options.GameTimePerTick
-	return s.Options.StartDate.Add(timeSinceStart)
+	timeSinceStart := time.Duration(s.TicksSinceStart) * s.Config.Game.GameTimePerTick
+	return s.Config.Game.StartDate.Add(timeSinceStart)
 }
 
 // Start starts the game loop
-func Start(db *database.Service) (*Service, error) {
+func Start(db *database.Service, config *config.Config) (*Service, error) {
 
 	loadedStocks, err := stocks.LoadStockDetails()
 	if err != nil {
@@ -55,18 +51,14 @@ func Start(db *database.Service) (*Service, error) {
 	// TODO: Take all Fixed events and map them where Key is startDate and value true?
 
 	s := &Service{
-		Options: Options{
-			TicksPerSecond:  0.1,
-			StartDate:       time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
-			GameTimePerTick: time.Hour,
-		},
+		Config:       config,
 		StockDetails: loadedStocks,
 		EventDetails: loadedEvents,
 		DB:           db,
 	}
 
 	go startLoop(s)
-	fmt.Println("stated game loop 😋")
+	log.Info().Msg("successfully started the game loop 😋")
 
 	return s, nil
 }
@@ -74,13 +66,13 @@ func Start(db *database.Service) (*Service, error) {
 // startLoop startsrunningticks indefinitly
 func startLoop(s *Service) {
 	s.TicksSinceStart, _ = s.DB.GetNextTick()
-	fmt.Println("loaded ticksSinceStart from database:", s.TicksSinceStart, "ticks")
+	log.Debug().Int64("ticksSinceStart", s.TicksSinceStart).Msg("loaded loaded ticksSinceStart from database")
 
 	for {
 		s.tick()
 
-		// Sleep for the duration of a single tick (Since we want 1 tick in 10 Seconds)
-		time.Sleep(time.Duration(1/s.Options.TicksPerSecond) * time.Second)
+		timePerTick := time.Duration(1/s.Config.Game.TicksPerSecond) * time.Second
+		time.Sleep(timePerTick)
 
 		s.TicksSinceStart++
 	}
@@ -101,7 +93,7 @@ func (s *Service) GetRandomEventEffect(e models.Event) (string, error) {
 
 // tick is updating the current state of our system
 func (s *Service) tick() error {
-	fmt.Println("\n> tick: " + strconv.FormatInt(s.TicksSinceStart, 10))
+	log.Debug().Int64("tick", s.TicksSinceStart).Msg("running tick")
 
 	currentlyRunningEvents, _ := s.DB.GetEvents()                      // Sub this for the DB query results
 	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1) // Sub this for the DB query results
@@ -174,7 +166,7 @@ func (s Service) ComputeStockNumbers(stocks []models.Stock, events []models.Even
 		affectedness := affectedness[stock.Symbol]
 		stock.Index += s.GetTendency(stock, affectedness)
 
-		fmt.Println("Name: ", stock.Symbol, "Index: ", stock.Index)
+		log.Debug().Str("name", stock.Symbol).Int64("index", stock.Index).Msg("updated stock")
 	}
 
 	return stocks

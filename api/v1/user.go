@@ -5,19 +5,30 @@ import (
 	"fantasymarket/utils/http/middleware/jwt"
 	"fantasymarket/utils/http/responses"
 	"net/http"
+
+	"github.com/go-chi/chi"
 )
 
 func (api *APIHandler) getUser(w http.ResponseWriter, r *http.Request) {
-	// GET   /user/{userID}		(Get info about specific user)
+	username := chi.URLParam(r, "username")
 
+	resp, err := api.DB.GetSelf(username)
+	if err != nil {
+		responses.ErrorResponse(w, http.StatusNotFound, err.Error())
+	}
+
+	responses.CustomResponse(w, resp, 200)
 }
 
 func (api *APIHandler) getSelf(w http.ResponseWriter, r *http.Request) {
 	user, _ := r.Context().Value(jwt.UserKey).(jwt.UserClaims)
 
-	// responses.CustomResponse(w, resp, 200)
+	resp, err := api.DB.GetSelf(user.Username)
+	if err != nil {
+		responses.ErrorResponse(w, http.StatusNotFound, err.Error())
+	}
 
-	responses.CustomResponse(w, user.UserID, 200)
+	responses.CustomResponse(w, resp, 200)
 }
 
 type updateUserRequest struct {
@@ -45,10 +56,20 @@ func (api *APIHandler) updateSelf(w http.ResponseWriter, r *http.Request) {
 			responses.ErrorResponse(w, http.StatusInternalServerError, "error updating username")
 			return
 		}
+		user.Username = req.username
 	}
 
-	responses.CustomResponse(w, map[string]string{"status": "success"}, 200)
-	// TODO: generate token
+	token, err := jwt.CreateToken("secret", user.Username, user.UserID)
+	if err != nil {
+		responses.ErrorResponse(w, http.StatusInternalServerError, "error generating user token")
+		return
+	}
+
+	responses.CustomResponse(w, map[string]string{
+		"username": user.Username,
+		"userID":   user.UserID,
+		"token":    token,
+	}, 200)
 }
 
 func (api *APIHandler) createUser(w http.ResponseWriter, r *http.Request) {
@@ -59,12 +80,18 @@ func (api *APIHandler) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	token, err := jwt.CreateToken("secret", user.Username, user.UserID.String())
+	if err != nil {
+		responses.ErrorResponse(w, http.StatusInternalServerError, "error generating user token")
+		return
+	}
+
 	responses.CustomResponse(w, map[string]string{
-		"status":   "success",
 		"username": user.Username,
 		"userID":   user.UserID.String(),
+		"token":    token,
 	}, 200)
-	// TODO: generate token
+
 }
 
 type loginUserRequest struct {

@@ -14,9 +14,14 @@ require (
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/mgechev/revive v1.0.2 // indirect
+	github.com/pkg/errors v0.9.1
+	github.com/rs/zerolog v1.18.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/senseyeio/duration v0.0.0-20180430131211-7c2a214ada46
+	github.com/spf13/viper v1.6.2
+	github.com/stevenroose/gonfig v0.1.4
 	github.com/stretchr/testify v1.5.1
+	go.uber.org/config v1.4.0
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
 	golang.org/x/sys v0.0.0-20200331124033-c3d80250170d // indirect
 	golang.org/x/tools v0.0.0-20200331202046-9d5940d49312 // indirect
