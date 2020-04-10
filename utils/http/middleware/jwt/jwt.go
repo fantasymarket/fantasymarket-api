@@ -65,7 +65,7 @@ type Claims struct {
 
 // UserClaims are user informations
 type UserClaims struct {
-	UserID   string `json:"user_id"`
+	UserID   uuid.UUID `json:"user_id"`
 	Username string `json:"username"`
 }
 

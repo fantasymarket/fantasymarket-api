@@ -99,8 +99,6 @@ func (s *Service) tick() error {
 	currentlyRunningEvents, _ := s.DB.GetEvents(s.GetCurrentDate())    // Sub this for the DB query results
 	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1) // Sub this for the DB query results
 
-	s.checkEventStillActive(currentlyRunningEvents)
-
 	// TODO: add new events to database:
 	//    - fixed events that need to be added at a fixed date
 	//		- random events
@@ -133,7 +131,7 @@ func (s Service) removeInactiveEvents(events []models.Event) {
 	}
 }
 
-// CalcutaleAffectedness calculates how much a stock is affected by all currently running events
+// CalculateAffectedness calculates how much a stock is affected by all currently running events
 func (s Service) CalculateAffectedness(stocks []models.Stock, activeEvents []models.Event) map[string]float64 {
 	var affectedness map[string]float64
 
@@ -188,7 +186,7 @@ func (s Service) GetActiveEventTags(activeEvents []models.Event) []events.TagOpt
 // ComputeStockNumbers computes the index at the next tick for a list of stocks
 func (s Service) ComputeStockNumbers(stocks []models.Stock, events []models.Event) []models.Stock {
 
-	affectedness := s.CalcutaleAffectedness(stocks, events)
+	affectedness := s.CalculateAffectedness(stocks, events)
 
 	// This computes the random and own stock, not taking into account other peoples selling
 	// As a stock drops to a % of its value, theres gonna be more buyers or more sellers

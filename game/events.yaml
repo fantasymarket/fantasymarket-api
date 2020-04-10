@@ -1,4 +1,4 @@
-  # SAMPLE EVENT:
+# SAMPLE EVENT:
   # - eventID: "quantum-breakthrough"
   #   title: "Quantum Breakthrough"
   #   description: "We did it reddit!"
@@ -10,9 +10,9 @@
   #   #	- random			- events that can happen randomly
   #   type: "random"
   #   fixedDate:   "2006-01-02 15:04:05"        # ONLY EVENT TYPE FIXED: date the event has to be run
-  #   randomChance:      0.00001  # the chance for the event to occur in a tick [0, 1] (thould be less than .01%)
-  #   reccuringDuration: P4Y # 4 years
-      
+  #   randomChancePerDay:      0.00001  # the chance for the event to occur in a tick [0, 1] (thould be less than .01%)
+  #   recurringDuration: P4Y # 4 years
+
   #   dependencies: ["!corona-virus-outbreak"] # these eventIDs have to have run before this event
   #   effects: [{
   #     chance: 0.2,
@@ -44,7 +44,6 @@
   effects: [ 
     {chance: 1, effects: ["healthcare-receive-huge-boost"]}]
 
-  runAfter: "0"
 
   duration: "random" #(because of no signs of stopping)
   
@@ -82,13 +81,14 @@
   description: "Healthcare stocks earn huge revenue boost amidst corona virus outbreak"
 
   type: "fixed"
-  fixedDate: 31.06.2020 
+  fixedDate: 2020-06-31 02:44:32
 
-  dependencies: ["corona-virus-outbreak"]
+  dependencies: [
+    {"corona-virus-outbreak"}
+    ]
   effects: null
 
-  runAfter: 4080 ticks #(170 days)
-  duration: 768 ticks #(32 days)
+  duration: P1M2D
 
   tags:
   - affectsTags: ["healthcare"] #Tags for Events and Tags for Stocks are the same. If yes, they might be affected
@@ -107,13 +107,12 @@
   authorized by the bank customer, which appears to inherently be more secure when accessing data."
 
   type: "fixed"
-  fixedDate: 30.07.2020
+  fixedDate: 2020-07-03 13:22:49
 
   dependencies: null
   effects: null
 
-  runAfter: 5040 ticks #(210 days)
-  duration: 1056 ticks #(44 days)
+  duration: P1M14D
 
   tags:
   - affectsTags: ["financial"]
@@ -154,29 +153,27 @@
   dependencies: null
   effects: null
 
-  runAfter: 4272 ticks (178 days)
-
-  duration: 456 ticks (19 days)
+  duration: P19D
 
   tags:
-  - affectsTags: healthcare
+  - affectsTags: ["healthcare"]
     trend: -0.6 
-    affectsStockIDs: IDEXX, ANTM, DVA
+    affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: PT2H1M55S
     duration: P7D 
-  - affectsTags: healthcare
+  - affectsTags: ["healthcare"]
     trend: -1.4
-    affectsStockIDs: IDEXX, ANTM, DVA
+    affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: P7DT2H1M55S
     duration: P7D 
-  - affectsTags: healthcare
+  - affectsTags: ["healthcare"]
     trend: -0.5
-    affectsStockIDs: IDEXX, ANTM, DVA
+    affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: P14DT2H1M55S
     duration: P7D 
-  - affectsTags: healthcare
+  - affectsTags: ["healthcare"]
     trend: 0.2
-    affectsStockIDs: IDEXX, ANTM, DVA
+    affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: P21DT2H1M55S
     duration: P7D 
     endDate: 2020-29-08 15:22:03 #event ends with this trend in mind
@@ -208,7 +205,7 @@
 
 
 - eventID: "presidential-election-us-potential-republicans-win"
-  type: custom
+  type: "custom"
   title: "Republicans winning Poland over"
   description: "As the presidential election of Year {} is happening, the votes may favor the Republicans." #todo (placeholder for description)
 
@@ -222,7 +219,7 @@
     
 
 - eventID: "presidential-election-us-potential-democrats-win"
-  type: custom
+  type: "custom"
   title: "Democrats are looking to win"
   description: "As the presidential election of Year {} is happening, the votes may favor the Democrats." #todo (placeholder for description)
 
@@ -315,8 +312,6 @@
   dependencies: null
   effects: null
 
-  runAfter: 11016 ticks
-
   tags:
   - affectsTags: ["financial"]
     minTrend: -0.9   
@@ -336,31 +331,31 @@
   type: "fixed"
   fixedDate: 2021-18-05 09:10:04
 
-  dependencies: buffett-sudden-death
+  dependencies: [
+    {"buffett-sudden-death"}
+    ]
   effects: null
 
-  runAfter: 12072 ticks
-
   tags:
-  - affectsTags: financial
+  - affectsTags: ["financial"]
     trend: -0.9
     affectsStockIDs: ["GS"]
     offset: P2DT33M24S
     duration: P7D
 
-  - affectsTags: financial
+  - affectsTags: ["financial"]
     trend: -0.1
     affectsStockIDs: ["AXP, JPM"]
     offset: P2DT33M24S
     duration: P7D
 
-  - affectsTags: financial
+  - affectsTags: ["financial"]
     trend: -0.4
     affectsStockIDs: ["GS"]
     offset: P9DT33M24S
     duration: P8D
 
-  - affectsTags: financial
+  - affectsTags: ["financial"]
     trend: -0.6
     affectsStockIDs: ["AXP, JPM"]
     offset: P9DT33M24S
@@ -379,8 +374,7 @@
   dependencies: null
   effects: null
 
-  runAfter: 15048 ticks (627 days)
-  duration: 2784 ticks (116 days)
+  duration: P3M26D
 
   tags:
   - affectsTags: ["financial"]
@@ -411,19 +405,34 @@
                 and set of a panic for investors, tumbling a few important stocks.
 
   type: "random"
-  randomChance: 0.44
+  randomChancePerDay: 0.009 #per day 
+
+  duration: P1W
 
   dependencies: null
-  effects: TO BE REWRITTEN
+  effects: [
+    {event-ID: "hacker-caused-stocks-to-tumble"}
+  ]
 
-  runAfter: null
-  duration: 48 ticks (2 days)
 
-  tags:
-  - affectsTags: financial, tech
-    trend: -0.5 to -1.4 (fluctuates)
-    affectsStockIDs: JPM, AXP (financial), FB, AAPL, MSFT (tech)
+- eventID: "hacker-caused-stocks-to-tumble"
+  title: "Stocks see huge tumbling due to recent event"
+  description: "With the recent event of injecting false price quotes into stock data feeds by an anonymous hacker, stocks have seen huge drops today as investors are wary of the 
+  effect it brings to others. Huge sell-offs and major quick sells are happening and are destroying the stock markets today."
 
+  type: "custom"
+  # Date: time.Now()
+  
+  dependencies: ["anonymous-hacker-finds-way"]
+  effects: null
+
+    tags:
+  - affectsTags: ["financial", "tech"]
+    minTrend: -1.4
+    maxTrend: -0.5
+    affectsStockIDs: ["JPM", "AXP", "FB", "AAPL", "MSFT"]
+    offset: PT1H24M43S
+    duration: P1W
 
 - eventID: "tesla-successful-breakthrough"
   title: "Tesla receives a huge boost following success of cyber truck launch"
@@ -432,18 +441,25 @@
                 Some multi-billionare investors are looking to invest a huge sum into Tesla over the next few weeks."
 
   type: "fixed"
-  fixedDate: 04.07.2022 - 31.08.2022
+  fixedDate: 2022-07-04 09:22:49
   
   dependencies: null
   effects: null
   
-  runAfter: 22656 ticks (944 days)
-  duration: 1368 ticks (57 days)
+  duration: P1M27D
 
   tags:
-  - affectsTags: energy
-    trend: 1.5 (for first month), 0.8 (the next following weeks)
-    affectsStockIDs: TSLA
+  - affectsTags: ["energy"]
+    trend: 1.5
+    affectsStockIDs: ["TSLA"]
+    offset: PT1H22M04S
+    duration: P1M
+
+  - affectsTags: ["energy"]
+    trend: 0.8
+    affectsStockIDs: ["TSLA"]
+    offset: P1MT1H22M04S
+    duration: P27D
 
 
 - eventID: "microsoft-declares-war-against-apple"
@@ -453,19 +469,30 @@
                 Tim Cook agrees and their war begins. Investors and entrepreneurs are keen to see who wins. Stock values are expected to fluctuate in an upward manner."
 
   type: "fixed"
-  fixedDate: 03.01.2023 - 31.12.2023
+  fixedDate: 2023-03-01 14:42:26
 
   dependencies: null
   effects: null
 
-  runAfter: 26352 ticks (1098 days)
-  duration: 8688 ticks (362 days)
+  duration: P11M27D
 
   tags:
-  - affectsTags: tech
-    trend: 0.2 to 1.1 (fluctuates, MSFT should have a higher stock value than AAPL)
-    affectsStockIDs: MSFT, AAPL
+  - affectsTags: ["tech"]
+    minTrend: 0.2
+    maxTrend: 1.1
+    affectsStockIDs: ["MSFT, AAPL"]
+    offset: P14H22M09S
+    duration: P1Y
 
+  # x := trend(MSFT)
+  # y := trend(AAPL)
+
+  # if y > x || x >= 0.4 && y <= 1.1 {
+  #   y = x - 0.4 * y
+  #   x = tag.maxTrend - y  
+  # }
+  # return x, y
+  ## trend of MSFT should always be higher than AAPL
 
 - eventID: "boeing-huge-airplane-crash"
   title: "2 Boeing airplanes crashed this week, bad overlook for stock values"
@@ -473,19 +500,37 @@
   bad outcome towards Boeing stocks over the following months."
 
   type: "fixed"
-  fixedDate: 12.04.2023 - 16.07.2023
+  fixedDate: 2023-04-12 19:44:02
 
   dependencies: null
   effects: null
 
-  runAfter: 29448 ticks (1227 days)
-  duration: 2256 ticks (94 days)
+  duration: P3M4D
 
   tags: 
-  - affectsTags: aviation
-    trend: -1.8 for first month, -1.5 for second month, -1.1 for third month, 0.2 for fourth month
-    affectsStockIDs: BA
+  - affectsTags: ["aviation"]
+    trend: -1.8
+    affectsStockIDs: ["BA"]
+    offset: PT2H19M40S
+    duration: P1M
 
+  - affectsTags: ["aviation"]
+    trend: -1.5
+    affectsStockIDs: ["BA"]
+    offset: P1MT2H19M40S
+    duration: P1M
+  
+  - affectsTags: ["aviation"]
+    trend: -1.1
+    affectsStockIDs: ["BA"]
+    offset: P2MT2H19M40S
+    duration: P1M
+
+  - affectsTags: ["aviation"]
+    trend: -0.2
+    affectsStockIDs: ["BA"]
+    offset: P3MT2H19M40S
+    duration: P1M
 
 - eventID: "global-pandemic"
   title: "Unknown virus suspected to be worse than SARS and Coronavirus"
@@ -493,18 +538,36 @@
   that SARS and Coronavirus brought. Further details and information still unknown."
 
   type: "random"
-  randomChance: 0.09
+  randomChancePerDay: 0.009
 
   dependencies: null
-  effects: null
+  effects: null #could put multiple effects with different chances for different time durations
 
-  runAfter: null
-  duration: 4032 ticks (168 days)
+  minDuration: P2M  #todo
+  maxDuration: P10Y #todo
 
   tags:
-  - affectsTags: all
-    trend: -1.4 for airplane, -0.3 for tech, 0.9 for health, -0.8 for rest
-    affectsStockIDs: all
+  - affectsTags: ["airplane"]
+    trend: -1.4
+    affectsStockIDs: ["BA"]
+    offset: P3DT22M14S
+
+
+  - affectsTags: ["tech"]
+    trend: -0.3
+    affectsStockIDs: 
+    offset: P3DT22M14S
+
+
+  - affectsTags: ["health"]
+    trend: -0.9
+    affectsStockIDs: 
+    offset: P3DT22M14S
+
+  - affectsTags: ["financial", "energy"]
+    trend: -0.8
+    affectsStockIDs: []
+    offset: P3DT22M14S
 
 
 - eventID: "new-streaming-platform"
