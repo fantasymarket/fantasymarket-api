@@ -3,6 +3,7 @@ package jwt
 import (
 	"context"
 	"fantasymarket/utils/http/responses"
+	uuid "github.com/satori/go.uuid"
 	"net/http"
 	"time"
 
@@ -51,7 +52,7 @@ func authenticator(next http.Handler, optional bool) http.Handler {
 
 		if userOk {
 			ctx := context.WithValue(r.Context(), UserKey, Claims{
-				UserID: userID.(string),
+				UserID: userID.(uuid.UUID),
 			})
 
 			// Token is authenticated, pass it through
@@ -68,12 +69,12 @@ func authenticator(next http.Handler, optional bool) http.Handler {
 
 // Claims is our custom claims type
 type Claims struct {
-	UserID string `json:"user_id"`
+	UserID uuid.UUID `json:"user_id"`
 	jwt.StandardClaims
 }
 
 // CreateToken issues a new jwt token
-func CreateToken(secret string, username string, userID string) (string, error) {
+func CreateToken(secret string, username string, userID uuid.UUID) (string, error) {
 
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.

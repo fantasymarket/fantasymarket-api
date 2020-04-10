@@ -14,12 +14,14 @@ type Order struct {
 	UserID uuid.UUID
 	User   User `gorm:"ForeignKey:UserID;AssociationForeignKey:UserID"`
 
-	CreatedAt  time.Time
-	CanceledAt time.Time
-	Type       string
-	Side       string
-	Symbol     string
-	status     string
+	CreatedAt  time.Time `json:"createdAt"`
+	CanceledAt time.Time `json:"canceledAt"`
+	Type       string `json:"type"`
+	Side       string `json:"side"`
+	Symbol     string `json:"symbol"`
+	Status     string `json:"status"`
+	LimitPrice int `json:"limitPrice"`
+	StopPrice int `json:"stopPrice"`
 
 	// Stuff that affects all tags
 	//// TimeOffset time.Duration // Optionally offset the event to e.g only affect a tag after x time

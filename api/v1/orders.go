@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"fantasymarket/utils/http/middleware/jwt"
+	"fantasymarket/database/models"
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
@@ -9,17 +11,20 @@ import (
 )
 
 func (api *APIHandler) orders(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value(jwt.UserKey).(jwt.Claims)
+	if ok != true {
+		log.Println(ok)
+	}
 
+	orders := api.DB.GetOrdersForUser(user.UserID)
+	w.Write(orders)
 }
 
 func (api *APIHandler) addOrder(w http.ResponseWriter, r *http.Request) {
-	type Order struct {
-		Type string	`json:"type"`
-		Side string `json:"side"`
-		Symbol string `json:"symbol"`
-		Quantity int `json:"quantity"`
-		LimitPrice int `json:"limitPrice"`
-		StopPrice int `json:"stopPrice"`
+
+	user, ok := r.Context().Value(jwt.UserKey).(jwt.Claims)
+	if ok != true {
+		log.Println(ok)
 	}
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -27,7 +32,7 @@ func (api *APIHandler) addOrder(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	newOrder := &Order{}
+	newOrder := &models.Order{UserID: user.UserID}
 	err = yaml.Unmarshal(body, newOrder)
 
 	if err != nil {
