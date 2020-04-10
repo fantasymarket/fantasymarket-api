@@ -2,9 +2,13 @@ package api
 
 import (
 	v1 "fantasymarket/api/v1"
+
+	"github.com/rs/zerolog/log"
+
 	"fantasymarket/database"
 	"fantasymarket/game"
-	"fmt"
+	"fantasymarket/utils/config"
+
 	"net/http"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -14,7 +18,7 @@ import (
 const addr = "localhost:42069"
 
 // Start starts a new instance of our REST API
-func Start(db *database.Service, game *game.Service) {
+func Start(db *database.Service, game *game.Service, config *config.Config) {
 
 	r := chi.NewRouter()
 
@@ -33,11 +37,11 @@ func Start(db *database.Service, game *game.Service) {
 	// Middleware
 	r.Use(middleware.Logger, cors.Handler)
 
-	v1Handler := v1.NewAPIRouter(db, game)
+	v1Handler := v1.NewAPIRouter(db, game, config)
 
 	r.Mount("/v1", v1Handler)
 	r.Mount("/", v1Handler)
 
-	fmt.Println("stated http server on " + addr + " :p")
+	log.Info().Str("address", addr).Msg("successfully started the http server")
 	http.ListenAndServe(addr, r)
 }
