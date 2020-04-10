@@ -8,6 +8,7 @@ import (
 	"fantasymarket/utils"
 	"fantasymarket/utils/config"
 	"fantasymarket/utils/hash"
+	"fantasymarket/utils/timeutils"
 
 	"strconv"
 	"time"
@@ -134,25 +135,52 @@ func (s Service) removeInactiveEvents(events []models.Event) {
 func (s Service) CalcutaleAffectedness(stocks []models.Stock, activeEvents []models.Event) map[string]float64 {
 	var affectedness map[string]float64
 
-	var tagOptions []events.TagOptions
-	for _, activeEvent := range activeEvents {
-		tagOptions = append(tagOptions, s.EventDetails[activeEvent.EventID].Tags...)
-	}
+	activeTags := s.GetActiveEventTags(activeEvents)
 
-	for _, tagOption := range tagOptions {
+	for _, tag := range activeTags {
 		for _, stock := range stocks {
 			stockDetails := s.StockDetails[stock.Symbol]
 
-			affectedByTag := utils.Some(stockDetails.Tags, tagOption.AffectsTags)
-			affectedBySymbol := utils.Includes(tagOption.AffectsStocks, stock.Symbol)
+			affectedByTag := utils.Some(stockDetails.Tags, tag.AffectsTags)
+			affectedBySymbol := utils.Includes(tag.AffectsStocks, stock.Symbol)
 
 			if affectedByTag || affectedBySymbol {
-				affectedness[stock.Symbol] += tagOption.CalculateTrend(s.TicksSinceStart, stock.Symbol)
+				affectedness[stock.Symbol] += tag.CalculateTrend(s.TicksSinceStart, stock.Symbol)
 			}
 		}
 	}
 
 	return affectedness
+}
+
+// GetActiveEventTags returns a list of event tags that
+// should currently be affecting all stocks
+func (s Service) GetActiveEventTags(activeEvents []models.Event) []events.TagOptions {
+	var activeTags []events.TagOptions
+	for _, activeEvent := range activeEvents {
+		eventDetails := s.EventDetails[activeEvent.EventID]
+		for _, tag := range eventDetails.Tags {
+
+			startDate := activeEvent.CreatedAt
+			currentDate := s.GetCurrentDate()
+
+			if !timeutils.Duration.IsZero(tag.Offset) {
+				startDate = tag.Offset.Shift(startDate)
+			}
+
+			if startDate.After(currentDate) {
+				continue
+			}
+
+			if !timeutils.Duration.IsZero(tag.Duration) && tag.Duration.Shift(startDate).Before(currentDate) {
+				continue
+			}
+
+			activeTags = append(activeTags, tag)
+		}
+	}
+
+	return activeTags
 }
 
 // ComputeStockNumbers computes the index at the next tick for a list of stocks
