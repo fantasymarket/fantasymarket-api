@@ -5,7 +5,6 @@ import (
 	"fantasymarket/utils/http/responses"
 	"io/ioutil"
 	"net/http"
-
 	"github.com/go-chi/chi"
 	"gopkg.in/yaml.v3"
 )

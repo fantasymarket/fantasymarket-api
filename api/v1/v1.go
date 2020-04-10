@@ -50,6 +50,8 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 		r.Get("/", api.orders)
 
+		r.Post("/", api.addOrder)
+
 		r.Get("/{orderID}", api.orders)
 
 		r.Delete("/{orderID}", api.orders)
