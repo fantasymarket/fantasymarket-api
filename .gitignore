@@ -19,3 +19,4 @@ database.db
 .vs
 .DS_Store
 .idea
+config.yaml

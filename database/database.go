@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/rs/zerolog/log"
+
 	"fantasymarket/database/models"
 	"fantasymarket/game/stocks"
+	"fantasymarket/utils/config"
 
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
@@ -16,11 +19,12 @@ import (
 
 // Service is the Database Service
 type Service struct {
-	DB *gorm.DB // gorm database instance
+	DB     *gorm.DB // gorm database instance
+	Config *config.Config
 }
 
 // Connect connects to the database and returns thedatabase object
-func Connect() (*Service, error) {
+func Connect(config *config.Config) (*Service, error) {
 	db, err := gorm.Open("sqlite3", "database.db")
 
 	if err != nil {
@@ -33,10 +37,12 @@ func Connect() (*Service, error) {
 		&models.Event{},
 		&models.Order{},
 	)
-	fmt.Println("connected to da database my doods D:")
+
+	log.Info().Msg("successfully connected to the database")
 
 	return &Service{
-		DB: db,
+		DB:     db,
+		Config: config,
 	}, nil
 }
 
