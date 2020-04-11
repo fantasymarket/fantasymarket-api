@@ -8,6 +8,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/jwtauth"
+	uuid "github.com/satori/go.uuid"
 )
 
 type key string
@@ -42,7 +43,7 @@ func authenticator(next http.Handler, optional bool) http.Handler {
 		// Set userID context to the user_id
 		user, userOk := claims["user"].(UserClaims)
 
-		if userOk && user.UserID != "" && user.Username != "" {
+		if userOk && user.UserID != uuid.Nil && user.Username != "" {
 			ctx := context.WithValue(r.Context(), UserKey, user)
 
 			// Token is authenticated, pass it through
@@ -65,12 +66,12 @@ type Claims struct {
 
 // UserClaims are user informations
 type UserClaims struct {
-	UserID   string `json:"user_id"`
-	Username string `json:"username"`
+	UserID   uuid.UUID `json:"user_id"`
+	Username string    `json:"username"`
 }
 
 // CreateToken issues a new jwt token
-func CreateToken(secret string, username string, userID string) (string, error) {
+func CreateToken(secret string, username string, userID uuid.UUID) (string, error) {
 
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
@@ -95,4 +96,9 @@ func CreateToken(secret string, username string, userID string) (string, error) 
 
 	// Sign and get the complete encoded token as a string using the secret
 	return token.SignedString([]byte(secret))
+}
+
+// GetUserFromContext extracts the UserClaims from a context
+func GetUserFromContext(ctx context.Context) UserClaims {
+	return ctx.Value(UserKey).(UserClaims)
 }

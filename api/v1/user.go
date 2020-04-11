@@ -21,7 +21,8 @@ func (api *APIHandler) getUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *APIHandler) getSelf(w http.ResponseWriter, r *http.Request) {
-	user, _ := r.Context().Value(jwt.UserKey).(jwt.UserClaims)
+	ctx := r.Context()
+	user := jwt.GetUserFromContext(ctx)
 
 	resp, err := api.DB.GetSelf(user.Username)
 	if err != nil {
@@ -36,7 +37,8 @@ type updateUserRequest struct {
 }
 
 func (api *APIHandler) updateSelf(w http.ResponseWriter, r *http.Request) {
-	user, _ := r.Context().Value(jwt.UserKey).(jwt.UserClaims)
+	ctx := r.Context()
+	user := jwt.GetUserFromContext(ctx)
 
 	var req updateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -52,7 +54,7 @@ func (api *APIHandler) updateSelf(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.username != "" {
-		if err := api.DB.RenameUser(user.Username, req.username); err != nil {
+		if err := api.DB.RenameUser(user.UserID, user.Username, req.username); err != nil {
 			responses.ErrorResponse(w, http.StatusInternalServerError, "error updating username")
 			return
 		}
@@ -67,7 +69,7 @@ func (api *APIHandler) updateSelf(w http.ResponseWriter, r *http.Request) {
 
 	responses.CustomResponse(w, map[string]string{
 		"username": user.Username,
-		"userID":   user.UserID,
+		"userID":   user.UserID.String(),
 		"token":    token,
 	}, 200)
 }
@@ -80,7 +82,7 @@ func (api *APIHandler) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := jwt.CreateToken("secret", user.Username, user.UserID.String())
+	token, err := jwt.CreateToken("secret", user.Username, user.UserID)
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, "error generating user token")
 		return
