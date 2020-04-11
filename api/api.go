@@ -10,6 +10,7 @@ import (
 	"fantasymarket/utils/config"
 
 	"net/http"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
