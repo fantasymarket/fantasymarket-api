@@ -3,7 +3,6 @@ package jwt
 import (
 	"context"
 	"fantasymarket/utils/http/responses"
-	uuid "github.com/satori/go.uuid"
 	"net/http"
 	"time"
 
@@ -35,25 +34,16 @@ func authenticator(next http.Handler, optional bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, claims, err := jwtauth.FromContext(r.Context())
 
-		if !optional {
-			if err != nil || token == nil || !token.Valid {
-				responses.ErrorResponse(w, http.StatusUnauthorized, "unauthorized")
-				return
-			}
-
-			if tokenType, ok := claims["type"]; !ok || tokenType != "auth" {
-				responses.ErrorResponse(w, http.StatusUnauthorized, "you can't use this type of token on this method")
-				return
-			}
+		if !optional && (err != nil || token == nil || !token.Valid) {
+			responses.ErrorResponse(w, http.StatusUnauthorized, "unauthorized")
+			return
 		}
 
 		// Set userID context to the user_id
-		userID, userOk := claims["user_id"]
+		user, userOk := claims["user"].(UserClaims)
 
-		if userOk {
-			ctx := context.WithValue(r.Context(), UserKey, Claims{
-				UserID: userID.(uuid.UUID),
-			})
+		if userOk && user.UserID != "" && user.Username != "" {
+			ctx := context.WithValue(r.Context(), UserKey, user)
 
 			// Token is authenticated, pass it through
 			next.ServeHTTP(w, r.WithContext(ctx))
@@ -69,12 +59,18 @@ func authenticator(next http.Handler, optional bool) http.Handler {
 
 // Claims is our custom claims type
 type Claims struct {
-	UserID uuid.UUID `json:"user_id"`
 	jwt.StandardClaims
+	User UserClaims `json:"user"`
+}
+
+// UserClaims are user informations
+type UserClaims struct {
+	UserID   string `json:"user_id"`
+	Username string `json:"username"`
 }
 
 // CreateToken issues a new jwt token
-func CreateToken(secret string, username string, userID uuid.UUID) (string, error) {
+func CreateToken(secret string, username string, userID string) (string, error) {
 
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
@@ -86,7 +82,12 @@ func CreateToken(secret string, username string, userID uuid.UUID) (string, erro
 			ExpiresAt: time.Now().Add(time.Minute * 5).Unix(),
 			Issuer:    "fantasymarket-api",
 		},
+		User: UserClaims{
+			Username: username,
+			UserID:   userID,
+		},
 	}
+
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		claims,
