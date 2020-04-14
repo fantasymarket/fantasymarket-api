@@ -67,10 +67,12 @@ func (api *APIHandler) updateSelf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responses.CustomResponse(w, map[string]string{
-		"username": user.Username,
-		"userID":   user.UserID.String(),
-		"token":    token,
+	responses.CustomResponse(w, map[string]interface{}{
+		"user": map[string]string{
+			"userID":   user.UserID.String(),
+			"username": user.Username,
+		},
+		"token": token,
 	}, 200)
 }
 
@@ -88,10 +90,12 @@ func (api *APIHandler) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responses.CustomResponse(w, map[string]string{
-		"username": user.Username,
-		"userID":   user.UserID.String(),
-		"token":    token,
+	responses.CustomResponse(w, map[string]interface{}{
+		"user": map[string]string{
+			"userID":   user.UserID.String(),
+			"username": user.Username,
+		},
+		"token": token,
 	}, 200)
 
 }

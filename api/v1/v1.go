@@ -66,7 +66,7 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 		r.Group(func(r chi.Router) {
 			r.Use(jwt.Middleware("secret", true))
 			r.Get("/{username}", api.getUser)
-			r.Post("/", api.createUser)
+			r.Put("/", api.createUser)
 		})
 
 		r.Group(func(r chi.Router) {

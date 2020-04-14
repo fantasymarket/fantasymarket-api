@@ -25,7 +25,7 @@ func Start(db *database.Service, game *game.Service, config *config.Config) {
 
 	// CORS Header
 	cors := cors.New(cors.Options{
-		AllowedOrigins:     []string{"https://fantasymarket.netlify.com/", "http://" + addr},
+		AllowedOrigins:     []string{"https://fantasymarket.netlify.com/", "http://localhost:3000"},
 		AllowedMethods:     []string{"GET", "POST", "PUT"},
 		AllowedHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:     []string{"Link"},

@@ -35,6 +35,9 @@ func Connect(config *config.Config) (*Service, error) {
 		&models.Stock{},
 		&models.Event{},
 		&models.Order{},
+		&models.User{},
+		&models.Portfolio{},
+		&models.PortfolioItem{},
 	)
 
 	log.Info().Msg("successfully connected to the database")

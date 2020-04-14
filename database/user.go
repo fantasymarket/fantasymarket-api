@@ -22,10 +22,10 @@ func (s *Service) CreateGuest() (*models.User, error) {
 	var username string
 	// we generate usenames until the username is unique so everyone
 	// starts of with a fresh account
-	for username != "" {
+	for username == "" {
 		u := petname.Generate(3, "-")
 
-		if s.DB.Where("username = ?", u).Select("username").First(models.User{}).RecordNotFound() {
+		if s.DB.Where("username = ?", u).Select("username").First(&models.User{}).RecordNotFound() {
 			username = u
 		}
 	}
