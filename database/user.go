@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
+	uuid "github.com/satori/go.uuid"
 
 	petname "github.com/dustinkirkland/golang-petname"
 )
@@ -21,10 +22,10 @@ func (s *Service) CreateGuest() (*models.User, error) {
 	var username string
 	// we generate usenames until the username is unique so everyone
 	// starts of with a fresh account
-	for username != "" {
+	for username == "" {
 		u := petname.Generate(3, "-")
 
-		if s.DB.Where("username = ?", u).Select("username").First(models.User{}).RecordNotFound() {
+		if s.DB.Where("username = ?", u).Select("username").First(&models.User{}).RecordNotFound() {
 			username = u
 		}
 	}
@@ -76,11 +77,12 @@ func (s *Service) ChangePassword(username, currentPassword string, newPassword s
 
 // RenameUser renames a user account
 // NOTE: this should only be able to be called on your current username
-func (s *Service) RenameUser(username, newUsername string) error {
+func (s *Service) RenameUser(userID uuid.UUID, username, newUsername string) error {
 
 	var user models.User
 	if err := s.DB.Where(models.User{
 		Username: username,
+		UserID:   userID,
 	}).Select("username. password").First(&user).Error; err != nil {
 		return err
 	}

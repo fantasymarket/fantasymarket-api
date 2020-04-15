@@ -63,7 +63,7 @@ func Start(db *database.Service, config *config.Config) (*Service, error) {
 	}
 
 	go startLoop(s)
-	log.Info().Msg("successfully started the game loop 😋")
+	log.Info().Msg("successfully started the game loop")
 
 	return s, nil
 }

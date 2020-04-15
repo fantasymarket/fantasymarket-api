@@ -1,17 +1,18 @@
-package utils
+package utils_test
 
 import (
+	"fantasymarket/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-type TestData struct {
+type getRandomFromArrayTestData struct {
 	items       map[string]float64
 	expectation string
 }
 
-var data = []TestData{
+var getRandomFromArrayData = []getRandomFromArrayTestData{
 	{
 		items: map[string]float64{
 			"event1":  0.1,
@@ -52,9 +53,9 @@ var data = []TestData{
 
 func TestSelectRandomWeightedItem(t *testing.T) {
 	seed := "TestSeed" // => results in 0.22
-	for _, test := range data {
+	for _, test := range getRandomFromArrayData {
 
-		val, err := SelectRandomWeightedItem(test.items, seed)
+		val, err := utils.SelectRandomWeightedItem(test.items, seed)
 		if assert.NoError(t, err) {
 			assert.Equal(t, test.expectation, val)
 		}
@@ -62,7 +63,7 @@ func TestSelectRandomWeightedItem(t *testing.T) {
 }
 
 func TestSelectRandomWeightedItemInvalidChance(t *testing.T) {
-	_, err := SelectRandomWeightedItem(map[string]float64{
+	_, err := utils.SelectRandomWeightedItem(map[string]float64{
 		"test": -1,
 	}, "🍉")
 	assert.Error(t, err)
