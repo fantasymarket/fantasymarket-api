@@ -23,6 +23,10 @@ type Service struct {
 	DB              *database.Service
 	Config          *config.Config
 	TicksSinceStart int64
+
+	// a history of all events that have run in the past
+	// map[eventID][]createdAt
+	EventHistory map[string][]time.Time
 }
 
 // GetCurrentDate returns the current in-game date
@@ -67,6 +71,8 @@ func Start(db *database.Service, config *config.Config) (*Service, error) {
 // startLoop startsrunningticks indefinitly
 func startLoop(s *Service) {
 	s.TicksSinceStart, _ = s.DB.GetNextTick()
+	s.EventHistory, _ = s.DB.GetEventHistory()
+
 	log.Debug().Int64("ticksSinceStart", s.TicksSinceStart).Msg("loaded loaded ticksSinceStart from database")
 
 	for {

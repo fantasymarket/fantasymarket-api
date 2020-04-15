@@ -117,6 +117,28 @@ func (s *Service) RemoveEvent(uniqueEventID uuid.UUID) error {
 	return s.DB.Where(models.Event{Active: true, ID: uniqueEventID}).Update("active", false).Error
 }
 
+func (s *Service) GetEventHistory() (map[string][]time.Time, error) {
+	eventHistory := map[string][]time.Time{}
+
+	var events []models.Event
+	if err := s.DB.Find(&events).Error; err != nil {
+		return nil, err
+	}
+
+	for _, event := range events {
+		eventID := event.EventID
+		createdAt := event.CreatedAt
+
+		if _, exists := eventHistory[eventID]; !exists {
+			eventHistory[eventID] = []time.Time{}
+		}
+		eventHistory[eventID] = append(eventHistory[eventID], createdAt)
+
+	}
+
+	return eventHistory, nil
+}
+
 // GetNextTick retrieves the tick number for the next tick from the database,
 // this is used to initialize our Service when the program restarts
 func (s *Service) GetNextTick() (int64, error) {
@@ -162,7 +184,7 @@ func (s *Service) CancelOrder(orderID uuid.UUID, currentDate time.Time) error {
 
 	// TODO check if the order is still active
 
-	return order.Updates(models.Order{Status: "cancelled", FilledAt: currentDate}).Error
+	return s.DB.Model(&order).Updates(models.Order{Status: "cancelled", FilledAt: currentDate}).Error
 }
 
 func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentDate time.Time) error {

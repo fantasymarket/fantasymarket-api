@@ -46,7 +46,7 @@ type EventDetails struct {
 	FixedDate             timeutils.Time     // date the event has to be run
 	FixedDateRandomOffset timeutils.Duration // Offset from 0-n added to the fixed date
 
-	randomChancePerDay      float64            // the chance for the event to occur in a day [0, 1]
+	RandomChancePerDay      float64            // the chance for the event to occur in a day [0, 1]
 	RecurringDuration timeutils.Duration // When an event has to happen e.g yearly
 
 	// these eventIDs have to have run before this event

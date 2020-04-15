@@ -1,67 +1,72 @@
 package game
 
 import (
-	"fantasymarket/database/models"
+	"bytes"
 	"fantasymarket/game/events"
-	"fantasymarket/utils/timeutils"
 	"fantasymarket/utils/hash"
+	"fantasymarket/utils/timeutils"
+	"html/template"
+	"strconv"
 	"time"
 )
 
-func (s *Service) startEvents(currentlyRunningEvents []models.Event) {
+func (s *Service) startEvents() {
 	currentDate := s.GetCurrentDate()
 	events := s.EventDetails
-
-	var currentlyRunningEventsMap = make(map[string]models.Event)
-	for _, e := range currentlyRunningEvents {
-		currentlyRunningEventsMap[e.EventID] = e
-	}
 
 	for _, event := range events {
 
 		eventNeedsToBeRun := false
 		createdAt := event.FixedDate.Time
+		eventID := event.EventID
+		seed := eventID + strconv.FormatInt(s.TicksSinceStart, 10)
 
 		switch event.Type {
 		case "fixed":
-			eventNeedsToBeRun = s.eventNeedsToBeRun(event, currentlyRunningEventsMap)
+			eventNeedsToBeRun = s.eventNeedsToBeRun(event)
 		case "recurring":
 
-			// TODO remove this comment never
-			// event is 2020.1.1 00:00
-			// today is 2028.1.1 01:00 // so 1 tick in
-			// so we keep adding 4 years until date > today
-			// date = 2032.1.1 00:00
-			// then - 4 years
-			// 2028.1.1 00:00
-			// this date is before the current time so the event will run in the next tick
-
-			// and then run the same logic as fixed
 			date := event.FixedDate.Time
 			for date.Before(currentDate) {
 				date = event.RecurringDuration.Shift(date)
 			}
+
 			date = timeutils.ShiftBack(event.RecurringDuration, date)
 			createdAt = date
 			event.FixedDate = timeutils.Time{Time: createdAt}
-			eventNeedsToBeRun = s.eventNeedsToBeRun(event, currentlyRunningEventsMap)
+			eventNeedsToBeRun = s.eventNeedsToBeRun(event)
 		case "random":
+
+			ticksPerDay := time.Hour * 24 / s.Config.Game.GameTimePerTick
+			chancePerTick := event.RandomChancePerDay * float64(ticksPerDay)
+
+			if chancePerTick > (float64(hash.Int64HashRange(0, 1e6, seed)) / 1e6) {
+				// s.eventNeedsToBeRun(event)
+			}
+
 			eventNeedsToBeRun = false // TODO
 			createdAt = s.GetCurrentDate()
 		}
 
-		if !eventNeedsToBeRun {
-			continue
+		if !event.FixedDateRandomOffset.IsZero() {
+			offset := calculateRandomOffset(event.FixedDateRandomOffset, seed)
+			createdAt.Add(offset)
 		}
 
-		// TODO Add Random Offset to createdAt
-		s.DB.AddEvent(event, createdAt)
+		if eventNeedsToBeRun {
+			s.DB.AddEvent(event, createdAt)
+
+			if _, ok := s.EventHistory[eventID]; !ok {
+				s.EventHistory[eventID] = []time.Time{}
+			}
+			s.EventHistory[eventID] = append(s.EventHistory[eventID], createdAt)
+		}
 	}
 }
 
-func (s *Service) addRandomOffset(time time.Time, randomOffset timeutils.Duration, seed string) time.Duration {
+func calculateRandomOffset(randomOffset timeutils.Duration, seed string) time.Duration {
 	date := time.Time{}
-	shiftedDate :== randomOffset.Shift(date)
+	shiftedDate := randomOffset.Shift(date)
 	difference := shiftedDate.Sub(shiftedDate)
 
 	offset := hash.Int64HashRange(0, int64(difference), seed)
@@ -69,41 +74,47 @@ func (s *Service) addRandomOffset(time time.Time, randomOffset timeutils.Duratio
 	return time.Duration(offset)
 }
 
-func (s *Service) eventNeedsToBeRun(event events.EventDetails, currentlyRunningEventsMap map[string]models.Event) bool {
-	date := event.FixedDate.Time
+func (s *Service) eventNeedsToBeRun(event events.EventDetails) bool {
 	currentDate := s.GetCurrentDate()
-	_, currentlyRunning := currentlyRunningEventsMap[event.EventID]
 
-	// notRunInThePast means the event can't have been run in another tick before this
-	notRunInThePast := event.FixedDate.After(timeutils.ShiftBack(event.Duration, date))
+	eventHistory, ok := s.EventHistory[event.EventID]
+	eventHasNeverRun := !ok || len(eventHistory) == 0
+	eventNeedsToRun := currentDate.After(event.FixedDate.Time)
 
-	// Event hasn't happened yet since it is not in currentlyRunning events
-	// and since fixedDate is after (currentTime - event.Duration),
-	// it can't have been run in the past
-	eventHasNotRunYet := !currentlyRunning && notRunInThePast
+	// TODO: handle events that can happening multiple times
+	// check if MinTimeBetween events is long enough
+	// eventShouldRun :=  currentDate after min time between events + eventHistory[len(eventHistory)-1]
 
-	// fixed Date is in the past so we'll have to run the event
-	fixedDateInPast := event.FixedDate.Before(date)
-
-	if fixedDateInPast && eventHasNotRunYet {
+	if eventHasNeverRun && eventNeedsToRun {
 		return true
 	}
+
 	return false
-	//TODO: Add an example to understand it better
 }
 
-func (s *Service) getRandomDateinRange(date timeutils.Time, duration timeutils.Duration) {
+// ChangeDescriptionPlaceholder fills the templates of a description string
+func (s *Service) ChangeDescriptionPlaceholder(description string) (string, error) {
+	currentDate := s.GetCurrentDate()
 
-	start := date
-	end := duration.Shift(date.Time)
+	data := struct {
+		Year  int
+		Month string
+		Day   int
+	}{
+		Year:  currentDate.Year(),
+		Month: currentDate.Month().String(),
+		Day:   currentDate.Day(),
+	}
 
-	// createdAt needs to be set to the date in our db
-}
+	tmpl, err := template.New("description").Parse(description)
+	if err != nil {
+		return "", err
+	}
 
-func (s *Service) changeDescriptionPlaceholder() {
-	// parse templates with
-	// https://golang.org/pkg/text/template/
+	var result bytes.Buffer
+	if err := tmpl.Execute(&result, data); err != nil {
+		return "", err
+	}
 
-	date := s.GetCurrentDate()
-	//TODO: Get the description of an event and find {year}, then sub {year} for data.year
+	return result.String(), nil
 }
