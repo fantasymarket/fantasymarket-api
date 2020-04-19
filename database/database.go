@@ -174,7 +174,12 @@ func (s *Service) AddOrder(order models.Order, userID uuid.UUID, currentDate tim
 	}).Error
 }
 
-//func (s *Service) GetOrder(id int) error {
+//func (s *Service) GetOrderForUser(userID uuid.UUID) error {
+
+//}
+
+//func (s *Service) GetOrderForUserByID(orderID uuid.UUID, userID uuid.UUID) {
+
 
 //}
 
@@ -222,3 +227,4 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentDate tim
 
 	return s.DB.Where(models.Order{OrderID: orderID}).Updates(models.Order{Status: "filled", FilledAt: currentDate}).Error
 }
+

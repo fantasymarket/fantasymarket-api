@@ -42,10 +42,11 @@
   
   dependencies: null
   effects: [ 
-    {chance: 1, effects: ["healthcare-receive-huge-boost"]}]
+    {chance: 1, effects: ["healthcare-receive-huge-boost"]}
+    ]
 
 
-  duration: "random" #(because of no signs of stopping)
+  duration: P11M02D
   
   tags:
   - affectsTags: ["all", "!healthcare"]
@@ -176,18 +177,16 @@
     affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: P21DT2H1M55S
     duration: P7D 
-    endDate: 2020-29-08 15:22:03 #event ends with this trend in mind
-
+ 
 
 - eventID: "presidential-election-us"
   title: "Presidential elections are around the corner. What will happen to stocks?"
   description: "With the presidential election about to occur, what will analysts and investors think of the impact it will bring to the stock market?"
 
-  fixedDate: 2020-11-03 12:22:22 #todo
-  fixedDateRandomOffset: P29D
+  fixedDate: 2020-11-01 12:22:22 
+  fixedDateRandomOffset: P1M
   type: "recurring"
-  recurringDuration: P4Y #4 in years -> next one is 03.11.2020. Usually around November. TODO: Create function to randomize November Date
-  
+  recurringDuration: P4Y
   # Could make it more complicated by having effects of different parties that would change the stocks
   # TODO: Create event chain with different parties
 
@@ -207,7 +206,7 @@
 - eventID: "presidential-election-us-potential-republicans-win"
   type: "custom"
   title: "Republicans winning Poland over"
-  description: "As the presidential election of Year {} is happening, the votes may favor the Republicans." #todo (placeholder for description)
+  description: "As the presidential election of Year {{.Year}} is happening, the votes may favor the Republicans." #todo (placeholder for description)
 
   duration: P5D 
 
@@ -221,7 +220,7 @@
 - eventID: "presidential-election-us-potential-democrats-win"
   type: "custom"
   title: "Democrats are looking to win"
-  description: "As the presidential election of Year {} is happening, the votes may favor the Democrats." #todo (placeholder for description)
+  description: "As the presidential election of Year {{.Year}} is happening, the votes may favor the Democrats." #todo (placeholder for description)
 
   duration: P5D
 
@@ -233,9 +232,9 @@
 
 
 - eventID: "presidential-election-us-potential-neutrals-win"
-  type: custom
+  type: "custom"
   title: "Republicans and Democrats losing, Neutrals are taking the stage it seems"
-  description: "As the presidential election of Year {} is happening, the votes may favor the Neutrals."
+  description: "As the presidential election of Year {{.Year}} is happening, the votes may favor the Neutrals."
 
   duration: P5D
 
@@ -247,10 +246,8 @@
 
 
 - eventID: "presidential-election-us-republican-win"
-  title: "President {} to represent the winning Republican party as a win"
-  description: "With the awaited final results for the US presidential election of year {}, the Republicans have shown to be in favor of the majority."
-
-  fixedDate: random date between 1 Nov and 31 Nov {year} #todo We need to change this to random range in Nov
+  title: "New President to represent the winning Republican party as a win"
+  description: "With the awaited final results for the US presidential election of year {{.Year}}, the Republicans have shown to be in favor of the majority."
 
   dependencies: "presidential-election-us-potential-republicans-win" #We need to start writing the func that starts events I feel. helps with thinking about it
   effects: null
@@ -265,10 +262,8 @@
 
 
 - eventID: "presidential-election-us-democrats-win"
-  title: "President {} to represent the winning Democratic party as a win"
-  description: "With the awaited final results for the US presidential election of year {}, the Democrats have shown to be in favor of the majority."
-
-  fixedDate: random date between 1 Nov and 31 Nov {year} #todo
+  title: "New President to represent the winning Democratic party as a win"
+  description: "With the awaited final results for the US presidential election of year {{.Year}}, the Democrats have shown to be in favor of the majority."
 
   dependencies: "presidential-election-us-potential-republicans-win"
   effects: null
@@ -283,17 +278,15 @@
 
 
 - eventID: "presidential-election-us-neutrals-win"
-  title: "President {} to represent the winning Neutral party as a win"
-  description: "With the awaited final results for the US presidential election of year {}, the Neutrals have shown to be in favor of the majority."
-
-  fixedDate: random date between 1 Nov and 31 Nov {year} #todo
+  title: "New President to represent the winning Neutral party as a win"
+  description: "With the awaited final results for the US presidential election of year {{.Year}}, the Neutrals have shown to be in favor of the majority."
 
   dependencies: "presidential-election-us-potential-neutrals-win"
   effects: null
 
   tags:
   - affectsTags: ["all"]
-    minTrend: -2  #todo
+    minTrend: -2  
     maxTrend: 2
     affectsStockIDs: ["all"]
     offset: PT1H2M55S

@@ -102,8 +102,8 @@ func (s *Service) GetRandomEventEffect(e models.Event) (string, error) {
 func (s *Service) tick() error {
 	log.Debug().Int64("tick", s.TicksSinceStart).Msg("running tick")
 
-	currentlyRunningEvents, _ := s.DB.GetEvents(s.GetCurrentDate())    // Sub this for the DB query results
-	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1) // Sub this for the DB query results
+	currentlyRunningEvents, _ := s.DB.GetEvents(s.GetCurrentDate())
+	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1)
 
 	// TODO: add new events to database:
 	//    - fixed events that need to be added at a fixed date

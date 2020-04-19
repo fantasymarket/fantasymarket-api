@@ -4,6 +4,7 @@ import (
 	"fantasymarket/utils/hash"
 	"fantasymarket/utils/timeutils"
 	"strconv"
+	"time"
 )
 
 // EventDetails is the type for storing information about events
@@ -46,8 +47,8 @@ type EventDetails struct {
 	FixedDate             timeutils.Time     // date the event has to be run
 	FixedDateRandomOffset timeutils.Duration // Offset from 0-n added to the fixed date
 
-	RandomChancePerDay      float64            // the chance for the event to occur in a day [0, 1]
-	RecurringDuration timeutils.Duration // When an event has to happen e.g yearly
+	RandomChancePerDay float64            // the chance for the event to occur in a day [0, 1]
+	RecurringDuration  timeutils.Duration // When an event has to happen e.g yearly
 
 	// these eventIDs have to have run before this event
 	// can be prefixed with `!` if the event should only be run if an event hasn't happened yet
@@ -56,10 +57,11 @@ type EventDetails struct {
 	// Effects are eventIDs that have to be run after this event is over
 	Effects []EventEffect
 
-	RunBefore timeutils.Time // The event has to be run before this date
-	RunAfter  timeutils.Time // The event has to be run after this date
-
 	Duration timeutils.Duration // Time during which the event is the event is run every tick
+
+	MinTimeBetweenEvents time.Duration  // The event can only run again after this time has passed
+	RunBefore            timeutils.Time // The event has to be run before this date
+	RunAfter             timeutils.Time // The event has to be run after this date
 
 	Tags []TagOptions
 }
