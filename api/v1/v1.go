@@ -42,8 +42,6 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 		r.Get("/{symbol}", api.getStockDetails)
 
-		r.Post("/orders", api.addOrder)
-
 	})
 
 	r.Route("/orders", func(r chi.Router) {

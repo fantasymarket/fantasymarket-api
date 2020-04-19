@@ -38,7 +38,5 @@ func (api *APIHandler) addOrder(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	// TODO: Call the fitting Database function here
-	fmt.Println(newOrder)
 
 }
