@@ -1,4 +1,4 @@
-  # SAMPLE EVENT:
+# SAMPLE EVENT:
   # - eventID: "quantum-breakthrough"
   #   title: "Quantum Breakthrough"
   #   description: "We did it reddit!"
@@ -10,9 +10,9 @@
   #   #	- random			- events that can happen randomly
   #   type: "random"
   #   fixedDate:   "2006-01-02 15:04:05"        # ONLY EVENT TYPE FIXED: date the event has to be run
-  #   randomChance:      0.00001  # the chance for the event to occur in a tick [0, 1] (thould be less than .01%)
-  #   reccuringDuration: P4Y # 4 years
-      
+  #   randomChancePerDay:      0.00001  # the chance for the event to occur in a tick [0, 1] (thould be less than .01%)
+  #   recurringDuration: P4Y # 4 years
+
   #   dependencies: ["!corona-virus-outbreak"] # these eventIDs have to have run before this event
   #   effects: [{
   #     chance: 0.2,
@@ -44,7 +44,6 @@
   effects: [ 
     {chance: 1, effects: ["healthcare-receive-huge-boost"]}]
 
-  runAfter: "0"
 
   duration: "random" #(because of no signs of stopping)
   
@@ -82,13 +81,14 @@
   description: "Healthcare stocks earn huge revenue boost amidst corona virus outbreak"
 
   type: "fixed"
-  fixedDate: 31.06.2020 
+  fixedDate: 2020-06-31 02:44:32
 
-  dependencies: ["corona-virus-outbreak"]
+  dependencies: [
+    {"corona-virus-outbreak"}
+    ]
   effects: null
 
-  runAfter: 4080 ticks #(170 days)
-  duration: 768 ticks #(32 days)
+  duration: P1M2D
 
   tags:
   - affectsTags: ["healthcare"] #Tags for Events and Tags for Stocks are the same. If yes, they might be affected
@@ -107,13 +107,12 @@
   authorized by the bank customer, which appears to inherently be more secure when accessing data."
 
   type: "fixed"
-  fixedDate: 30.07.2020
+  fixedDate: 2020-07-03 13:22:49
 
   dependencies: null
   effects: null
 
-  runAfter: 5040 ticks #(210 days)
-  duration: 1056 ticks #(44 days)
+  duration: P1M14D
 
   tags:
   - affectsTags: ["financial"]
@@ -154,29 +153,27 @@
   dependencies: null
   effects: null
 
-  runAfter: 4272 ticks (178 days)
-
-  duration: 456 ticks (19 days)
+  duration: P19D
 
   tags:
-  - affectsTags: healthcare
+  - affectsTags: ["healthcare"]
     trend: -0.6 
-    affectsStockIDs: IDEXX, ANTM, DVA
+    affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: PT2H1M55S
     duration: P7D 
-  - affectsTags: healthcare
+  - affectsTags: ["healthcare"]
     trend: -1.4
-    affectsStockIDs: IDEXX, ANTM, DVA
+    affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: P7DT2H1M55S
     duration: P7D 
-  - affectsTags: healthcare
+  - affectsTags: ["healthcare"]
     trend: -0.5
-    affectsStockIDs: IDEXX, ANTM, DVA
+    affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: P14DT2H1M55S
     duration: P7D 
-  - affectsTags: healthcare
+  - affectsTags: ["healthcare"]
     trend: 0.2
-    affectsStockIDs: IDEXX, ANTM, DVA
+    affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: P21DT2H1M55S
     duration: P7D 
     endDate: 2020-29-08 15:22:03 #event ends with this trend in mind
@@ -208,7 +205,7 @@
 
 
 - eventID: "presidential-election-us-potential-republicans-win"
-  type: custom
+  type: "custom"
   title: "Republicans winning Poland over"
   description: "As the presidential election of Year {} is happening, the votes may favor the Republicans." #todo (placeholder for description)
 
@@ -222,7 +219,7 @@
     
 
 - eventID: "presidential-election-us-potential-democrats-win"
-  type: custom
+  type: "custom"
   title: "Democrats are looking to win"
   description: "As the presidential election of Year {} is happening, the votes may favor the Democrats." #todo (placeholder for description)
 
@@ -315,8 +312,6 @@
   dependencies: null
   effects: null
 
-  runAfter: 11016 ticks
-
   tags:
   - affectsTags: ["financial"]
     minTrend: -0.9   
@@ -336,31 +331,31 @@
   type: "fixed"
   fixedDate: 2021-18-05 09:10:04
 
-  dependencies: buffett-sudden-death
+  dependencies: [
+    {"buffett-sudden-death"}
+    ]
   effects: null
 
-  runAfter: 12072 ticks
-
   tags:
-  - affectsTags: financial
+  - affectsTags: ["financial"]
     trend: -0.9
     affectsStockIDs: ["GS"]
     offset: P2DT33M24S
     duration: P7D
 
-  - affectsTags: financial
+  - affectsTags: ["financial"]
     trend: -0.1
     affectsStockIDs: ["AXP, JPM"]
     offset: P2DT33M24S
     duration: P7D
 
-  - affectsTags: financial
+  - affectsTags: ["financial"]
     trend: -0.4
     affectsStockIDs: ["GS"]
     offset: P9DT33M24S
     duration: P8D
 
-  - affectsTags: financial
+  - affectsTags: ["financial"]
     trend: -0.6
     affectsStockIDs: ["AXP, JPM"]
     offset: P9DT33M24S
@@ -379,8 +374,7 @@
   dependencies: null
   effects: null
 
-  runAfter: 15048 ticks (627 days)
-  duration: 2784 ticks (116 days)
+  duration: P3M26D
 
   tags:
   - affectsTags: ["financial"]
@@ -411,19 +405,34 @@
                 and set of a panic for investors, tumbling a few important stocks.
 
   type: "random"
-  randomChance: 0.44
+  randomChancePerDay: 0.009 #per day 
+
+  duration: P1W
 
   dependencies: null
-  effects: TO BE REWRITTEN
+  effects: [
+    {event-ID: "hacker-caused-stocks-to-tumble"}
+  ]
 
-  runAfter: null
-  duration: 48 ticks (2 days)
 
-  tags:
-  - affectsTags: financial, tech
-    trend: -0.5 to -1.4 (fluctuates)
-    affectsStockIDs: JPM, AXP (financial), FB, AAPL, MSFT (tech)
+- eventID: "hacker-caused-stocks-to-tumble"
+  title: "Stocks see huge tumbling due to recent event"
+  description: "With the recent event of injecting false price quotes into stock data feeds by an anonymous hacker, stocks have seen huge drops today as investors are wary of the 
+  effect it brings to others. Huge sell-offs and major quick sells are happening and are destroying the stock markets today."
 
+  type: "custom"
+  # Date: time.Now()
+  
+  dependencies: ["anonymous-hacker-finds-way"]
+  effects: null
+
+    tags:
+  - affectsTags: ["financial", "tech"]
+    minTrend: -1.4
+    maxTrend: -0.5
+    affectsStockIDs: ["JPM", "AXP", "FB", "AAPL", "MSFT"]
+    offset: PT1H24M43S
+    duration: P1W
 
 - eventID: "tesla-successful-breakthrough"
   title: "Tesla receives a huge boost following success of cyber truck launch"
@@ -432,18 +441,25 @@
                 Some multi-billionare investors are looking to invest a huge sum into Tesla over the next few weeks."
 
   type: "fixed"
-  fixedDate: 04.07.2022 - 31.08.2022
+  fixedDate: 2022-07-04 09:22:49
   
   dependencies: null
   effects: null
   
-  runAfter: 22656 ticks (944 days)
-  duration: 1368 ticks (57 days)
+  duration: P1M27D
 
   tags:
-  - affectsTags: energy
-    trend: 1.5 (for first month), 0.8 (the next following weeks)
-    affectsStockIDs: TSLA
+  - affectsTags: ["energy"]
+    trend: 1.5
+    affectsStockIDs: ["TSLA"]
+    offset: PT1H22M04S
+    duration: P1M
+
+  - affectsTags: ["energy"]
+    trend: 0.8
+    affectsStockIDs: ["TSLA"]
+    offset: P1MT1H22M04S
+    duration: P27D
 
 
 - eventID: "microsoft-declares-war-against-apple"
@@ -453,19 +469,82 @@
                 Tim Cook agrees and their war begins. Investors and entrepreneurs are keen to see who wins. Stock values are expected to fluctuate in an upward manner."
 
   type: "fixed"
-  fixedDate: 03.01.2023 - 31.12.2023
+  fixedDate: 2023-03-01 14:42:26
 
   dependencies: null
-  effects: null
-
-  runAfter: 26352 ticks (1098 days)
-  duration: 8688 ticks (362 days)
+  effects: [{
+    chance: 0.5,
+    eventID: "microsoft-declares-war-against-apple-and-wins", 
+  } {
+    chance: 1,
+    eventID: "microsoft-declares-war-against-apple-and-loses",  #event
+  }]
 
   tags:
-  - affectsTags: tech
-    trend: 0.2 to 1.1 (fluctuates, MSFT should have a higher stock value than AAPL)
-    affectsStockIDs: MSFT, AAPL
+  - affectsTags: ["tech"]
+    minTrend: 0.2
+    maxTrend: 1.1
+    affectsStockIDs: ["MSFT, AAPL"]
+    offset: PT14H22M09S
+    duration: P11M27D
 
+  - eventID: "microsoft-declares-war-against-apple-and-wins"
+    title: "Microsoft wins the technological innovation war against rival Apple"
+    description: "After a long awaited overview of the huge battle between two large technology companies Apple and Microsoft, 
+    the winner has shone to Microsoft's favor."
+
+    dependencies: ["microsoft-declares-war-against-apple"]
+    effects: [{
+      chance: 1,
+      eventID: "microsoft-releases-new-console"
+    }]
+  
+   tags:
+  - affectsTags: ["tech"]
+    trend: 1.7
+    affectsStockIDs: ["MSFT"]
+    offset: P1DT32M44S
+    duration: P1M
+
+   - affectsTags: ["tech"]
+    trend: -0.2
+    affectsStockIDs: ["AAPL"]
+    offset: P1DT32M44S
+    duration: P1M
+
+   - affectsTags: ["tech"]
+    trend: 0.4
+    affectsStockIDs: ["MSFT"]
+    offset: P1M1DT32M44S
+    duration: P1M
+
+  - affectsTags: ["tech"]
+    trend: -0.6
+    affectsStockIDs: ["AAPL"]
+    offset: P1M1DT32M44S
+    duration: P1M
+
+    - affectsTags: ["tech"]
+    trend: -0.1
+    affectsStockIDs: ["MSFT"]
+    offset: P2M1DT32M44S
+    duration: P1M
+
+    - affectsTags: ["tech"]
+    trend: 0.2
+    affectsStockIDs: ["AAPL"]
+    offset: P2M1DT32M44S
+    duration: P1M
+
+  # x := trend(MSFT)
+  # y := trend(AAPL)
+
+  # if y > x || x >= 0.4 && y <= 1.1 {
+  #   y = x - 0.4 * y
+  #   x = tag.maxTrend - y  
+  # }
+  # return x, y
+  ## trend of MSFT should always be higher than AAPL
 
 - eventID: "boeing-huge-airplane-crash"
   title: "2 Boeing airplanes crashed this week, bad overlook for stock values"
@@ -473,19 +552,37 @@
   bad outcome towards Boeing stocks over the following months."
 
   type: "fixed"
-  fixedDate: 12.04.2023 - 16.07.2023
+  fixedDate: 2023-04-12 19:44:02
 
   dependencies: null
   effects: null
 
-  runAfter: 29448 ticks (1227 days)
-  duration: 2256 ticks (94 days)
+  duration: P3M4D
 
   tags: 
-  - affectsTags: aviation
-    trend: -1.8 for first month, -1.5 for second month, -1.1 for third month, 0.2 for fourth month
-    affectsStockIDs: BA
+  - affectsTags: ["aviation"]
+    trend: -1.8
+    affectsStockIDs: ["BA"]
+    offset: PT2H19M40S
+    duration: P1M
 
+  - affectsTags: ["aviation"]
+    trend: -1.5
+    affectsStockIDs: ["BA"]
+    offset: P1MT2H19M40S
+    duration: P1M
+  
+  - affectsTags: ["aviation"]
+    trend: -1.1
+    affectsStockIDs: ["BA"]
+    offset: P2MT2H19M40S
+    duration: P1M
+
+  - affectsTags: ["aviation"]
+    trend: -0.2
+    affectsStockIDs: ["BA"]
+    offset: P3MT2H19M40S
+    duration: P1M
 
 - eventID: "global-pandemic"
   title: "Unknown virus suspected to be worse than SARS and Coronavirus"
@@ -493,39 +590,68 @@
   that SARS and Coronavirus brought. Further details and information still unknown."
 
   type: "random"
-  randomChance: 0.09
+  randomChancePerDay: 0.009
 
   dependencies: null
-  effects: null
+  effects: null #could put multiple effects with different chances for different time durations
 
-  runAfter: null
-  duration: 4032 ticks (168 days)
+  minDuration: P2M  #todo
+  maxDuration: P10Y #todo
 
   tags:
-  - affectsTags: all
-    trend: -1.4 for airplane, -0.3 for tech, 0.9 for health, -0.8 for rest
-    affectsStockIDs: all
+  - affectsTags: ["airplane"]
+    trend: -1.4
+    affectsStockIDs: ["BA"]
+    offset: P3DT22M14S
+
+
+  - affectsTags: ["tech"]
+    trend: -0.3
+    affectsStockIDs: ["MSFT", "FB", "NFLX", "AAPL"]
+    offset: P3DT22M14S
+
+
+  - affectsTags: ["health"]
+    trend: -0.9
+    affectsStockIDs: ["IDEXX", "ANTM", "DVA"]
+    offset: P3DT22M14S
+
+  - affectsTags: ["financial", "energy"]
+    trend: -0.8
+    affectsStockIDs: ["AXP", "JPM", "GS", "RDS-A", "TSLA", "NEP", "FSLR"]
+    offset: P3DT22M14S
 
 
 - eventID: "new-streaming-platform"
   title: "New streaming platform coming in 2024, supposedly better than Netflix and Hulu"
-  description: "With Apple winning a very close battle against Microsoft in their 'technological innovation war' last year,
+  description: "With Apple losing a very close battle against Microsoft in their 'technological innovation war' last year,
   Apple is deciding to launch a new streaming platform, AppleSHD, coming out on Spring 2024. Moderators expecting
   AppleSHD to be a very strong competitor against Netflix and Hulu."
 
   type: "fixed"
-  fixedDate: 02.02.2024 - 06.04.2024
+  fixedDate: 2024-02-02 13:04:29
 
-  dependencies: "microsoft-declares-war-against-apple", apple wins
+  dependencies: ["microsoft-declares-war-against-apple-and-wins"]
   effects: null
 
-  runAfter: 35808 ticks (1492 days)
-  duration: 1536 ticks (64 days)
-
   tags:
-  - affectsTags: tech
-    trend: 1.8 for first few weeks, 1.2 for next weeks, 0.4 for last week
-    affectsStockIDs: AAPL
+  - affectsTags: ["tech"]
+    trend: 1.8
+    affectsStockIDs: ["AAPL"]
+    offset: PT2H22M04S
+    duration: P3W
+
+   - affectsTags: ["tech"]
+    trend: 1.2
+    affectsStockIDs: ["AAPL"]
+    offset: P3WT2H22M04S
+    duration: P2W
+
+   - affectsTags: ["tech"]
+    trend: 0.4
+    affectsStockIDs: ["AAPL"]
+    offset: P1M1WT22M04S
+    duration: P1W
 
 
 - eventID: "microsoft-releases-new-car"
@@ -534,38 +660,48 @@
   to launch their own brand car. Blueprints available, to be produced in 2025."
   
   type: "fixed"
-  fixedDate: 09.02.2025 - 04.05.2025
+  fixedDate: 2025-02-09 14:04:29
 
-  dependencies: "microsoft-declares-war-against-apple", apple wins,
-                else: see eventID: "microsoft-releases-new-console"
+  dependencies: ["microsoft-declares-war-against-apple-and-loses"]
   effects: null
 
-  runAfter: 44736 ticks (1864 days)
-  duration: 2040 ticks (85 days)
+  - tags:
+  affectsTags: ["tech"]
+  minTrend: 0.4
+  maxTrend: 1.2
+  affectsStockID: ["MSFT"]
+  offset: PT2H
+  duration: P2M28D
 
-  tags:
-  - affectsTags: tech
-    trend: MSFT - 1.7 for first month, 0.4 for second month, -0.1 for third month; AAPL - -0.2 for first month, -0.6 for second month, 0.2 for third month 
-    affectsStockIDs: MSFT, AAPL
-
-- eventID: "microsoft-releases-new-car"
+- eventID: "microsoft-releases-new-console"
   title: "Microsoft to release new console in Q4 2024"
   description: "Microsoft is releasing a new console, Ghost X Microsoft tm, to be launched late this year. It is expected to have cloud gaming as well as supporting
   Microsoft SkyGlasses tm, their branded glasses supported for gaming and everyday life." 
 
   type: "fixed"
-  fixedDate: 08.10.2024 - 31.12.2024
+  fixedDate: 2024-08-10 04:09:22
 
   dependencies: null
-  effects: null
-  
-  runAfter: 42432 ticks (1764 days)
-  duration: 1992 ticks (83 days)
+  effects: null 
 
   tags: 
-  - affectsTags: tech
-    trend: 1.3 for first month, 0.8 for second month, 1.8 for last month (Christmas spending)
-    affectsStockIDs: MSFT
+  - affectsTags: ["tech"]
+    trend: 1.3
+    affectsStockIDs: ["MSFT"]
+    offset: P1H22M04S
+    duration: P1M
+
+  - affectsTags: ["tech"]
+    trend: 0.8
+    affectsStockIDs: ["MSFT"]
+    offset: P1MT1H22M04S
+    duration: P1M
+
+  - affectsTags: ["tech"]
+    trend: 1.8
+    affectsStockIDs: ["MSFT"]
+    offset: P2MT1H22M04S
+    duration: P1M
 
 
 - eventID: "AXP-releases-crypto-credit-card"
@@ -576,18 +712,43 @@
   to release a 9% APR for the first 10000 users and a credit line starting at $1000."
 
   type: "fixed"
-  fixedDate: 02.02.2025 - 08.09.2025 (card released 18.06.2025)
+  fixedDate: 2025-02-02 19:22:49 # (card released 18.06.2025)
 
   dependencies: null
   effects: null
 
-  runAfter: 44568 ticks (1857 days)
   duration: 5184 ticks (216 days)
 
   tags:
-  - affectsTags: financial
-    trend: 0.8 for first month, 1.4 for second and third, 1.8 for fourth (during release), 1.3 for fifth, 0.6 for sixth.
-    affectsStockIDs: AXP
+  - affectsTags: ["financial"]
+    trend: 0.8
+    affectsStockIDs: ["AXP"]
+    offset: P2H20M49S
+    duration: P1M
+  
+  - affectsTags: ["financial"]
+    trend: 1.4
+    affectsStockIDs: ["AXP"]
+    offset: P1MT2H20M49S
+    duration: P2M
+  
+  - affectsTags: ["financial"]
+    trend: 1.8
+    affectsStockIDs: ["AXP"]
+    offset: P3MT2H20M49S
+    duration: P1M
+
+  - affectsTags: ["financial"]
+    trend: 1.3
+    affectsStockIDs: ["AXP"]
+    offset: P4MT2H20M49S
+    duration: P1M
+  
+  -- affectsTags: ["financial"]
+    trend: 0.6
+    affectsStockIDs: ["AXP"]
+    offset: P5MT2H20M49S
+    duration: P1M
 
 
 - eventID: "bitcoin-drops-to-2-year-low"
@@ -597,19 +758,30 @@
   which made Bitcoin fall 65%."
 
   type: "fixed"
-  fixedDate: 04.07.2025 - 09.08.2025
+  fixedDate: 2025-07-04 09:48:02
 
   dependencies: null
   effects: null
   
-  runAfter: 48216 ticks (2009 days)
-  duration: 840 ticks (35 days)
 
   tags:
-  - affectsTags: financial
-    trend: -0.6 for JPM, -0.2 for GS and -1.4 for AXP (due to crypto card)
-    affectsStockIDs: JPM, GS, AXP
+  - affectsTags: ["financial"]
+    trend: -0.6
+    affectsStockIDs: ["JPM"]
+    offset: PT2H44M49S
+    duration: P1M5D
 
+  - affectsTags: ["financial"]
+    trend: -0.2
+    affectsStockIDs: ["GS"]
+    offset: PT2H44M49S
+    duration: P1M5D
+
+    - affectsTags: ["financial"]
+    trend: -1.4
+    affectsStockIDs: ["AXP"]
+    offset: PT2H44M49S
+    duration: P1M5D
 
 - eventID: "facebook-facing-bankrupcy"
   title: "Facebook faces bankrupcy after dealing with privacy scandals"
@@ -619,18 +791,31 @@
   the social media platform, with investors and business mangates also backing out from their investments."
 
   type: "fixed"
-  fixedDate: 08.07.2025 - 29.07.2025
+  fixedDate: 2025-08-07 10:38:06
 
   dependencies: null
   effects: null
   
-  runAfter: 48312 ticks (2013 days)
   duration: 504 ticks (21 days)
 
   tags:
-  - affectsTags: tech
-    trend: -1.2 for first week, -1.6 for second week, -0.4 for remaining
-    affectsStockIDs: FB (NASDAQ) / FB2A (FRA)
+  - affectsTags: ["tech"]
+    trend: -1.2
+    affectsStockIDs: ["FB"]
+    offset: PT39M22S
+    duration: P1W
+
+   - affectsTags: ["tech"]
+    trend: -1.7
+    affectsStockIDs: ["FB"]
+    offset: P1WT39M22S
+    duration: P1W
+
+   - affectsTags: ["tech"]
+    trend: -0.4
+    affectsStockIDs: ["FB"]
+    offset: P2WT39M22S
+    duration: P1W
 
 
 - eventID: "upcoming-cloud-storm-to-threaten-solar-power-companies"
@@ -640,18 +825,17 @@
   also reduce revenue levels."
 
   type: "fixed"
-  fixedDate: 12.09.2025 - 18.10.2025
+  fixedDate: 2025-09-12 18:04:46
 
   dependencies: null
   effects: null
 
-  runAfter: 49848 ticks (2077 days)
-  duration: 864 ticks (36 days)
-
   tags:
-  - affectsTags: energy
+  - affectsTags: ["energy"]
     trend: -1.4 
-    affectsStockIDs: NEP, FSLR
+    affectsStockIDs: ["NEP, FSLR"]
+    offset: PT1H22M44S
+    duration: P1M6D
 
 
 - eventID: "buffett-employees-to-sell-davita-shares"
@@ -661,18 +845,35 @@
   downturn in Davita's share after a huge sell-off from Berkshire Hathaway."
 
   type: "fixed"
-  fixedDate: 29.10.2025 - 08.12.2025
+  fixedDate: 2025-10-29 19:00:07
 
   dependencies: null
   effects: null
 
-  runAfter: 50976 ticks (2124 days)
-  duration: 936 ticks (39 days)
-
   tags:
-  - affectsTags: healthcare
-    trend: -1.1 for first few weeks, -0.7 for next few weeks, -0.2 for second last week and 0.1 for last week
-    affectsStockIDs: DVA
+  - affectsTags: ["healthcare"]
+    trend: -1.1
+    affectsStockIDs: ["DVA"]
+    offset: PT3H9M06S
+    duration: P2W
+
+  - affectsTags: ["healthcare"]
+    trend: -0.7
+    affectsStockIDs: ["DVA"]
+    offset: P2WT3H9M06S
+    duration: P2W
+
+  - affectsTags: ["healthcare"]
+    trend: -0.2
+    affectsStockIDs: ["DVA"]
+    offset: P4WT3H9M06S
+    duration: P1W
+
+  - affectsTags: ["healthcare"]
+    trend: -0.1
+    affectsStockIDs: ["DVA"]
+    offset: P5WT3H9M06S
+    duration: P1W
 
 
 - eventID: "american-express-to-launch-into-tech"
@@ -684,19 +885,44 @@
   With Intel X15 12-core CPUs and a graphics card of up to GTX 4220 Turbo Ti, this laptop is one to have."
 
   type: "fixed"
-  fixedDate: 11.11.2025 - 02.02.2026 #(19.12.2025 launch of laptop)
+  fixedDate: 2025-11-11 06:44:19 #(19.12.2025 launch of laptop)
 
   dependencies: null
   effects: null
 
-  runAfter: 51264 ticks (2136 days)
   duration: 1944 ticks (81 days)
 
   tags:
-  - affectsTags: financial
+  - affectsTags: ["financial"]
     trend: 0.4 for first week, 0.9 for second, 0.5 for third, 1.2 for first month of launch, 0.2 until end
-    affectsStockIDs: AXP
+    affectsStockIDs: ["AXP"]
+    offset: PT29M44S
+    duration: P1W
 
+   - affectsTags: ["financial"]
+    trend: 0.9
+    affectsStockIDs: ["AXP"]
+    offset: P1WT29M44S
+    duration: P1W
+
+   - affectsTags: ["financial"]
+    trend: 0.5
+    affectsStockIDs: ["AXP"]
+    offset: P2WT29M44S
+    duration: P1W
+  
+   - affectsTags: ["financial"]
+    trend: 1.2
+    affectsStockIDs: ["AXP"]
+    offset: P3WT29M44S
+    duration: P1M
+  
+   - affectsTags: ["financial"]
+    trend: 0.2
+    affectsStockIDs: ["AXP"]
+    offset: P1M3WT29M44S
+    duration: P30D
+  
 
 - eventID: "boeing-huge-buy-off-for-fighter-planes"
   title: "Boeing to sell over 15,000 fighter planes to the U.S army"
@@ -705,18 +931,31 @@
   looking for a sharp incline towards growth. Stock values may increase rapidly during the buy-off."
 
   type: "fixed"
-  fixedDate: 09.01.2026 - 03.03.2026
+  fixedDate: 2026-01-09 14:02:00
 
   dependencies: null
   effects: null
   
-  runAfter: 52776 ticks (2199 days)
   duration: 1296 ticks (54 days)
 
   tags:
-  - affectsTags: aviation
-    trend: 0.4 for first 2 weeks, 1.8 for February, -0.3 for March
-    affectsStockIDs: BA
+  - affectsTags: ["aviation"]
+    trend: 0.4
+    affectsStockIDs: ["BA"]
+    offset: P2DT44M20S
+    duration: P22D
+
+  - affectsTags: ["aviation"]
+    trend: 1.8
+    affectsStockIDs: ["BA"]
+    offset: P22DT44M20S
+    duration: P1M
+
+   - affectsTags: ["aviation"]
+    trend: -0.3
+    affectsStockIDs: ["BA"]
+    offset: P1M22DT44M20S
+    duration: P1M
   
 
 - eventID: "microsoft-buys-facebook-amidst-crisis"
@@ -727,18 +966,49 @@
   sold off by Microsoft for 1.9B USD."
 
   type: "fixed"
-  fixedDate: 04.03.2026 - 05.05.2026 
+  fixedDate: 2026-04-03 09:44:49
   
   dependencies: null
   effects: null
-  
-  runAfter: 54096 ticks (2254 days)
+
   duration: 1464 ticks (61 days)
 
   tags:
-  - affectsTags: tech
-    trend: -0.9 for FB, 0.8 for MSFT during first month; -0.5 for FB, 1.2 for MSFT for April, 0.2 for FB, 0.8 for MSFT during May
-    affectsStockIDs: MSFT, FB
+  - affectsTags: ["tech"]
+    trend: -0.9
+    affectsStockIDs: ["FB"]
+    offset: PT29M44S
+    duration: P28D
+
+  - affectsTags: ["tech"]
+    trend: 0.8
+    affectsStockIDs: ["MSFT"]
+    offset: PT29M44S
+    duration: P28D
+
+  - affectsTags: ["tech"]
+    trend: -0.5
+    affectsStockIDs: ["FB"]
+    offset: P28DT29M44S
+    duration: P1M
+
+  - affectsTags: ["tech"]
+    trend: 1.2
+    affectsStockIDs: ["MSFT"]
+    offset: P28DT29M44S
+    duration: P1M
+  
+   - affectsTags: ["tech"]
+    trend: 0.2
+    affectsStockIDs: ["FB"]
+    offset: P1M28DT29M44S
+    duration: P1M
+  
+   - affectsTags: ["tech"]
+    trend: 0.8
+    affectsStockIDs: ["MSFT"]
+    offset: P1M28DT29M44S
+    duration: P1M
 
 
 - eventID: "netflix-to-obtain-copyright-permission-from-HBO"
@@ -748,18 +1018,32 @@
   Netflix streamers."
 
   type: "fixed"
-  fixedDate: 14.04.2026 - 15.07.2026
+  fixedDate: 2026-04-14 12:04:09
 
   dependencies: null
   effects: null
 
-  runAfter: 55056 ticks (2294 days)
   duration: 2184 ticks (91 days)
 
   tags:
-  - affectsTags: tech
-    trend: 0.3 for first month, 0.9 for second month, 0.5 for third month
-    affectsStockIDs: NFLX
+  - affectsTags: ["tech"]
+    trend: 0.3
+    affectsStockIDs: ["NFLX"]
+    offset: PT49M22S
+    duration: P1M
+
+  - affectsTags: ["tech"]
+    trend: 0.9
+    affectsStockIDs: ["NFLX"]
+    offset: P1MT49M22S
+    duration: P1M
+
+    - affectsTags: ["tech"]
+    trend: 0.5
+    affectsStockIDs: ["NFLX"]
+    offset: P2MT49M22S
+    duration: P1M
+
 
 
 - eventID: "apple-new-iphone-huge-issues"
@@ -768,38 +1052,80 @@
   limited functionality to bluetooth and wi-fi support, and even overheating."
 
   type: "fixed"
-  fixedDate: 19.06.2026 - 21.08.2026
+  fixedDate: 2026-06-19 04:32:25
 
   dependencies: null
-  effects: null
+  effects: [{
+    chance: 0.99999999999941982731298372981,
+    eventID: "apple-to-release-quick-fixes"
+  }]
 
-  runAfter: 56616 ticks (2359 days)
   duration: 1488 ticks (62 days)
 
   tags:
-  - affectsTags: tech
-    trend: -1.2 for first month, -0.4 for second month, ending with -0.9 on third month.
-    affectsStockIDs: AAPL
+  - affectsTags: ["tech"]
+    trend: -1.2
+    affectsStockIDs: ["AAPL"]
+    offset: PT44M29S
+    duration: P1M
+  
+   - affectsTags: ["tech"]
+    trend: -0.4
+    affectsStockIDs: ["AAPL"]
+    offset: P1MT44M29S
+    duration: P1M
+
+   - affectsTags: ["tech"]
+    trend: -0.9
+    affectsStockIDs: ["AAPL"]
+    offset: P2MT44M29S
+    duration: P1M
+
 
 
 - eventID: "apple-to-release-quick-fixes"
-  title: "After latest fiasco, Apple plans to provide quick response and fixes to hugely negative critiques."
+  title: "After the latest fiasco, Apple plans to provide quick response and fixes to hugely negative critiques."
   description: "With the huge debacle of the release of the iPhone 18, Apple is planning to release weekly updates for the next
   5 months to ensure that bugs and crashes will be fixed."
 
   type: "fixed"
-  fixedDate: 28.06.2026 - 15.11.2026
+  fixedDate: 2026-06-28 04:44:59
 
-  dependencies: apple-new-iphone-huge-issues
+  dependencies: ["apple-new-iphone-huge-issues"]
   effects: null
 
-  runAfter: 56832 ticks (2368 days)
   duration: 3240 ticks (135 days)
 
   tags:
-  - affectsTags: tech
-    trend: -1.2 for first month, -0.4 for second, -0.9 for third, 0.1 for fourth, 0.3 for fifth
-    affectsStockIDs: AAPL
+  - affectsTags: ["tech"]
+    trend: -1.2
+    affectsStockIDs: ["AAPL"]
+    offset: PT58M24S
+    duration: P1M
+
+  - affectsTags: ["tech"]
+    trend: -0.4
+    affectsStockIDs: ["AAPL"]
+    offset: P1MT58M24S
+    duration: P1M
+
+  - affectsTags: ["tech"]
+    trend: -0.9
+    affectsStockIDs: ["AAPL"]
+    offset: P2MT58M24S
+    duration: P1M
+
+  - affectsTags: ["tech"]
+    trend: 0.1
+    affectsStockIDs: ["AAPL"]
+    offset: P3MT58M24S
+    duration: P1M
+
+  - affectsTags: ["tech"]
+    trend: 0.3
+    affectsStockIDs: ["AAPL"]
+    offset: P4MT58M24S
+    duration: P1M
 
 
 

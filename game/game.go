@@ -8,6 +8,7 @@ import (
 	"fantasymarket/utils"
 	"fantasymarket/utils/config"
 	"fantasymarket/utils/hash"
+	"fantasymarket/utils/timeutils"
 
 	"strconv"
 	"time"
@@ -22,6 +23,10 @@ type Service struct {
 	DB              *database.Service
 	Config          *config.Config
 	TicksSinceStart int64
+
+	// a history of all events that have run in the past
+	// map[eventID][]createdAt
+	EventHistory map[string][]time.Time
 }
 
 // GetCurrentDate returns the current in-game date
@@ -58,7 +63,7 @@ func Start(db *database.Service, config *config.Config) (*Service, error) {
 	}
 
 	go startLoop(s)
-	log.Info().Msg("successfully started the game loop 😋")
+	log.Info().Msg("successfully started the game loop")
 
 	return s, nil
 }
@@ -66,6 +71,8 @@ func Start(db *database.Service, config *config.Config) (*Service, error) {
 // startLoop startsrunningticks indefinitly
 func startLoop(s *Service) {
 	s.TicksSinceStart, _ = s.DB.GetNextTick()
+	s.EventHistory, _ = s.DB.GetEventHistory()
+
 	log.Debug().Int64("ticksSinceStart", s.TicksSinceStart).Msg("loaded loaded ticksSinceStart from database")
 
 	for {
@@ -95,11 +102,11 @@ func (s *Service) GetRandomEventEffect(e models.Event) (string, error) {
 func (s *Service) tick() error {
 	log.Debug().Int64("tick", s.TicksSinceStart).Msg("running tick")
 
-	currentlyRunningEvents, _ := s.DB.GetEvents()                      // Sub this for the DB query results
+	currentlyRunningEvents, _ := s.DB.GetEvents(s.GetCurrentDate())    // Sub this for the DB query results
 	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1) // Sub this for the DB query results
 
 	// TODO: add new events to database:
-	//      - fixed events that need to be added at a fixed date
+	//    - fixed events that need to be added at a fixed date
 	//		- random events
 	// 		- reccuring events
 
@@ -130,24 +137,21 @@ func (s Service) removeInactiveEvents(events []models.Event) {
 	}
 }
 
-// CalcutaleAffectedness calculates how much a stock is affected by all currently running events
-func (s Service) CalcutaleAffectedness(stocks []models.Stock, activeEvents []models.Event) map[string]float64 {
+// CalculateAffectedness calculates how much a stock is affected by all currently running events
+func (s Service) CalculateAffectedness(stocks []models.Stock, activeEvents []models.Event) map[string]float64 {
 	var affectedness map[string]float64
 
-	var tagOptions []events.TagOptions
-	for _, activeEvent := range activeEvents {
-		tagOptions = append(tagOptions, s.EventDetails[activeEvent.EventID].Tags...)
-	}
+	activeTags := s.GetActiveEventTags(activeEvents)
 
-	for _, tagOption := range tagOptions {
+	for _, tag := range activeTags {
 		for _, stock := range stocks {
 			stockDetails := s.StockDetails[stock.Symbol]
 
-			affectedByTag := utils.Some(stockDetails.Tags, tagOption.AffectsTags)
-			affectedBySymbol := utils.Includes(tagOption.AffectsStocks, stock.Symbol)
+			affectedByTag := utils.Some(stockDetails.Tags, tag.AffectsTags)
+			affectedBySymbol := utils.Includes(tag.AffectsStocks, stock.Symbol)
 
 			if affectedByTag || affectedBySymbol {
-				affectedness[stock.Symbol] += tagOption.CalculateTrend(s.TicksSinceStart, stock.Symbol)
+				affectedness[stock.Symbol] += tag.CalculateTrend(s.TicksSinceStart, stock.Symbol)
 			}
 		}
 	}
@@ -155,10 +159,40 @@ func (s Service) CalcutaleAffectedness(stocks []models.Stock, activeEvents []mod
 	return affectedness
 }
 
+// GetActiveEventTags returns a list of event tags that
+// should currently be affecting all stocks
+func (s Service) GetActiveEventTags(activeEvents []models.Event) []events.TagOptions {
+	var activeTags []events.TagOptions
+	for _, activeEvent := range activeEvents {
+		eventDetails := s.EventDetails[activeEvent.EventID]
+		for _, tag := range eventDetails.Tags {
+
+			startDate := activeEvent.CreatedAt
+			currentDate := s.GetCurrentDate()
+
+			if !timeutils.Duration.IsZero(tag.Offset) {
+				startDate = tag.Offset.Shift(startDate)
+			}
+
+			if startDate.After(currentDate) {
+				continue
+			}
+
+			if !timeutils.Duration.IsZero(tag.Duration) && tag.Duration.Shift(startDate).Before(currentDate) {
+				continue
+			}
+
+			activeTags = append(activeTags, tag)
+		}
+	}
+
+	return activeTags
+}
+
 // ComputeStockNumbers computes the index at the next tick for a list of stocks
 func (s Service) ComputeStockNumbers(stocks []models.Stock, events []models.Event) []models.Stock {
 
-	affectedness := s.CalcutaleAffectedness(stocks, events)
+	affectedness := s.CalculateAffectedness(stocks, events)
 
 	// This computes the random and own stock, not taking into account other peoples selling
 	// As a stock drops to a % of its value, theres gonna be more buyers or more sellers

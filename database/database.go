@@ -2,10 +2,12 @@ package database
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/rs/zerolog/log"
 
 	"fantasymarket/database/models"
+	"fantasymarket/game/events"
 	"fantasymarket/game/stocks"
 	"fantasymarket/utils/config"
 
@@ -35,6 +37,9 @@ func Connect(config *config.Config) (*Service, error) {
 		&models.Stock{},
 		&models.Event{},
 		&models.Order{},
+		&models.User{},
+		&models.Portfolio{},
+		&models.PortfolioItem{},
 	)
 
 	log.Info().Msg("successfully connected to the database")
@@ -87,19 +92,54 @@ func (s *Service) AddStocks(stocks []models.Stock, tick int64) error {
 }
 
 // GetEvents fetches all currently active events
-func (s *Service) GetEvents() ([]models.Event, error) {
+func (s *Service) GetEvents(currentDate time.Time) ([]models.Event, error) {
 	var events []models.Event
-	// TODO: createdAt > currentGameTime
-	if err := s.DB.Where(models.Event{Active: true}).Find(&events).Error; err != nil {
+
+	if err := s.DB.Where(models.Event{
+		Active: true,
+	}).Where("created_at > ?", currentDate).Find(&events).Error; err != nil {
 		return nil, err
 	}
 
 	return events, nil
 }
 
+// AddEvent adds an event to the event table
+func (s *Service) AddEvent(event events.EventDetails, createdAt time.Time) error {
+	return s.DB.Create(&models.Event{
+		EventID:   event.EventID,
+		Title:     event.Title,
+		Text:      event.Description,
+		Active:    true,
+		CreatedAt: createdAt,
+	}).Error
+}
+
 // RemoveEvent marks an event as inactive so it won't affect stocks in the GameLoop anymore
 func (s *Service) RemoveEvent(uniqueEventID uuid.UUID) error {
 	return s.DB.Where(models.Event{Active: true, ID: uniqueEventID}).Update("active", false).Error
+}
+
+func (s *Service) GetEventHistory() (map[string][]time.Time, error) {
+	eventHistory := map[string][]time.Time{}
+
+	var events []models.Event
+	if err := s.DB.Find(&events).Error; err != nil {
+		return nil, err
+	}
+
+	for _, event := range events {
+		eventID := event.EventID
+		createdAt := event.CreatedAt
+
+		if _, exists := eventHistory[eventID]; !exists {
+			eventHistory[eventID] = []time.Time{}
+		}
+		eventHistory[eventID] = append(eventHistory[eventID], createdAt)
+
+	}
+
+	return eventHistory, nil
 }
 
 // GetNextTick retrieves the tick number for the next tick from the database,
@@ -123,14 +163,67 @@ func (s *Service) GetStocksAtTick(lastTick int64) ([]models.Stock, error) {
 	return stocks, nil
 }
 
-//func (s *Service) AddOrder(order map[string]string) error {
+func (s *Service) AddOrder(order models.Order, userID uuid.UUID, currentDate time.Time) error {
+	return s.DB.Create(&models.Order{
+		UserID:    userID,
+		CreatedAt: currentDate,
+		Type:      order.Type,
+		Side:      order.Side,
+		Symbol:    order.Symbol,
+		Status:    order.Status,
+	}).Error
+}
+
+//func (s *Service) GetOrderForUser(userID uuid.UUID) error {
 
 //}
 
-//func (s *Service) GetOrder(id int) error {
+//func (s *Service) GetOrderForUserByID(orderID uuid.UUID, userID uuid.UUID) {
+
 
 //}
 
-//func (s *Service) DeleteOrder(id int) error {
+func (s *Service) CancelOrder(orderID uuid.UUID, currentDate time.Time) error {
 
-//}
+	var order models.Order
+	if err := s.DB.Where(models.Order{OrderID: orderID}).First(&order).Error; err != nil {
+		return err
+	}
+
+	// TODO check if the order is still active
+
+	return s.DB.Model(&order).Updates(models.Order{Status: "cancelled", FilledAt: currentDate}).Error
+}
+
+func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentDate time.Time) error {
+
+	var order models.Order
+	// TODO: update users portfolio
+	if err := s.DB.Where(models.Order{OrderID: orderID}).Find(&order).Error; err != nil {
+		return err
+	}
+
+	var user models.User
+	if err := s.DB.Where(models.User{UserID: userID}).Preload("Portfolio.Items").Find(&user).Error; err != nil {
+		return err
+	}
+
+	// user.Portfolio is the portfolio
+	// user.Portfolio.Items are all items
+
+	// create new PortfolioItem if it doesn't exist yet
+	// update the amount
+
+	// if order.Type == "stock" {
+	// 	if Portfolio.Items.contains(order.Symbol) {
+	// 		Portfolio.Items.amount += order.Amount
+	// 	}
+	// 	else {
+	// 		Portfolio.Items = Append(Portfolio.items, new PortfolioItem{Type: order.Type, Symbol: order.Symbol, Amount: order.Amount})
+	// 	}
+	// }
+
+	// TODO: update users portfolio balance
+
+	return s.DB.Where(models.Order{OrderID: orderID}).Updates(models.Order{Status: "filled", FilledAt: currentDate}).Error
+}

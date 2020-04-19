@@ -5,9 +5,8 @@ import (
 	"fantasymarket/game"
 	"fantasymarket/utils/config"
 	"fantasymarket/utils/http/middleware/jwt"
-	"net/http"
-
 	"github.com/go-chi/chi"
+	"net/http"
 )
 
 // APIHandler holds the dependencies for http handlers
@@ -50,9 +49,11 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 		r.Post("/", api.addOrder)
 
-		r.Get("/{orderID}", api.orders)
+		r.Get("/{orderID}", api.ordersID)
 
-		r.Delete("/{orderID}", api.orders)
+		r.Post("/fill/{orderID}", api.fillOrder)
+
+		r.Delete("/{orderID}", api.deleteOrder)
 	})
 
 	r.Route("/portfolio", func(r chi.Router) {
@@ -64,13 +65,13 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 	r.Route("/user", func(r chi.Router) {
 		r.Group(func(r chi.Router) {
-			r.Use(jwt.Middleware("secret", true))
+			r.Use(jwt.Middleware(api.Config.TokenSecret, true))
 			r.Get("/{username}", api.getUser)
-			r.Post("/", api.createUser)
+			r.Put("/", api.createUser)
 		})
 
 		r.Group(func(r chi.Router) {
-			r.Use(jwt.Middleware("secret", false))
+			r.Use(jwt.Middleware(api.Config.TokenSecret, false))
 			r.Get("/", api.getSelf)
 			r.Post("/", api.updateSelf)
 		})
