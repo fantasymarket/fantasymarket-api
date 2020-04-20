@@ -89,7 +89,8 @@ func (s *Service) GetRandomEventEffect(e models.Event) (string, error) {
 	}
 
 	seed := e.EventID + strconv.FormatInt(s.TicksSinceStart, 10)
-	return utils.SelectRandomWeightedItem(effects, seed)
+	randomNumber := hash.Float64Hash(seed)
+	return utils.SelectRandomWeightedItem(effects, randomNumber)
 }
 
 // tick is updating the current state of our system

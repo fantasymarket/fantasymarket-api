@@ -19,7 +19,7 @@ tasks:
   lint:
     desc: "lint all files"
     cmds:
-      - $(go env GOPATH)/bin/revive -config .revive.toml -exclude=./vendor/... ./...
+      - $(go env GOPATH)/bin/revive -formatter stylish -config .revive.toml -exclude=./vendor/... ./...
 
   install-linter:
     desc: "install the revive linter"
