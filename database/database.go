@@ -163,6 +163,7 @@ func (s *Service) GetStocksAtTick(lastTick int64) ([]models.Stock, error) {
 	return stocks, nil
 }
 
+// AddOrder adds an Order to the database
 func (s *Service) AddOrder(order models.Order, userID uuid.UUID, currentDate time.Time) error {
 	return s.DB.Create(&models.Order{
 		UserID:    userID,
@@ -174,15 +175,25 @@ func (s *Service) AddOrder(order models.Order, userID uuid.UUID, currentDate tim
 	}).Error
 }
 
-//func (s *Service) GetOrderForUser(userID uuid.UUID) error {
+// GetOrders gets all orders based on the parameters of orderDetails where Symbol, Type and userID can be set
+func (s *Service) GetOrders(orderDetails models.Order, limit int, offest int) (*[]models.Order, error) {
+	var orders *[]models.Order
+	if err := s.DB.Where(models.Order{UserID: orderDetails.UserID, Type: orderDetails.Type, Symbol: orderDetails.Symbol}).Error; err != nil {
+		return orders, err
+	}
+	return orders, nil
+}
 
-//}
+// GetOrderByID gets an order by the orderID
+func (s *Service) GetOrderByID(orderID uuid.UUID) (*models.Order, error) {
+	var order *models.Order
+	if err := s.DB.Where(models.Order{OrderID: orderID}).First(&order).Error; err != nil {
+		return order, err
+	}
+	return order, nil
+}
 
-//func (s *Service) GetOrderForUserByID(orderID uuid.UUID, userID uuid.UUID) {
-
-
-//}
-
+// CancelOrder cancels an order in the database
 func (s *Service) CancelOrder(orderID uuid.UUID, currentDate time.Time) error {
 
 	var order models.Order
@@ -195,6 +206,7 @@ func (s *Service) CancelOrder(orderID uuid.UUID, currentDate time.Time) error {
 	return s.DB.Model(&order).Updates(models.Order{Status: "cancelled", FilledAt: currentDate}).Error
 }
 
+// FillOrder "completes" the order
 func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentDate time.Time) error {
 
 	var order models.Order
@@ -227,4 +239,3 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentDate tim
 
 	return s.DB.Where(models.Order{OrderID: orderID}).Updates(models.Order{Status: "filled", FilledAt: currentDate}).Error
 }
-
