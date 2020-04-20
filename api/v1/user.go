@@ -61,7 +61,7 @@ func (api *APIHandler) updateSelf(w http.ResponseWriter, r *http.Request) {
 		user.Username = req.username
 	}
 
-	token, err := jwt.CreateToken("secret", user.Username, user.UserID)
+	token, err := jwt.CreateToken(api.Config.TokenSecret, user.Username, user.UserID)
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, "error generating user token")
 		return
@@ -84,7 +84,7 @@ func (api *APIHandler) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := jwt.CreateToken("secret", user.Username, user.UserID)
+	token, err := jwt.CreateToken(api.Config.TokenSecret, user.Username, user.UserID)
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, "error generating user token")
 		return
