@@ -35,3 +35,8 @@ tasks:
       - task install-linter
       - task lint
       - task test
+
+  build:
+    cmds:
+      - go mod download
+      - go generate ./...
