@@ -34,23 +34,35 @@ var defaultConfig = Config{
 	},
 	TokenSecret: "secret",
 	LogLevel:    "info",
+	Development: false,
 }
 
 // Load loads the global configuration
 func Load() (*Config, error) {
 
-	if _, err := os.Stat("config.yaml"); os.IsNotExist(err) {
-		err := file.Copy("config.example.yaml", "config.yaml")
-		if err != nil {
-			return nil, err
+	// we populate a config.yaml in development environments
+	_, configErr := os.Stat("config.yaml")
+	_, exampleErr := os.Stat("config.example.yaml")
+
+	// config.yaml is only created if the sample config exists in the same dir
+	shouldCreateConfig := exampleErr == nil && os.IsNotExist(configErr)
+	if shouldCreateConfig {
+		if configErr = file.Copy("config.example.yaml", "config.yaml"); configErr != nil {
+			return nil, configErr
 		}
 	}
 
-	yaml, err := uberConfig.NewYAML(
-		uberConfig.Static(defaultConfig),
-		uberConfig.File("config.yaml"),
-		uberConfig.Expand(os.LookupEnv),
-	)
+	// we append all providers one-by-one so they are
+	// loaded in the right order
+	options := []uberConfig.YAMLOption{}
+	options = append(options, uberConfig.Static(defaultConfig))
+	// only load the config file if it actually exists
+	if configErr == nil {
+		options = append(options, uberConfig.File("config.yaml"))
+	}
+	options = append(options, uberConfig.Expand(os.LookupEnv))
+
+	yaml, err := uberConfig.NewYAML(options...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,6 +74,7 @@ func Load() (*Config, error) {
 
 	zerolog.SetGlobalLevel(getLogLevel(conf.LogLevel))
 
+	// we have a nicer looking logger for development environments
 	if conf.Development {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
