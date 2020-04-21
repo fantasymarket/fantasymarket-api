@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// StartEvents checks an event if it should run or not depending on the event type
 func (s *Service) startEvents() {
 	currentDate := s.GetCurrentDate()
 	events := s.EventDetails
@@ -85,10 +86,7 @@ func (s *Service) eventNeedsToBeRun(event events.EventDetails) bool {
 	eventDateInPast := currentDate.After(event.FixedDate.Time)
 
 	// TODO: handle events that can happening multiple times
-	// check if MinTimeBetween events is long enough
 	// eventShouldRun :=  currentDate after MinTimeBetween events + eventHistory[len(eventHistory)-1]
-	// eventShouldRun := checks if the current date is after the combined time of last time the event ran and how long
-	//	it has to wait until the event can run again.
 
 	randomEventShouldRun := currentDate.After(timeStampOfLastEvent.Add(event.MinTimeBetweenEvents))
 

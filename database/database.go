@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -175,10 +176,11 @@ func (s *Service) AddOrder(order models.Order, userID uuid.UUID, currentDate tim
 	}).Error
 }
 
-// GetOrders gets all orders based on the parameters of orderDetails where Symbol, Type and userID can be set
-func (s *Service) GetOrders(orderDetails models.Order, limit int, offest int) (*[]models.Order, error) {
+// GetOrders gets all orders based on the parameters of orderDetails where Symbol, Type and userID can be set.
+// Limit is how many items. Offset is from where to where the data is used
+func (s *Service) GetOrders(orderDetails models.Order, limit int, offset int) (*[]models.Order, error) {
 	var orders *[]models.Order
-	if err := s.DB.Where(models.Order{UserID: orderDetails.UserID, Type: orderDetails.Type, Symbol: orderDetails.Symbol}).Error; err != nil {
+	if err := s.DB.Where(models.Order{UserID: orderDetails.UserID, Type: orderDetails.Type, Symbol: orderDetails.Symbol}).Limit(limit).Offset(offset).Error; err != nil {
 		return orders, err
 	}
 	return orders, nil
@@ -202,8 +204,10 @@ func (s *Service) CancelOrder(orderID uuid.UUID, currentDate time.Time) error {
 	}
 
 	// TODO check if the order is still active
-
-	return s.DB.Model(&order).Updates(models.Order{Status: "cancelled", FilledAt: currentDate}).Error
+	if order.Status == "waiting" {
+		return s.DB.Model(&order).Updates(models.Order{Status: "cancelled", FilledAt: currentDate}).Error
+	}
+	return errors.New("Can't cancel order, as its already filled or cancelled.")
 }
 
 // FillOrder "completes" the order
@@ -216,9 +220,22 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentDate tim
 	}
 
 	var user models.User
-	if err := s.DB.Where(models.User{UserID: userID}).Preload("Portfolio.Items").Find(&user).Error; err != nil {
+	if err := s.DB.Where(models.User{UserID: userID}).Preload("Portfolio").Find(&user).Error; err != nil {
 		return err
 	}
+
+	
+
+	var affectedPortfolioItem models.PortfolioItem
+	db.Where(models.PortfolioItem{
+		PortfolioID: user.PortfolioID,
+		Symbol:      order.Symbol,
+	}).Attrs(models.PortfolioItem{
+		PortfolioID: user.PortfolioID,
+		Symbol:      order.Symbol,
+		Type:        order.Type,
+		Amount:      0,
+	}).FirstOrCreate(&affectedPortfolioItem)
 
 	// user.Portfolio is the portfolio
 	// user.Portfolio.Items are all items
@@ -226,14 +243,19 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentDate tim
 	// create new PortfolioItem if it doesn't exist yet
 	// update the amount
 
-	// if order.Type == "stock" {
-	// 	if Portfolio.Items.contains(order.Symbol) {
-	// 		Portfolio.Items.amount += order.Amount
-	// 	}
-	// 	else {
-	// 		Portfolio.Items = Append(Portfolio.items, new PortfolioItem{Type: order.Type, Symbol: order.Symbol, Amount: order.Amount})
-	// 	}
+	// if Portfolio.Items.contains(order.Symbol) {
+	// 	Portfolio.Items.amount += order.Amount
+	// } else {
+	// 	Portfolio.Items = Append(Portfolio.Items, new PortfolioItem{Type: order.Type, Symbol: order.Symbol, Amount: order.Amount})
 	// }
+
+	if order.Type == "stock" {
+		if &user.Portfolio.Items.contains(order.Symbol) {
+			&user.Portfolio.Items.amount += order.Amount
+		} else {
+			&user.Portfolio.Items = Append(&Portfolio.Items, models.PortfolioItem{Type: order.Type, Symbol: order.Symbol, Amount: order.Amount})
+		}
+	}
 
 	// TODO: update users portfolio balance
 
