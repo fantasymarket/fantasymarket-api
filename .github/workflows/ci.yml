@@ -22,12 +22,20 @@ jobs:
     
     - name: Run Tests
       run: task ci
-    
-    - name: Run GoReleaser
-      uses: goreleaser/goreleaser-action@v1
-      if: startsWith(github.ref, 'refs/tags/')
+
+    - name: Build Binary
+      run: task build
+
+    - name: Compress Binary
+      uses: actions-github/upx@master
       with:
-        version: latest
-        args: release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      file: 'bin/fantasymarket'
+
+    - name: Deploy (staging)
+      if: github.ref == 'refs/heads/develop'
+      run: task deploy-staging
+
+    - name: Deploy (production)
+      if: github.ref == 'refs/heads/master'
+      run: task deploy-production
+

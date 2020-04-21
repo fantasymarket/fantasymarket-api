@@ -1,12 +1,9 @@
 version: '2'
 
 tasks:
-  default:
-    cmd: task --list
-  help:
-    cmd: task --list
-
   run:
+    env:
+      development: false
     desc: "run fantasymarket"
     cmds:
       - go run main.go
@@ -31,12 +28,23 @@ tasks:
   ci:
     desc: "run ci scripts (should only be run in ci environments)"
     cmds:
-      - go mod verify
+      - go mod download
       - task install-linter
       - task lint
       - task test
 
   build:
+    env:
+      GOOS: linux
+      GOARCH: amd64
     cmds:
-      - go mod download
       - go generate ./...
+      - go build -ldflags="-s -w" -o bin/fantasymarket -i main.go
+
+  deploy-staging:
+    cmds:
+      - echo "deployment isn't setup yet"
+
+  deploy-production:
+    cmds:
+      - echo "deployment isn't setup yet"
