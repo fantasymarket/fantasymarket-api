@@ -26,10 +26,10 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 	r := chi.NewRouter()
 
 	// Standalone GET Requests
-	r.Get("/news", api.getEvents) // Allow for query parameters
+	r.Get("/events", api.getEvents) // Allow for query parameters
 
 	r.Get("/overview", api.getOverview) // Some stats for the dashboard
-	// Top 2 Gainers / Top 2 Loosers
+	// Top 2 Gainers / Top 2 Losers
 	// Maybe total + of all stock and things like that in the future
 
 	r.Get("/time", api.getTime) // Current time on the server
@@ -54,13 +54,6 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 		r.Post("/fill/{orderID}", api.fillOrder)
 
 		r.Delete("/{orderID}", api.deleteOrder)
-	})
-
-	r.Route("/portfolio", func(r chi.Router) {
-
-		r.Get("/", api.getPortfolio)
-
-		r.Get("/{symbol}", api.getPortfolio)
 	})
 
 	r.Route("/user", func(r chi.Router) {

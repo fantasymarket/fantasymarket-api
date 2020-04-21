@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// StartEvents checks an event if it should run or not depending on the event type
 func (s *Service) startEvents() {
 	currentDate := s.GetCurrentDate()
 	events := s.EventDetails
@@ -41,10 +42,9 @@ func (s *Service) startEvents() {
 			chancePerTick := event.RandomChancePerDay * float64(ticksPerDay)
 
 			if chancePerTick > (float64(hash.Int64HashRange(0, 1e6, seed)) / 1e6) {
-				// s.eventNeedsToBeRun(event)
+				eventNeedsToBeRun = s.eventNeedsToBeRun(event)
 			}
 
-			eventNeedsToBeRun = false // TODO
 			createdAt = s.GetCurrentDate()
 		}
 
@@ -77,19 +77,20 @@ func calculateRandomOffset(randomOffset timeutils.Duration, seed string) time.Du
 func (s *Service) eventNeedsToBeRun(event events.EventDetails) bool {
 	currentDate := s.GetCurrentDate()
 
+	lengthOfEventHistorySlice := len(s.EventHistory[event.EventID])
+	timeStampOfLastEvent := s.EventHistory[event.EventID][lengthOfEventHistorySlice-1]
+
 	eventHistory, ok := s.EventHistory[event.EventID]
+
 	eventHasNeverRun := !ok || len(eventHistory) == 0
-	eventNeedsToRun := currentDate.After(event.FixedDate.Time)
+	eventDateInPast := currentDate.After(event.FixedDate.Time)
 
 	// TODO: handle events that can happening multiple times
-	// check if MinTimeBetween events is long enough
-	// eventShouldRun :=  currentDate after min time between events + eventHistory[len(eventHistory)-1]
+	// eventShouldRun :=  currentDate after MinTimeBetween events + eventHistory[len(eventHistory)-1]
 
-	if eventHasNeverRun && eventNeedsToRun {
-		return true
-	}
+	randomEventShouldRun := currentDate.After(timeStampOfLastEvent.Add(event.MinTimeBetweenEvents))
 
-	return false
+	return eventHasNeverRun && eventDateInPast || event.Type == "random" && randomEventShouldRun
 }
 
 // ChangeDescriptionPlaceholder fills the templates of a description string
