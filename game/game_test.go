@@ -2,7 +2,7 @@ package game
 
 import (
 	"fantasymarket/database/models"
-	"fantasymarket/game/stocks"
+	"fantasymarket/game/details"
 
 	"testing"
 
@@ -58,7 +58,7 @@ var data = []TestData{
 	},
 }
 
-var stockDetails = map[string]stocks.StockDetails{
+var stockDetails = map[string]details.StockDetails{
 	"TEST0": {Stability: 1, Trend: 1},
 	"TEST1": {Stability: 5, Trend: 1},
 	"TEST2": {Stability: 1, Trend: 5},

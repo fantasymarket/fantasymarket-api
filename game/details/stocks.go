@@ -1,4 +1,4 @@
-package stocks
+package details
 
 import (
 	"io/ioutil"

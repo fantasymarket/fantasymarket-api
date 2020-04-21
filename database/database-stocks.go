@@ -2,11 +2,11 @@ package database
 
 import (
 	"fantasymarket/database/models"
-	"fantasymarket/game/stocks"
+	"fantasymarket/game/details"
 )
 
 // CreateInitialStocks takes a list of initial stocks and uses them to initialize the database
-func (s *Service) CreateInitialStocks(stockDetails map[string]stocks.StockDetails) error {
+func (s *Service) CreateInitialStocks(stockDetails map[string]details.StockDetails) error {
 
 	for _, stock := range stockDetails {
 		if err := s.DB.FirstOrCreate(

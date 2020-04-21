@@ -1,4 +1,4 @@
-package events
+package details
 
 import (
 	"io/ioutil"

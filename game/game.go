@@ -3,8 +3,7 @@ package game
 import (
 	"fantasymarket/database"
 	"fantasymarket/database/models"
-	"fantasymarket/game/events"
-	"fantasymarket/game/stocks"
+	"fantasymarket/game/details"
 	"fantasymarket/utils"
 	"fantasymarket/utils/config"
 	"fantasymarket/utils/hash"
@@ -18,8 +17,8 @@ import (
 
 // Service is the GameService
 type Service struct {
-	EventDetails    map[string]events.EventDetails
-	StockDetails    map[string]stocks.StockDetails
+	EventDetails    map[string]details.EventDetails
+	StockDetails    map[string]details.StockDetails
 	DB              *database.Service
 	Config          *config.Config
 	TicksSinceStart int64
@@ -38,7 +37,7 @@ func (s *Service) GetCurrentDate() time.Time {
 // Start starts the game loop
 func Start(db *database.Service, config *config.Config) (*Service, error) {
 
-	loadedStocks, err := stocks.LoadStockDetails()
+	loadedStocks, err := details.LoadStockDetails()
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +47,7 @@ func Start(db *database.Service, config *config.Config) (*Service, error) {
 	}
 
 	// TODO: right now, this map is empty
-	loadedEvents, err := events.LoadEventDetails()
+	loadedEvents, err := details.LoadEventDetails()
 	if err != nil {
 		return nil, err
 	}
@@ -162,8 +161,8 @@ func (s Service) CalculateAffectedness(stocks []models.Stock, activeEvents []mod
 
 // GetActiveEventTags returns a list of event tags that
 // should currently be affecting all stocks
-func (s Service) GetActiveEventTags(activeEvents []models.Event) []events.TagOptions {
-	var activeTags []events.TagOptions
+func (s Service) GetActiveEventTags(activeEvents []models.Event) []details.TagOptions {
+	var activeTags []details.TagOptions
 	for _, activeEvent := range activeEvents {
 		eventDetails := s.EventDetails[activeEvent.EventID]
 		for _, tag := range eventDetails.Tags {

@@ -2,7 +2,7 @@ package database
 
 import (
 	"fantasymarket/database/models"
-	"fantasymarket/game/events"
+	"fantasymarket/game/details"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -22,7 +22,7 @@ func (s *Service) GetEvents(currentDate time.Time) ([]models.Event, error) {
 }
 
 // AddEvent adds an event to the event table
-func (s *Service) AddEvent(event events.EventDetails, createdAt time.Time) error {
+func (s *Service) AddEvent(event details.EventDetails, createdAt time.Time) error {
 	return s.DB.Create(&models.Event{
 		EventID:   event.EventID,
 		Title:     event.Title,

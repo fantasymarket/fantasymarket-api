@@ -2,7 +2,7 @@ package game
 
 import (
 	"bytes"
-	"fantasymarket/game/events"
+	"fantasymarket/game/details"
 	"fantasymarket/utils/hash"
 	"fantasymarket/utils/timeutils"
 	"html/template"
@@ -74,7 +74,7 @@ func calculateRandomOffset(randomOffset timeutils.Duration, seed string) time.Du
 	return time.Duration(offset)
 }
 
-func (s *Service) eventNeedsToBeRun(event events.EventDetails) bool {
+func (s *Service) eventNeedsToBeRun(event details.EventDetails) bool {
 	currentDate := s.GetCurrentDate()
 
 	lengthOfEventHistorySlice := len(s.EventHistory[event.EventID])
