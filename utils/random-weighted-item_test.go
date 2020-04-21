@@ -4,12 +4,15 @@ import (
 	"fantasymarket/utils"
 	"testing"
 
+	"errors"
+
 	"github.com/stretchr/testify/assert"
 )
 
 type getRandomFromArrayTestData struct {
-	items       map[string]float64
-	expectation string
+	items        map[string]float64
+	randomNumber float64
+	expectation  string
 }
 
 var getRandomFromArrayData = []getRandomFromArrayTestData{
@@ -23,7 +26,8 @@ var getRandomFromArrayData = []getRandomFromArrayTestData{
 			"event6 ": 0.93,
 			"event7 ": 1,
 		},
-		expectation: "event3",
+		randomNumber: 0.22,
+		expectation:  "event3",
 	},
 	{
 		items: map[string]float64{
@@ -31,31 +35,33 @@ var getRandomFromArrayData = []getRandomFromArrayTestData{
 			"event2": 0.5,
 			"event3": 1,
 		},
-		expectation: "event1",
+		randomNumber: 0.22,
+		expectation:  "event1",
 	},
 	{
 		items: map[string]float64{
 			"TestCase0.001": 0.11,
 		},
-		expectation: "",
+		randomNumber: 0.22,
+		expectation:  "",
 	},
 	{
 		items: map[string]float64{
 			"TestCase0": 0,
 		},
-		expectation: "TestCase0",
+		randomNumber: 0.22,
+		expectation:  "TestCase0",
 	},
 	{
-		items:       map[string]float64{},
-		expectation: "",
+		items:        map[string]float64{},
+		randomNumber: 0.22,
+		expectation:  "",
 	},
 }
 
 func TestSelectRandomWeightedItem(t *testing.T) {
-	seed := "TestSeed" // => results in 0.22
 	for _, test := range getRandomFromArrayData {
-
-		val, err := utils.SelectRandomWeightedItem(test.items, seed)
+		val, err := utils.SelectRandomWeightedItem(test.items, test.randomNumber)
 		if assert.NoError(t, err) {
 			assert.Equal(t, test.expectation, val)
 		}
@@ -65,6 +71,7 @@ func TestSelectRandomWeightedItem(t *testing.T) {
 func TestSelectRandomWeightedItemInvalidChance(t *testing.T) {
 	_, err := utils.SelectRandomWeightedItem(map[string]float64{
 		"test": -1,
-	}, "🍉")
-	assert.Error(t, err)
+	}, 0.22)
+
+	assert.True(t, errors.Is(err, utils.ErrInvalidChance))
 }

@@ -20,3 +20,5 @@ database.db
 .DS_Store
 .idea
 config.yaml
+bin/*
+dist/*

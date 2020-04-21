@@ -20,8 +20,9 @@ type APIHandler struct {
 // NewAPIRouter creates a new API HTTP handler
 func NewAPIRouter(db *database.Service, game *game.Service, config *config.Config) http.Handler {
 	api := &APIHandler{
-		DB:   db,
-		Game: game,
+		DB:     db,
+		Game:   game,
+		Config: config,
 	}
 
 	r := chi.NewRouter()

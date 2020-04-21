@@ -23,3 +23,10 @@ warningCode = 0
 [rule.unexported-return]
 [rule.indent-error-flow]
 [rule.errorf] 
+
+[rule.superfluous-else]
+[rule.modifies-parameter]
+[rule.unreachable-code]
+
+[rule.cyclomatic]
+  arguments = [10]
