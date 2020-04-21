@@ -29,7 +29,7 @@ jobs:
     - name: Compress Binary
       uses: actions-github/upx@master
       with:
-      file: 'bin/fantasymarket'
+        file: 'bin/fantasymarket'
 
     - name: Deploy (staging)
       if: github.ref == 'refs/heads/develop'
