@@ -224,8 +224,6 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentDate tim
 		return err
 	}
 
-	
-
 	var affectedPortfolioItem models.PortfolioItem
 	db.Where(models.PortfolioItem{
 		PortfolioID: user.PortfolioID,
