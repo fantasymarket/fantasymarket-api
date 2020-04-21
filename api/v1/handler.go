@@ -7,7 +7,7 @@ import (
 )
 
 func (api *APIHandler) getEvents(w http.ResponseWriter, r *http.Request) {
-	events, err := api.DB.GetEvents()
+	events, err := api.DB.GetEvents(api.Game.GetCurrentDate())
 
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, "we're ginormously fucked")
