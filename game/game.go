@@ -8,6 +8,7 @@ import (
 	"fantasymarket/utils/config"
 	"fantasymarket/utils/hash"
 	"fantasymarket/utils/timeutils"
+	"fmt"
 
 	"strconv"
 	"time"
@@ -39,20 +40,17 @@ func Start(db *database.Service, config *config.Config) (*Service, error) {
 
 	loadedStocks, err := details.LoadStockDetails()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("game: failed to Load stock Details: %w", err)
 	}
 
 	if err := db.CreateInitialStocks(loadedStocks); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("game: failed to initialize stocks: %w", err)
 	}
 
-	// TODO: right now, this map is empty
 	loadedEvents, err := details.LoadEventDetails()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("game: failed to load events: %w", err)
 	}
-
-	// TODO: Take all Fixed events and map them where Key is startDate and value true?
 
 	s := &Service{
 		Config:       config,
@@ -75,7 +73,9 @@ func startLoop(s *Service) {
 	log.Debug().Int64("ticksSinceStart", s.TicksSinceStart).Msg("loaded loaded ticksSinceStart from database")
 
 	for {
-		s.tick()
+		if err := s.tick(); err != nil {
+			log.Error().Err(err).Int64("ticksSinceStart", s.TicksSinceStart).Msg("error while running tick")
+		}
 
 		timePerTick := time.Duration(1/s.Config.Game.TicksPerSecond) * time.Second
 		time.Sleep(timePerTick)
@@ -100,23 +100,31 @@ func (s *Service) GetRandomEventEffect(e models.Event) (string, error) {
 
 // tick is updating the current state of our system
 func (s *Service) tick() error {
-	log.Debug().Int64("tick", s.TicksSinceStart).Msg("running tick")
+	log.Debug().Int64("tick", s.TicksSinceStart).Str("date", s.GetCurrentDate().String()).Msg("running tick")
 
-	currentlyRunningEvents, _ := s.DB.GetEvents(s.GetCurrentDate())
-	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1)
+	currentlyRunningEvents, err := s.DB.GetEvents(s.GetCurrentDate())
+	if err != nil {
+		return fmt.Errorf("game: failed to get events from DB: %w", err)
+	}
 
-	// TODO: add new events to database:
-	//    - fixed events that need to be added at a fixed date
-	//		- random events
-	// 		- reccuring events
+	lastStockIndexes, err := s.DB.GetStocksAtTick(s.TicksSinceStart - 1)
+	if err != nil {
+		return fmt.Errorf("game: failed to get stocks indexes: %w", err)
+	}
+
+	if err := s.startEvents(); err != nil {
+		return fmt.Errorf("game: failed to start events: %w", err)
+	}
 
 	s.removeInactiveEvents(currentlyRunningEvents)
 	newStocks := s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents)
+
 	if err := s.DB.AddStocks(newStocks, s.TicksSinceStart); err != nil {
-		return err
+		return fmt.Errorf("game: failed to add stocks: %w", err)
 	}
 
 	// TODO: process current orderbook
+	// s.processOrders()
 
 	return nil
 }
@@ -163,6 +171,7 @@ func (s Service) CalculateAffectedness(stocks []models.Stock, activeEvents []mod
 // should currently be affecting all stocks
 func (s Service) GetActiveEventTags(activeEvents []models.Event) []details.TagOptions {
 	var activeTags []details.TagOptions
+
 	for _, activeEvent := range activeEvents {
 		eventDetails := s.EventDetails[activeEvent.EventID]
 		for _, tag := range eventDetails.Tags {

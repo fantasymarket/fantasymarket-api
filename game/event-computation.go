@@ -5,28 +5,26 @@ import (
 	"fantasymarket/game/details"
 	"fantasymarket/utils/hash"
 	"fantasymarket/utils/timeutils"
+	"fmt"
 	"html/template"
 	"strconv"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 // StartEvents checks an event if it should run or not depending on the event type
-func (s *Service) startEvents() {
+func (s *Service) startEvents() error {
 	currentDate := s.GetCurrentDate()
 	events := s.EventDetails
 
 	for _, event := range events {
 
-		eventNeedsToBeRun := false
 		createdAt := event.FixedDate.Time
 		eventID := event.EventID
 		seed := eventID + strconv.FormatInt(s.TicksSinceStart, 10)
 
-		switch event.Type {
-		case "fixed":
-			eventNeedsToBeRun = s.eventNeedsToBeRun(event)
-		case "recurring":
-
+		if event.Type == "recurring" {
 			date := event.FixedDate.Time
 			for date.Before(currentDate) {
 				date = event.RecurringDuration.Shift(date)
@@ -35,17 +33,17 @@ func (s *Service) startEvents() {
 			date = timeutils.ShiftBack(event.RecurringDuration, date)
 			createdAt = date
 			event.FixedDate = timeutils.Time{Time: createdAt}
-			eventNeedsToBeRun = s.eventNeedsToBeRun(event)
-		case "random":
+		}
 
+		if event.Type == "random" {
 			ticksPerDay := time.Hour * 24 / s.Config.Game.GameTimePerTick
 			chancePerTick := event.RandomChancePerDay * float64(ticksPerDay)
-
-			if chancePerTick > (float64(hash.Int64HashRange(0, 1e6, seed)) / 1e6) {
-				eventNeedsToBeRun = s.eventNeedsToBeRun(event)
-			}
-
 			createdAt = s.GetCurrentDate()
+
+			// we can just skip to the next loop
+			if chancePerTick < hash.Float64Hash(seed) {
+				continue
+			}
 		}
 
 		if !event.FixedDateRandomOffset.IsZero() {
@@ -53,15 +51,30 @@ func (s *Service) startEvents() {
 			createdAt.Add(offset)
 		}
 
-		if eventNeedsToBeRun {
-			s.DB.AddEvent(event, createdAt)
-
-			if _, ok := s.EventHistory[eventID]; !ok {
-				s.EventHistory[eventID] = []time.Time{}
+		if s.eventNeedsToBeRun(event) {
+			if err := s.addEventToRun(event, createdAt); err != nil {
+				return fmt.Errorf("event-computation: failed to start event: %w", err)
 			}
-			s.EventHistory[eventID] = append(s.EventHistory[eventID], createdAt)
 		}
 	}
+
+	return nil
+}
+
+func (s *Service) addEventToRun(event details.EventDetails, createdAt time.Time) error {
+	eventID := event.EventID
+
+	if err := s.DB.AddEvent(event, createdAt); err != nil {
+		return err
+	}
+
+	if _, ok := s.EventHistory[eventID]; !ok {
+		s.EventHistory[eventID] = []time.Time{}
+	}
+	s.EventHistory[eventID] = append(s.EventHistory[eventID], createdAt)
+
+	log.Debug().Str("eventID", event.EventID).Msg("starting event")
+	return nil
 }
 
 func calculateRandomOffset(randomOffset timeutils.Duration, seed string) time.Duration {
@@ -78,15 +91,16 @@ func (s *Service) eventNeedsToBeRun(event details.EventDetails) bool {
 	currentDate := s.GetCurrentDate()
 
 	lengthOfEventHistorySlice := len(s.EventHistory[event.EventID])
-	timeStampOfLastEvent := s.EventHistory[event.EventID][lengthOfEventHistorySlice-1]
+
+	timeStampOfLastEvent := time.Time{}
+	if lengthOfEventHistorySlice != 0 {
+		timeStampOfLastEvent = s.EventHistory[event.EventID][lengthOfEventHistorySlice-1]
+	}
 
 	eventHistory, ok := s.EventHistory[event.EventID]
 
 	eventHasNeverRun := !ok || len(eventHistory) == 0
 	eventDateInPast := currentDate.After(event.FixedDate.Time)
-
-	// TODO: handle events that can happening multiple times
-	// eventShouldRun :=  currentDate after MinTimeBetween events + eventHistory[len(eventHistory)-1]
 
 	randomEventShouldRun := currentDate.After(timeStampOfLastEvent.Add(event.MinTimeBetweenEvents))
 
@@ -109,12 +123,12 @@ func (s *Service) ChangeDescriptionPlaceholder(description string) (string, erro
 
 	tmpl, err := template.New("description").Parse(description)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("event-computation: failed to change description: %w", err)
 	}
 
 	var result bytes.Buffer
 	if err := tmpl.Execute(&result, data); err != nil {
-		return "", err
+		return "", fmt.Errorf("event-computation: failed to execute description substitution: %w", err)
 	}
 
 	return result.String(), nil
