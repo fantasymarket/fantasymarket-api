@@ -28,7 +28,7 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 	// Standalone GET Requests
 	r.Get("/events", api.getEvents) // Allow for query parameters
 
-	r.Get("/overview", api.getOverview) // Some stats for the dashboard
+	//r.Get("/overview", api.getOverview) // Some stats for the dashboard
 	// Top 2 Gainers / Top 2 Losers
 	// Maybe total + of all stock and things like that in the future
 
@@ -45,7 +45,7 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 	r.Route("/orders", func(r chi.Router) {
 
-		r.Get("/", api.orders)
+		r.Get("/", api.ordersForUser)
 
 		r.Post("/", api.addOrder)
 

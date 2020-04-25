@@ -12,15 +12,15 @@ import (
 func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 	allStocks, err := ioutil.ReadFile("game/stocks.yaml")
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error getting list of stocks")
+		responses.ErrorResponse(w, "Error getting list of stocks", http.StatusInternalServerError)
 		return
 	}
 
-	m := []stocks.StockDetails{} // Test again if this works, I checked the docs and in theory when the map is already initialized it should still work. If not change it back again
+	m := []stocks.StockDetails{}
 	err = yaml.Unmarshal(allStocks, &m)
 
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error parsing stocks")
+		responses.ErrorResponse(w, "Error parsing the stocks", http.StatusInternalServerError)
 		return
 	}
 
@@ -32,21 +32,21 @@ func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 	yamlData, err := ioutil.ReadFile("game/stocks.yaml")
 
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error getting list of stocks")
+		responses.ErrorResponse(w, "Error getting Stock Details", http.StatusInternalServerError)
 	}
 
-	var stocks []stocks.StockDetails
+	var myStocks []stocks.StockDetails
 
-	if err := yaml.Unmarshal(yamlData, &stocks); err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error parsing stock")
+	if err := yaml.Unmarshal(yamlData, &myStocks); err != nil {
+		responses.ErrorResponse(w, "Error parsing the stock", http.StatusInternalServerError)
 	}
 
-	for i := range stocks {
-		if stocks[i].Symbol == symbol {
-			responses.CustomResponse(w, stocks[i], 200)
+	for i := range myStocks {
+		if myStocks[i].Symbol == symbol {
+			responses.CustomResponse(w, myStocks[i], 200)
 			return
 		}
 	}
 
-	responses.ErrorResponse(w, http.StatusNotFound, "no stock with symbol available")
+	responses.ErrorResponse(w, "Error getting the Stock Detail", http.StatusInternalServerError)
 }
