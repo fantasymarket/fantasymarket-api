@@ -9,20 +9,20 @@ import (
 
 // Order is a Order Struct
 type Order struct {
-	OrderID uuid.UUID `gorm:"primary_key"` // A Unique ID for every order (since the same event might happen multiple times)
+	OrderID uuid.UUID `gorm:"primary_key"`
 
-	UserID uuid.UUID
-	User   User `gorm:"ForeignKey:UserID;AssociationForeignKey:UserID"`
+	UserID    uuid.UUID
+	User      User `gorm:"ForeignKey:UserID;AssociationForeignKey:UserID"`
+	CreatedAt time.Time
 
-	CreatedAt  time.Time
+	Type   string // the type of the asset (so only stock for now)
+	Symbol string // the symbol of the stock
+	Side   string // buy or sell
+	Status string // filled, waiting or canceled
+	Amount int64  // amount of stocks in the order
+
 	CanceledAt time.Time
-	Type       string
-	Side       string
-	Symbol     string
-	status     string
-
-	// Stuff that affects all tags
-	//// TimeOffset time.Duration // Optionally offset the event to e.g only affect a tag after x time
+	FilledAt   time.Time
 }
 
 // BeforeCreate runs before a order is created in the database
