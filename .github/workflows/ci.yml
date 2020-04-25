@@ -26,11 +26,6 @@ jobs:
     - name: Build Binary
       run: task build
 
-    - name: Compress Binary
-      uses: actions-github/upx@master
-      with:
-        file: 'bin/fantasymarket'
-
     - name: Deploy (staging)
       if: github.ref == 'refs/heads/develop'
       run: task deploy-staging

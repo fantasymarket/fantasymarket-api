@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fantasymarket/game/stocks"
+	"fantasymarket/game/details"
 	"fantasymarket/utils/http/responses"
 	"io/ioutil"
 	"net/http"
@@ -17,7 +17,7 @@ func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m := []stocks.StockDetails{} // Test again if this works, I checked the docs and in theory when the map is already initialized it should still work. If not change it back again
+	m := []details.StockDetails{} // Test again if this works, I checked the docs and in theory when the map is already initialized it should still work. If not change it back again
 	err = yaml.Unmarshal(allStocks, &m)
 
 	if err != nil {
@@ -36,7 +36,7 @@ func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 		responses.ErrorResponse(w, http.StatusInternalServerError, "error getting list of stocks")
 	}
 
-	var stocks []stocks.StockDetails
+	var stocks []details.StockDetails
 
 	if err := yaml.Unmarshal(yamlData, &stocks); err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, "error parsing stock")

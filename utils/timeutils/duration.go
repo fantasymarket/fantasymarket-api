@@ -1,6 +1,8 @@
 package timeutils
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/senseyeio/duration"
@@ -28,4 +30,44 @@ func timeDuration(d Duration) time.Duration {
 	dur = dur + (time.Duration(d.TM) * time.Minute)
 	dur = dur + (time.Duration(d.TS) * time.Second)
 	return dur
+}
+
+// UnmarshalJSON implements `json.Unmarshaler`
+func (d *Duration) UnmarshalJSON(b []byte) (err error) {
+
+	fmt.Println("fuck")
+
+	s := strings.Trim(string(b), "\"")
+	if s == "null" {
+		d.Duration = duration.Duration{}
+		return
+	}
+
+	d.Duration, err = duration.ParseISO8601(s)
+
+	return
+}
+
+// UnmarshalYAML implements `yaml.Unmarshaler`
+func (d *Duration) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var b = ""
+	err := unmarshal(&b)
+	if err != nil {
+		return err
+	}
+
+	s := strings.Trim(string(b), "\"")
+	if s == "null" {
+		d.Duration = duration.Duration{}
+		return nil
+	}
+
+	d.Duration, err = duration.ParseISO8601(s)
+
+	return nil
+}
+
+// MarshalJSON implements `json.Marshaler`
+func (d Duration) MarshalJSON() ([]byte, error) {
+	return []byte(timeDuration(d).String()), nil
 }
