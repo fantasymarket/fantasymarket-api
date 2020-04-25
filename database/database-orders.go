@@ -22,7 +22,7 @@ var (
 	ErrCantSellMoreThanYouHave = errors.New("cant sell more than you have")
 
 	// ListOFValidTypes is the list of types accepted for trading
-	ListOFValidTypes = [3]string{"stock", "crypt", "earth"}
+	ListOFValidTypes = [3]string{"stock", "crypto", "earth"}
 )
 
 // AddOrder adds an Order to the database
@@ -42,7 +42,7 @@ func (s *Service) AddOrder(order models.Order, userID uuid.UUID, currentDate tim
 func (s *Service) GetOrders(orderDetails models.Order, limit int, offset int) (*[]models.Order, error) {
 	var orders *[]models.Order
 	if err := s.DB.Where(models.Order{UserID: orderDetails.UserID, Type: orderDetails.Type, Symbol: orderDetails.Symbol}).Limit(limit).Offset(offset).Error; err != nil {
-		return orders, err
+		return nil, err
 	}
 
 	return orders, nil
@@ -52,7 +52,7 @@ func (s *Service) GetOrders(orderDetails models.Order, limit int, offset int) (*
 func (s *Service) GetOrderByID(orderID uuid.UUID) (*models.Order, error) {
 	var order *models.Order
 	if err := s.DB.Where(models.Order{OrderID: orderID}).First(&order).Error; err != nil {
-		return order, err
+		return nil, err
 	}
 
 	return order, nil
@@ -133,32 +133,38 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentIndex in
 		return ErrCantSellMoreThanYouHave
 	}
 
-	// we use a transactions since if updating
-	// balance fails, we also need to rollback
-	// the portfolioItem's amount
-	tx := s.DB.Begin()
-
-	if err := tx.Model(&affectedPortfolioItem).Updates(models.PortfolioItem{
-		Amount: newAmount,
-	}).Error; err != nil {
-		tx.Rollback()
-		s.CancelOrder(order.OrderID, currentDate)
-		return err
-	}
-
 	newBalance := user.Portfolio.Balance - price
-	if err := tx.Model(&user.Portfolio).Updates(models.Portfolio{
-		Balance: newBalance,
-	}).Error; err != nil {
-		tx.Rollback()
-		s.CancelOrder(order.OrderID, currentDate)
-		return err
-	}
-
-	if err := tx.Commit().Error; err != nil {
+	if err := s.updatePortfolioItem(user.Portfolio.PortfolioID, affectedPortfolioItem.PortfolioItemID, newAmount, newBalance); err != nil {
 		s.CancelOrder(order.OrderID, currentDate)
 		return err
 	}
 
 	return s.DB.Where(models.Order{OrderID: orderID}).Updates(models.Order{Status: "filled", FilledAt: currentDate}).Error
+}
+
+func (s *Service) updatePortfolioItem(portfolioID uuid.UUID, itemID uuid.UUID, newAmount int64, newBalance int64) error {
+	// we use a transactions since if updating
+	// balance fails, we also need to rollback
+	// the portfolioItem's amount
+	tx := s.DB.Begin()
+
+	if err := tx.Where(&models.PortfolioItem{
+		PortfolioItemID: itemID,
+	}).Updates(models.PortfolioItem{
+		Amount: newAmount,
+	}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Where(&models.Portfolio{
+		PortfolioID: portfolioID,
+	}).Updates(models.Portfolio{
+		Balance: newBalance,
+	}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
