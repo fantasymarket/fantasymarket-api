@@ -39,7 +39,7 @@ tasks:
       GOARCH: amd64
     cmds:
       - go generate ./...
-      - go build -ldflags="-s -w" -o bin/fantasymarket -i main.go
+      - go build -ldflags="-s -w" -i main.go -o bin/fantasymarket
 
   deploy-staging:
     cmds:

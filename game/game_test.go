@@ -3,19 +3,24 @@ package game
 import (
 	"fantasymarket/database/models"
 	"fantasymarket/game/details"
+	"fantasymarket/utils/config"
+	"fantasymarket/utils/timeutils"
+	"time"
+
+	"github.com/senseyeio/duration"
 
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-type TestData struct {
+type TestGetTendencyData struct {
 	stock        models.Stock
 	affectedness float64
 	expectation  map[string]int64
 }
 
-var data = []TestData{
+var GetTendencyData = []TestGetTendencyData{
 	{
 		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
 		affectedness: -1,
@@ -70,7 +75,7 @@ func TestGetTendency(t *testing.T) {
 		StockDetails: stockDetails,
 	}
 
-	for _, test := range data {
+	for _, test := range GetTendencyData {
 		for i := range stockDetails {
 			test.stock.Symbol = string(i)
 
@@ -78,4 +83,105 @@ func TestGetTendency(t *testing.T) {
 			assert.Equal(t, test.expectation[i], result)
 		}
 	}
+}
+
+func parseTime(s string) time.Time {
+	t, _ := time.Parse(time.RFC3339, s)
+	return t
+}
+
+func parseDuration(s string) timeutils.Duration {
+	d, _ := duration.ParseISO8601(s)
+	return timeutils.Duration{Duration: d}
+}
+
+type activeEvent struct {
+	EventID   string
+	CreatedAt time.Time
+	Tags      []details.TagOptions
+}
+
+type activeEventsTestData struct {
+	activeEvents []activeEvent // map[eventID]createdAt
+	result       []details.TagOptions
+	expectation  []details.TagOptions
+}
+
+var testActiveTagsData = activeEventsTestData{
+	activeEvents: []activeEvent{
+		{
+			EventID:   "event1",
+			CreatedAt: parseTime("2019-12-30T15:04:05Z"),
+			Tags: []details.TagOptions{
+				{
+					AffectsTags: []string{"some-type-only-event1-affects"},
+					Offset:      parseDuration("P1D"),
+					Duration:    parseDuration("P2M"),
+				},
+			},
+		},
+		{
+			EventID:   "event2",
+			CreatedAt: parseTime("2019-01-02T15:04:05Z"),
+			Tags: []details.TagOptions{
+				{
+					AffectsStocks: []string{"IDEXX", "ANTM"},
+					Offset:        parseDuration("P1D"),
+					Duration:      parseDuration("P2M"),
+				},
+			},
+		},
+		{
+			EventID:   "event3",
+			CreatedAt: parseTime("2019-01-02T15:04:05Z"),
+			Tags: []details.TagOptions{
+				{
+					AffectsStocks: []string{"GOOG", "APPL"},
+					Offset:        parseDuration("P1D"),
+					Duration:      parseDuration("P12M"),
+				},
+			},
+		},
+	},
+	expectation: []details.TagOptions{
+		details.TagOptions{
+			AffectsTags: []string{"some-type-only-event1-affects"},
+		},
+		{
+			AffectsStocks: []string{"GOOG", "APPL"},
+		},
+	},
+}
+
+func TestGetActiveEventTags(t *testing.T) {
+
+	events := []models.Event{}
+	eventDetails := map[string]details.EventDetails{}
+
+	for _, event := range testActiveTagsData.activeEvents {
+		events = append(events, models.Event{
+			Active:    true,
+			CreatedAt: event.CreatedAt,
+			EventID:   event.EventID,
+		})
+
+		eventDetails[event.EventID] = details.EventDetails{
+			EventID: event.EventID,
+			Tags:    event.Tags,
+		}
+	}
+
+	startDate, _ := time.Parse(time.RFC3339, "2020-01-02T15:04:05Z")
+
+	s := Service{
+		Config: &config.Config{
+			Game: config.GameConfig{
+				StartDate: timeutils.Time{Time: startDate},
+			},
+		},
+		EventDetails: eventDetails,
+	}
+
+	result := s.GetActiveEventTags(events)
+	assert.Equal(t, testActiveTagsData.expectation, result)
 }

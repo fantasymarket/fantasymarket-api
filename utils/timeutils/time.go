@@ -34,3 +34,15 @@ func (t *Time) UnmarshalJSON(b []byte) (err error) {
 
 	return
 }
+
+// UnmarshalYAML implements `yaml.Unmarshaler`
+func (t *Time) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var b string
+	err := unmarshal(&b)
+
+	if err != nil {
+		return err
+	}
+
+	return t.UnmarshalJSON([]byte(b))
+}
