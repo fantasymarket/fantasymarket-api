@@ -6,13 +6,12 @@ import (
 	"time"
 )
 
-
 func (api *APIHandler) getTime(w http.ResponseWriter, r *http.Request) {
 	t := api.Config.Game.StartDate
 
 	if !t.IsZero() {
 		responses.CustomResponse(w, t.Format(time.RFC3339), 200)
 	} else {
-		responses.ErrorResponse(w, "we're absolutely fucked", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "error getting date")
 	}
 }

@@ -1,10 +1,11 @@
 package v1
 
 import (
-	"fantasymarket/game/stocks"
+	"fantasymarket/game/details"
 	"fantasymarket/utils/http/responses"
 	"io/ioutil"
 	"net/http"
+
 	"github.com/go-chi/chi"
 	"gopkg.in/yaml.v3"
 )
@@ -12,15 +13,15 @@ import (
 func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 	allStocks, err := ioutil.ReadFile("game/stocks.yaml")
 	if err != nil {
-		responses.ErrorResponse(w, "Error getting list of stocks", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error getting list of stocks")
 		return
 	}
 
-	m := []stocks.StockDetails{}
+	m := []details.StockDetails{}
 	err = yaml.Unmarshal(allStocks, &m)
 
 	if err != nil {
-		responses.ErrorResponse(w, "Error parsing the stocks", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing the stocks")
 		return
 	}
 
@@ -32,13 +33,13 @@ func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 	yamlData, err := ioutil.ReadFile("game/stocks.yaml")
 
 	if err != nil {
-		responses.ErrorResponse(w, "Error getting Stock Details", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error getting Stock Details")
 	}
 
-	var myStocks []stocks.StockDetails
+	var myStocks []details.StockDetails
 
 	if err := yaml.Unmarshal(yamlData, &myStocks); err != nil {
-		responses.ErrorResponse(w, "Error parsing the stock", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing the stock")
 	}
 
 	for i := range myStocks {
@@ -48,5 +49,5 @@ func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	responses.ErrorResponse(w, "Error getting the Stock Detail", http.StatusInternalServerError)
+	responses.ErrorResponse(w, http.StatusInternalServerError, "Error getting the Stock Detail")
 }
