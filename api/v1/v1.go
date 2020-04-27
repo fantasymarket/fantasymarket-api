@@ -5,9 +5,8 @@ import (
 	"fantasymarket/game"
 	"fantasymarket/utils/config"
 	"fantasymarket/utils/http/middleware/jwt"
-	"net/http"
-
 	"github.com/go-chi/chi"
+	"net/http"
 )
 
 // APIHandler holds the dependencies for http handlers
@@ -28,10 +27,10 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 	r := chi.NewRouter()
 
 	// Standalone GET Requests
-	r.Get("/news", api.getEvents) // Allow for query parameters
+	r.Get("/events", api.getEvents) // Allow for query parameters
 
-	r.Get("/overview", api.getOverview) // Some stats for the dashboard
-	// Top 2 Gainers / Top 2 Loosers
+	//r.Get("/overview", api.getOverview) // Some stats for the dashboard
+	// Top 2 Gainers / Top 2 Losers
 	// Maybe total + of all stock and things like that in the future
 
 	r.Get("/time", api.getTime) // Current time on the server
@@ -43,24 +42,19 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 		r.Get("/{symbol}", api.getStockDetails)
 
-		r.Post("/orders", api.addOrder)
-
 	})
 
 	r.Route("/orders", func(r chi.Router) {
 
-		r.Get("/", api.orders)
+		r.Get("/", api.ordersForUser)
 
-		r.Get("/{orderID}", api.orders)
+		r.Post("/", api.addOrder)
 
-		r.Delete("/{orderID}", api.orders)
-	})
+		r.Get("/{orderID}", api.ordersID)
 
-	r.Route("/portfolio", func(r chi.Router) {
+		r.Post("/fill/{orderID}", api.fillOrder)
 
-		r.Get("/", api.getPortfolio)
-
-		r.Get("/{symbol}", api.getPortfolio)
+		r.Delete("/{orderID}", api.deleteOrder)
 	})
 
 	r.Route("/user", func(r chi.Router) {

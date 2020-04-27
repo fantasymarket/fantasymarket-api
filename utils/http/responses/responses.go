@@ -23,7 +23,7 @@ func CustomResponse(w http.ResponseWriter, response interface{}, status int) {
 }
 
 // ErrorResponse writes a HTTP error with a json error message
-func ErrorResponse(w http.ResponseWriter, statusCode int, message string) {
+func ErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(errorResponse{Error: error{
