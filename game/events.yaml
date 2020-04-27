@@ -82,7 +82,7 @@
   description: "Healthcare stocks earn huge revenue boost amidst corona virus outbreak"
 
   type: "fixed"
-  fixedDate: 2020-06-31 02:44:32
+  fixedDate: 2020-07-31 02:44:32
 
   dependencies: [
     {"corona-virus-outbreak"}
@@ -92,11 +92,9 @@
   duration: P1M2D
 
   tags:
-  - affectsTags: ["healthcare"] #Tags for Events and Tags for Stocks are the same. If yes, they might be affected
-    trend: 1.3
+  - trend: 1.3
     affectsStockIDs: ["IDEXX, ANTM"] #If the affectsStockIDs is the same as the StockID, the stock IS affected by the number given by the trend -If affectsStockIDs is empty, ignore it
-  - affectsTags: ["healthcare"]
-    trend: 1.1
+  - trend: 1.1
     affectsStockIDs: ["DVA"]
 
 
@@ -116,28 +114,23 @@
   duration: P1M14D
 
   tags:
-  - affectsTags: ["financial"]
-    trend: 0.2 
+  - trend: 0.2 
     affectsStockIDs: ["JPM"]
     offset: PT39M22S
     duration: P7D 
-  - affectsTags: ["financial"]
-    trend: 0.8 
+  - trend: 0.8 
     affectsStockIDs: ["JPM"]
     offset: P7DT39M22S
     duration: P7D 
-  - affectsTags: ["financial"]
-    trend: 1.2  
+  - trend: 1.2  
     affectsStockIDs: ["JPM"]
     offset: P14DT39M22S
     duration: P7D 
-  - affectsTags: ["financial"]
-    trend: 0.4
+  - trend: 0.4
     affectsStockIDs: ["JPM"]
     offset: P21DT39M22S
     duration: P7D 
-  - affectsTags: ["financial"]
-    trend: 0.5
+  - trend: 0.5
     affectsStockIDs: ["JPM"]
     offset: P28DT39M22S
     duration: P16D
@@ -157,23 +150,19 @@
   duration: P19D
 
   tags:
-  - affectsTags: ["healthcare"]
-    trend: -0.6 
+  - trend: -0.6 
     affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: PT2H1M55S
     duration: P7D 
-  - affectsTags: ["healthcare"]
-    trend: -1.4
+  - trend: -1.4
     affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: P7DT2H1M55S
     duration: P7D 
-  - affectsTags: ["healthcare"]
-    trend: -0.5
+  - trend: -0.5
     affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: P14DT2H1M55S
     duration: P7D 
-  - affectsTags: ["healthcare"]
-    trend: 0.2
+  - trend: 0.2
     affectsStockIDs: ["IDEXX, ANTM, DVA"]
     offset: P21DT2H1M55S
     duration: P7D 
@@ -182,10 +171,9 @@
 - eventID: "presidential-election-us"
   title: "Presidential elections are around the corner. What will happen to stocks?"
   description: "With the presidential election about to occur, what will analysts and investors think of the impact it will bring to the stock market?"
-
+  type: "recurring"
   fixedDate: 2020-11-01 12:22:22 
   fixedDateRandomOffset: P1M
-  type: "recurring"
   recurringDuration: P4Y
   # Could make it more complicated by having effects of different parties that would change the stocks
   # TODO: Create event chain with different parties
@@ -248,6 +236,7 @@
 - eventID: "presidential-election-us-republican-win"
   title: "New President to represent the winning Republican party as a win"
   description: "With the awaited final results for the US presidential election of year {{.Year}}, the Republicans have shown to be in favor of the majority."
+  type: "custom"
 
   dependencies: "presidential-election-us-potential-republicans-win" #We need to start writing the func that starts events I feel. helps with thinking about it
   effects: null
@@ -264,6 +253,7 @@
 - eventID: "presidential-election-us-democrats-win"
   title: "New President to represent the winning Democratic party as a win"
   description: "With the awaited final results for the US presidential election of year {{.Year}}, the Democrats have shown to be in favor of the majority."
+  type: "custom"
 
   dependencies: "presidential-election-us-potential-republicans-win"
   effects: null
@@ -280,6 +270,7 @@
 - eventID: "presidential-election-us-neutrals-win"
   title: "New President to represent the winning Neutral party as a win"
   description: "With the awaited final results for the US presidential election of year {{.Year}}, the Neutrals have shown to be in favor of the majority."
+  type: "custom"
 
   dependencies: "presidential-election-us-potential-neutrals-win"
   effects: null
@@ -306,8 +297,7 @@
   effects: null
 
   tags:
-  - affectsTags: ["financial"]
-    minTrend: -0.9   
+  - minTrend: -0.9   
     maxTrend: -0.2  
     affectsStockIDs: ["GS"]
     offset: PT4H44M18S
@@ -322,7 +312,7 @@
                 value of each bank."
 
   type: "fixed"
-  fixedDate: 2021-18-05 09:10:04
+  fixedDate: 2021-05-18 09:10:04
 
   dependencies: [
     {"buffett-sudden-death"}
@@ -330,26 +320,22 @@
   effects: null
 
   tags:
-  - affectsTags: ["financial"]
-    trend: -0.9
+  - trend: -0.9
     affectsStockIDs: ["GS"]
     offset: P2DT33M24S
     duration: P7D
 
-  - affectsTags: ["financial"]
-    trend: -0.1
+  - trend: -0.1
     affectsStockIDs: ["AXP, JPM"]
     offset: P2DT33M24S
     duration: P7D
 
-  - affectsTags: ["financial"]
-    trend: -0.4
+  - trend: -0.4
     affectsStockIDs: ["GS"]
     offset: P9DT33M24S
     duration: P8D
 
-  - affectsTags: ["financial"]
-    trend: -0.6
+  - trend: -0.6
     affectsStockIDs: ["AXP, JPM"]
     offset: P9DT33M24S
     duration: P8D
@@ -362,7 +348,7 @@
                 Following a few months, Deutsche Bank received a final value per share of 7.22 USD but was unable to maintain its value. Stock closes." #as of 18.01.2022
 
   type: "fixed"
-  fixedDate: 2021-22-09 16:02:58
+  fixedDate: 2021-09-22 16:02:58
 
   dependencies: null
   effects: null
@@ -370,26 +356,20 @@
   duration: P3M26D
 
   tags:
-  - affectsTags: ["financial"]
-    trend: -1.2
+  - trend: -1.2
     affectsStockIDs: ["DB"]
     offset: PT43M40S
     duration: P30D
 
-  tags:
-  - affectsTags: ["financial"]
-    trend: 0.8
+  - trend: 0.8
     affectsStockIDs: ["DB"]
     offset: P30DT43M40S
     duration: P60D
   
-   tags:
-  - affectsTags: ["financial"]
-    trend: -1.8
+  - trend: -1.8
     affectsStockIDs: ["DB"]
     offset: P90DT43M40S
     duration: P28D
-    #stockCloses after this
 
 
 - eventID: "anonymous-hacker-finds-way"
@@ -481,10 +461,12 @@
     offset: PT14H22M09S
     duration: P11M27D
 
-  - eventID: "microsoft-declares-war-against-apple-and-wins"
-    title: "Microsoft wins the technological innovation war against rival Apple"
-    description: "After a long awaited overview of the huge battle between two large technology companies Apple and Microsoft, 
-    the winner has shone to Microsoft's favor."
+- eventID: "microsoft-declares-war-against-apple-and-wins"
+  type: "custom"
+  title: "Microsoft wins the technological innovation war against rival Apple"
+  description: >-
+    After a long awaited overview of the huge battle between two large technology companies Apple and Microsoft, 
+    the winner has shone to Microsoft's favor.
 
     dependencies: ["microsoft-declares-war-against-apple"]
     effects: [{
@@ -681,19 +663,19 @@
   - affectsTags: ["tech"]
     trend: 1.3
     affectsStockIDs: ["MSFT"]
-    offset: P1H22M04S
+    offset: PT1H22M4S
     duration: P1M
 
   - affectsTags: ["tech"]
     trend: 0.8
     affectsStockIDs: ["MSFT"]
-    offset: P1MT1H22M04S
+    offset: P1MT1H22M4S
     duration: P1M
 
   - affectsTags: ["tech"]
     trend: 1.8
     affectsStockIDs: ["MSFT"]
-    offset: P2MT1H22M04S
+    offset: P2MT1H22M4S
     duration: P1M
 
 
@@ -710,13 +692,13 @@
   dependencies: null
   effects: null
 
-  duration: 5184 ticks (216 days)
+  duration: P18M2DT6H
 
   tags:
   - affectsTags: ["financial"]
     trend: 0.8
     affectsStockIDs: ["AXP"]
-    offset: P2H20M49S
+    offset: PT2H20M49S
     duration: P1M
   
   - affectsTags: ["financial"]
@@ -789,7 +771,7 @@
   dependencies: null
   effects: null
   
-  duration: 504 ticks (21 days)
+  duration: P21D
 
   tags:
   - affectsTags: ["tech"]
@@ -883,7 +865,7 @@
   dependencies: null
   effects: null
 
-  duration: 1944 ticks (81 days)
+  duration: P2M10D
 
   tags:
   - affectsTags: ["financial"]
@@ -929,7 +911,7 @@
   dependencies: null
   effects: null
   
-  duration: 1296 ticks (54 days)
+  duration: P1M24D
 
   tags:
   - affectsTags: ["aviation"]
@@ -964,7 +946,7 @@
   dependencies: null
   effects: null
 
-  duration: 1464 ticks (61 days)
+  duration: P2M1D
 
   tags:
   - affectsTags: ["tech"]
@@ -1016,7 +998,7 @@
   dependencies: null
   effects: null
 
-  duration: 2184 ticks (91 days)
+  duration: P3M1DT10S
 
   tags:
   - affectsTags: ["tech"]
@@ -1049,11 +1031,11 @@
 
   dependencies: null
   effects: [{
-    chance: 0.99999999999941982731298372981,
+    chance: 0.99999999999941982731298372981, # why?
     eventID: "apple-to-release-quick-fixes"
   }]
 
-  duration: 1488 ticks (62 days)
+  duration: P2M1DT9M12S
 
   tags:
   - affectsTags: ["tech"]
@@ -1087,7 +1069,7 @@
   dependencies: ["apple-new-iphone-huge-issues"]
   effects: null
 
-  duration: 3240 ticks (135 days)
+  duration: P6M
 
   tags:
   - affectsTags: ["tech"]

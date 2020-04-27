@@ -3,6 +3,7 @@ severity = "warning"
 confidence = 0.8
 errorCode = 0
 warningCode = 0
+cyclomatic = 12
 
 [rule.blank-imports]
 [rule.context-as-argument]
@@ -27,6 +28,3 @@ warningCode = 0
 [rule.superfluous-else]
 [rule.modifies-parameter]
 [rule.unreachable-code]
-
-[rule.cyclomatic]
-  arguments = [10]

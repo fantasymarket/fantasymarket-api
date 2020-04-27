@@ -2,6 +2,7 @@ package game
 
 import (
 	"bytes"
+	"errors"
 	"fantasymarket/game/details"
 	"fantasymarket/utils/hash"
 	"fantasymarket/utils/timeutils"
@@ -9,8 +10,15 @@ import (
 	"html/template"
 	"strconv"
 	"time"
+)
 
-	"github.com/rs/zerolog/log"
+var (
+	// ErrInvalidRecurringDuration means the supplied duration is invalid
+	ErrInvalidRecurringDuration = errors.New("Recurring duration cannot be 0")
+	// ErrInvalidChancePerDay means the chance per day is invalid
+	ErrInvalidChancePerDay = errors.New("Chance per day cant be 0 or less than 0")
+	// ErrInvalidEventType means that the type on the event is invalid
+	ErrInvalidEventType = errors.New("404: Event Type not found")
 )
 
 // StartEvents checks an event if it should run or not depending on the event type
@@ -19,6 +27,10 @@ func (s *Service) startEvents() error {
 	events := s.EventDetails
 
 	for _, event := range events {
+
+		if err := validateEvent(event); err != nil {
+			return err
+		}
 
 		createdAt := event.FixedDate.Time
 		eventID := event.EventID
@@ -46,6 +58,10 @@ func (s *Service) startEvents() error {
 			}
 		}
 
+		if event.Type == "custom" {
+			continue
+		}
+
 		if !event.FixedDateRandomOffset.IsZero() {
 			offset := calculateRandomOffset(event.FixedDateRandomOffset, seed)
 			createdAt.Add(offset)
@@ -56,6 +72,32 @@ func (s *Service) startEvents() error {
 				return fmt.Errorf("event-computation: failed to start event: %w", err)
 			}
 		}
+	}
+
+	return nil
+}
+
+// validateEvent validates the properties of an event
+func validateEvent(event details.EventDetails) error {
+	switch event.Type {
+	case "recurring":
+		if event.RecurringDuration.IsZero() {
+			return fmt.Errorf("%w: eventID: %s", ErrInvalidRecurringDuration, event.EventID)
+		}
+
+	case "random":
+		if event.RandomChancePerDay <= 0 {
+			return fmt.Errorf("%w: eventID: %s", ErrInvalidChancePerDay, event.EventID)
+		}
+
+	case "fixed":
+		break
+
+	case "custom":
+		break
+
+	default:
+		return fmt.Errorf("%w: eventID: %s", ErrInvalidEventType, event.EventID)
 	}
 
 	return nil
@@ -73,7 +115,6 @@ func (s *Service) addEventToRun(event details.EventDetails, createdAt time.Time)
 	}
 	s.EventHistory[eventID] = append(s.EventHistory[eventID], createdAt)
 
-	log.Debug().Str("eventID", event.EventID).Msg("starting event")
 	return nil
 }
 

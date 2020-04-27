@@ -2,7 +2,6 @@ package timeutils
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -28,7 +27,6 @@ func TestUnmarshalJSONIntegration(t *testing.T) {
 	for jsonData, expectedDate := range unmarshallJSON {
 		var result Date
 		err := json.Unmarshal([]byte(jsonData), &result)
-		fmt.Println(result.Date.Format(time.RFC3339))
 
 		assert.NoError(t, err)
 		assert.Equal(t, expectedDate, result.Date.UnixNano())

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fantasymarket/database/models"
 	"fantasymarket/utils/hash"
-	"fmt"
 
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
@@ -117,7 +116,6 @@ func (s *Service) LoginUser(username, password string) (*models.User, error) {
 			return nil, errors.New("couldn't find user")
 		}
 
-		fmt.Println("error loging in:", err)
 		return nil, errors.New("could't find user in database")
 	}
 
