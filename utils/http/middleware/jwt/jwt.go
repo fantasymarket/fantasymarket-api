@@ -36,7 +36,7 @@ func authenticator(next http.Handler, optional bool) http.Handler {
 		token, claims, err := jwtauth.FromContext(r.Context())
 
 		if !optional && (err != nil || token == nil || !token.Valid) {
-			responses.ErrorResponse(w, "Unauthorized", http.StatusUnauthorized)
+			responses.ErrorResponse(w, http.StatusUnauthorized, "unauthorized")
 			return
 		}
 
@@ -53,7 +53,7 @@ func authenticator(next http.Handler, optional bool) http.Handler {
 
 		// Error if something is wrong with the token
 		if !optional {
-			responses.ErrorResponse(w, "Malformed JSON-Web-Token", http.StatusUnauthorized)
+			responses.ErrorResponse(w, http.StatusUnauthorized, "malformed jwt token")
 		}
 	})
 }

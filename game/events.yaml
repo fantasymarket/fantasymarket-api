@@ -40,11 +40,10 @@
   type: "fixed"
   fixedDate: 2020-01-01 00:00:01
   
-  dependencies: null
+  dependencies: []
   effects: [ 
     {chance: 1, effects: ["healthcare-receive-huge-boost"]}
-    ]
-
+  ]
 
   duration: P11M02D
   
@@ -75,8 +74,6 @@
     duration: P27D
     # endDate: 2020-11-02
     
-
-
 - eventID: "healthcare-receive-huge-boost"
   title: "Healthcare stocks earns 30% revenue boost"
   description: "Healthcare stocks earn huge revenue boost amidst corona virus outbreak"
@@ -84,10 +81,9 @@
   type: "fixed"
   fixedDate: 2020-07-31 02:44:32
 
-  dependencies: [
-    {"corona-virus-outbreak"}
-    ]
-  effects: null
+  dependencies: ["corona-virus-outbreak"]
+    
+  effects: []
 
   duration: P1M2D
 
@@ -96,7 +92,6 @@
     affectsStockIDs: ["IDEXX, ANTM"] #If the affectsStockIDs is the same as the StockID, the stock IS affected by the number given by the trend -If affectsStockIDs is empty, ignore it
   - trend: 1.1
     affectsStockIDs: ["DVA"]
-
 
 - eventID: "JPM-to-modernize-access-to-data"
   title: "JPM modernizes how customers access their data, effective immediately"
@@ -108,8 +103,8 @@
   type: "fixed"
   fixedDate: 2020-07-03 13:22:49
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
 
   duration: P1M14D
 
@@ -137,15 +132,15 @@
 
 - eventID: "healthcare-sudden-dive"
   title: "Healthcare revenue drops by more than 50% in less than a month"
-  description: "After a huge stock value increase the past month, it followed with a sudden huge drop of more than 50%
-                Some investors and top analysts expected a "pre-mature excitement" which resulted in a worry over the long-term
-                value of these stocks and decided to pull away most of their investment. Some stocks are seeing their all-time lows."
-
+  description: >
+    After a huge stock value increase the past month, it followed with a sudden huge drop of more than 50%
+    Some investors and top analysts expected a "pre-mature excitement" which resulted in a worry over the long-term
+    value of these stocks and decided to pull away most of their investment. Some stocks are seeing their all-time lows.
   type: "fixed"
   fixedDate: 2020-08-08 06:44:43 #- 27.08.2020
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
 
   duration: P19D
 
@@ -167,7 +162,6 @@
     offset: P21DT2H1M55S
     duration: P7D 
  
-
 - eventID: "presidential-election-us"
   title: "Presidential elections are around the corner. What will happen to stocks?"
   description: "With the presidential election about to occur, what will analysts and investors think of the impact it will bring to the stock market?"
@@ -190,7 +184,6 @@
     maxTrend: 2   #todo
     affectsStockIDs: ["all"]
 
-
 - eventID: "presidential-election-us-potential-republicans-win"
   type: "custom"
   title: "Republicans winning Poland over"
@@ -199,11 +192,10 @@
   duration: P5D 
 
   effects: [
-    {chance: 0.45, effects: ["presidential-election-us-republican-win"]}
-    {chance: 0.90, effects: ["presidential-election-us-democrats-win"]}
-    {chance: 1, effects: ["presidential-election-us-neutral-win"]}
+    {chance: 0.45, effects: ["presidential-election-us-republican-win"]},
+    {chance: 0.90, effects: ["presidential-election-us-democrats-win"]},
+    {chance: 1, effects: ["presidential-election-us-neutral-win"]},
   ]
-    
 
 - eventID: "presidential-election-us-potential-democrats-win"
   type: "custom"
@@ -213,11 +205,10 @@
   duration: P5D
 
   effects: [
-    {chance: 0.35, effects: ["presidential-election-us-republican-win"]}
-    {chance: 0.90, effects: ["presidential-election-us-democrats-win"]}
-    {chance: 1, effects: ["presidential-election-us-neutral-win"]}
+    {chance: 0.35, effects: ["presidential-election-us-republican-win"]},
+    {chance: 0.90, effects: ["presidential-election-us-democrats-win"]},
+    {chance: 1, effects: ["presidential-election-us-neutral-win"]},
   ]
-
 
 - eventID: "presidential-election-us-potential-neutrals-win"
   type: "custom"
@@ -227,19 +218,18 @@
   duration: P5D
 
   effects: [
-    {chance: 0.35, effects: ["presidential-election-us-republican-win"]}
-    {chance: 0.85, effects: ["presidential-election-us-democrats-win"]}
-    {chance: 1, effects: ["presidential-election-us-neutral-win"]}
+    {chance: 0.35, effects: ["presidential-election-us-republican-win"]},
+    {chance: 0.85, effects: ["presidential-election-us-democrats-win"]},
+    {chance: 1, effects: ["presidential-election-us-neutral-win"]},
   ]
-
 
 - eventID: "presidential-election-us-republican-win"
   title: "New President to represent the winning Republican party as a win"
   description: "With the awaited final results for the US presidential election of year {{.Year}}, the Republicans have shown to be in favor of the majority."
   type: "custom"
 
-  dependencies: "presidential-election-us-potential-republicans-win" #We need to start writing the func that starts events I feel. helps with thinking about it
-  effects: null
+  dependencies: ["presidential-election-us-potential-republicans-win"] #TODO: Write this func
+  effects: []
 
   tags:
   - affectsTags: ["all"]
@@ -248,15 +238,14 @@
     affectsStockIDs: ["all"]
     offset: PT1H2M55S
     duration: P7D
-
 
 - eventID: "presidential-election-us-democrats-win"
   title: "New President to represent the winning Democratic party as a win"
   description: "With the awaited final results for the US presidential election of year {{.Year}}, the Democrats have shown to be in favor of the majority."
   type: "custom"
 
-  dependencies: "presidential-election-us-potential-republicans-win"
-  effects: null
+  dependencies: ["presidential-election-us-potential-republicans-win"]
+  effects: []
 
   tags:
   - affectsTags: ["all"]
@@ -266,14 +255,13 @@
     offset: PT1H2M55S
     duration: P7D
 
-
 - eventID: "presidential-election-us-neutrals-win"
   title: "New President to represent the winning Neutral party as a win"
   description: "With the awaited final results for the US presidential election of year {{.Year}}, the Neutrals have shown to be in favor of the majority."
   type: "custom"
 
-  dependencies: "presidential-election-us-potential-neutrals-win"
-  effects: null
+  dependencies: ["presidential-election-us-potential-neutrals-win"]
+  effects: []
 
   tags:
   - affectsTags: ["all"]
@@ -283,18 +271,17 @@
     offset: PT1H2M55S
     duration: P7D
 
-
-
 - eventID: "buffett-sudden-death"
   title: "Multi-billionare business mangate Warren Buffett dies, aged 90"
-  description: "Today at 9:25 UTC, Warren Buffett dies, aged 90, after suffering from a 6-month heart failure with attempts
-                resuscitation beforehand."
+  description: >-
+    "Today at 9:25 UTC, Warren Buffett dies, aged 90, after suffering from a 6-month heart failure with attempts
+    resuscitation beforehand."
   
   type: "fixed"
   fixedDate: 2021-04-04 11:40:29
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
 
   tags:
   - minTrend: -0.9   
@@ -303,21 +290,19 @@
     offset: PT4H44M18S
     duration: P3M
 
-
 - eventID: "banking-companies-help-GS"
   title: "AXP and JPM help fellow company GS bring stock values back up"
-  description: "With Goldman Sachs' (GS) stock prices fluctuating in a downwards trend the past few weeks, 
-                fellow companies American Express (AXP) and JPMorgan Chase & Co (JPM) provide support and capital. 
-                Analysts fear the "terrible" idea of merging which would make management difficult and would weaken 
-                value of each bank."
+  description: >-
+    "With Goldman Sachs' (GS) stock prices fluctuating in a downwards trend the past few weeks, 
+    fellow companies American Express (AXP) and JPMorgan Chase & Co (JPM) provide support and capital. 
+    Analysts fear the "terrible" idea of merging which would make management difficult and would weaken 
+    value of each bank."
 
   type: "fixed"
   fixedDate: 2021-05-18 09:10:04
 
-  dependencies: [
-    {"buffett-sudden-death"}
-    ]
-  effects: null
+  dependencies: ["buffett-sudden-death"]
+  effects: []
 
   tags:
   - trend: -0.9
@@ -340,18 +325,18 @@
     offset: P9DT33M24S
     duration: P8D
     
-
 - eventID: "db-complete-collapse"
   title: "Deutsche Bank reaches a complete collapse with record low value per share"
-  description: "With a value of less than 5 USD per share, banking company Deutsche Bank is unable to retain position to attract investors
-                and is suffering from 265B EUR of debt. Capital Group uses their last strand of effort to help Deutsche Bank but is unable to succeed.
-                Following a few months, Deutsche Bank received a final value per share of 7.22 USD but was unable to maintain its value. Stock closes." #as of 18.01.2022
+  description: >-
+    "With a value of less than 5 USD per share, banking company Deutsche Bank is unable to retain position to attract investors
+    and is suffering from 265B EUR of debt. Capital Group uses their last strand of effort to help Deutsche Bank but is unable to succeed.
+    Following a few months, Deutsche Bank received a final value per share of 7.22 USD but was unable to maintain its value. Stock closes." 
 
   type: "fixed"
   fixedDate: 2021-09-22 16:02:58
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
 
   duration: P3M26D
 
@@ -371,35 +356,35 @@
     offset: P90DT43M40S
     duration: P28D
 
-
 - eventID: "anonymous-hacker-finds-way"
   title: "Anonymous hacker finds way into main data feeds"
-  description: "An anonymous hacker (still unidentified) injected false price quotes into data feeds earlier this morning. The hacker apparently published "fake news"
-                and set of a panic for investors, tumbling a few important stocks.
+  description: >-
+    "An anonymous hacker (still unidentified) injected false price quotes into data feeds earlier this morning. The hacker apparently published "fake news"
+    and set of a panic for investors, tumbling a few important stocks.
 
   type: "random"
   randomChancePerDay: 0.009 #per day 
 
   duration: P1W
 
-  dependencies: null
+  dependencies: []
   effects: [
     {event-ID: "hacker-caused-stocks-to-tumble"}
   ]
 
-
 - eventID: "hacker-caused-stocks-to-tumble"
   title: "Stocks see huge tumbling due to recent event"
-  description: "With the recent event of injecting false price quotes into stock data feeds by an anonymous hacker, stocks have seen huge drops today as investors are wary of the 
-  effect it brings to others. Huge sell-offs and major quick sells are happening and are destroying the stock markets today."
+  description: >-
+    "With the recent event of injecting false price quotes into stock data feeds by an anonymous hacker, stocks have seen huge drops today as investors are wary of the 
+    effect it brings to others. Huge sell-offs and major quick sells are happening and are destroying the stock markets today."
 
   type: "custom"
   # Date: time.Now()
   
   dependencies: ["anonymous-hacker-finds-way"]
-  effects: null
+  effects: []
 
-    tags:
+  tags:
   - affectsTags: ["financial", "tech"]
     minTrend: -1.4
     maxTrend: -0.5
@@ -409,15 +394,16 @@
 
 - eventID: "tesla-successful-breakthrough"
   title: "Tesla receives a huge boost following success of cyber truck launch"
-  description: "Electric-car company Tesla had a perfectly successful week following their recent success with the 
-                cyber truck. They had reportedly generated a 1.2B USD revenue over just 2 weeks. Investors are currently eyeing out their growth.
-                Some multi-billionare investors are looking to invest a huge sum into Tesla over the next few weeks."
-
+  description: >-
+    Electric-car company Tesla had a perfectly successful week following their recent success with the 
+    cyber truck. They had reportedly generated a 1.2B USD revenue over just 2 weeks. Investors are currently eyeing out their growth.
+    Some multi-billionare investors are looking to invest a huge sum into Tesla over the next few weeks.
+  
   type: "fixed"
   fixedDate: 2022-07-04 09:22:49
   
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
   
   duration: P1M27D
 
@@ -434,21 +420,21 @@
     offset: P1MT1H22M04S
     duration: P27D
 
-
 - eventID: "microsoft-declares-war-against-apple"
-  title: "Microsoft declares "technological innovation" war against long-time rival Apple"
-  description: "Earlier this week Microsoft declared a so-called 'technological-innovation' war against their long-time rival Apple. Into the details of the 
-                fun-inducing war: Winner is declared by best innovation of new technology, revenue values, stock increases, overall expenditure. As silly as it sounds, Apple CEO 
-                Tim Cook agrees and their war begins. Investors and entrepreneurs are keen to see who wins. Stock values are expected to fluctuate in an upward manner."
-
+  title: "Microsoft declares \"technological innovation\" war against long-time rival Apple"
+  description: >-
+    Earlier this week Microsoft declared a so-called 'technological-innovation' war against their long-time rival Apple. Into the details of the 
+    fun-inducing war: Winner is declared by best innovation of new technology, revenue values, stock increases, overall expenditure. As silly as it sounds, Apple CEO 
+    Tim Cook agrees and their war begins. Investors and entrepreneurs are keen to see who wins. Stock values are expected to fluctuate in an upward manner.
+  
   type: "fixed"
   fixedDate: 2023-03-01 14:42:26
 
-  dependencies: null
+  dependencies: []
   effects: [{
     chance: 0.5,
     eventID: "microsoft-declares-war-against-apple-and-wins", 
-  } {
+  }, {
     chance: 1,
     eventID: "microsoft-declares-war-against-apple-and-loses",  #event
   }]
@@ -468,69 +454,64 @@
     After a long awaited overview of the huge battle between two large technology companies Apple and Microsoft, 
     the winner has shone to Microsoft's favor.
 
-    dependencies: ["microsoft-declares-war-against-apple"]
-    effects: [{
-      chance: 1,
-      eventID: "microsoft-releases-new-console"
-    }]
-  
-   tags:
-  - affectsTags: ["tech"]
-    trend: 1.7
+  dependencies: ["microsoft-declares-war-against-apple"]
+  effects: [{
+    chance: 1,
+    eventID: "microsoft-releases-new-console"
+  }]
+
+  tags:
+  - trend: 1.7
     affectsStockIDs: ["MSFT"]
     offset: P1DT32M44S
     duration: P1M
 
-   - affectsTags: ["tech"]
-    trend: -0.2
+  - trend: -0.2
     affectsStockIDs: ["AAPL"]
     offset: P1DT32M44S
     duration: P1M
 
-   - affectsTags: ["tech"]
-    trend: 0.4
+  - trend: 0.4
     affectsStockIDs: ["MSFT"]
     offset: P1M1DT32M44S
     duration: P1M
 
-  - affectsTags: ["tech"]
-    trend: -0.6
+  - trend: -0.6
     affectsStockIDs: ["AAPL"]
     offset: P1M1DT32M44S
     duration: P1M
 
-    - affectsTags: ["tech"]
-    trend: -0.1
+  - trend: -0.1
     affectsStockIDs: ["MSFT"]
     offset: P2M1DT32M44S
     duration: P1M
 
-    - affectsTags: ["tech"]
-    trend: 0.2
+  - trend: 0.2
     affectsStockIDs: ["AAPL"]
     offset: P2M1DT32M44S
     duration: P1M
 
-  # x := trend(MSFT)
-  # y := trend(AAPL)
+# x := trend(MSFT)
+# y := trend(AAPL)
 
-  # if y > x || x >= 0.4 && y <= 1.1 {
-  #   y = x - 0.4 * y
-  #   x = tag.maxTrend - y  
-  # }
-  # return x, y
-  ## trend of MSFT should always be higher than AAPL
+# if y > x || x >= 0.4 && y <= 1.1 {
+#   y = x - 0.4 * y
+#   x = tag.maxTrend - y  
+# }
+# return x, y
+# trend of MSFT should always be higher than AAPL
 
 - eventID: "boeing-huge-airplane-crash"
   title: "2 Boeing airplanes crashed this week, bad overlook for stock values"
-  description: "A 737-700 and 777-700 crashed near the shores of the Carribean country Jamaica and on the mountains near the south of France. Analysts predict a very
-  bad outcome towards Boeing stocks over the following months."
+  description: >-
+    A 737-700 and 777-700 crashed near the shores of the Carribean country Jamaica and on the mountains near the south of France. Analysts predict a very
+    bad outcome towards Boeing stocks over the following months.
 
   type: "fixed"
   fixedDate: 2023-04-12 19:44:02
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
 
   duration: P3M4D
 
@@ -561,14 +542,15 @@
 
 - eventID: "global-pandemic"
   title: "Unknown virus suspected to be worse than SARS and Coronavirus"
-  description: "With careful research, scientists suspect a virus that is supposedly going to appear worse than the effect
-  that SARS and Coronavirus brought. Further details and information still unknown."
+  description: >-
+    With careful research, scientists suspect a virus that is supposedly going to appear worse than the effect
+    that SARS and Coronavirus brought. Further details and information still unknown.
 
   type: "random"
   randomChancePerDay: 0.009
 
-  dependencies: null
-  effects: null #could put multiple effects with different chances for different time durations
+  dependencies: []
+  effects: [] #could put multiple effects with different chances for different time durations
 
   minDuration: P2M  #todo
   maxDuration: P10Y #todo
@@ -579,12 +561,10 @@
     affectsStockIDs: ["BA"]
     offset: P3DT22M14S
 
-
   - affectsTags: ["tech"]
     trend: -0.3
     affectsStockIDs: ["MSFT", "FB", "NFLX", "AAPL"]
     offset: P3DT22M14S
-
 
   - affectsTags: ["health"]
     trend: -0.9
@@ -596,68 +576,65 @@
     affectsStockIDs: ["AXP", "JPM", "GS", "RDS-A", "TSLA", "NEP", "FSLR"]
     offset: P3DT22M14S
 
-
 - eventID: "new-streaming-platform"
   title: "New streaming platform coming in 2024, supposedly better than Netflix and Hulu"
-  description: "With Apple losing a very close battle against Microsoft in their 'technological innovation war' last year,
-  Apple is deciding to launch a new streaming platform, AppleSHD, coming out on Spring 2024. Moderators expecting
-  AppleSHD to be a very strong competitor against Netflix and Hulu."
+  description: >-
+    With Apple losing a very close battle against Microsoft in their 'technological innovation war' last year,
+    Apple is deciding to launch a new streaming platform, AppleSHD, coming out on Spring 2024. Moderators expecting
+    AppleSHD to be a very strong competitor against Netflix and Hulu.
 
   type: "fixed"
   fixedDate: 2024-02-02 13:04:29
 
   dependencies: ["microsoft-declares-war-against-apple-and-wins"]
-  effects: null
+  effects: []
 
   tags:
-  - affectsTags: ["tech"]
-    trend: 1.8
+  - trend: 1.8
     affectsStockIDs: ["AAPL"]
     offset: PT2H22M04S
     duration: P3W
 
-   - affectsTags: ["tech"]
-    trend: 1.2
+  - trend: 1.2
     affectsStockIDs: ["AAPL"]
     offset: P3WT2H22M04S
     duration: P2W
 
-   - affectsTags: ["tech"]
-    trend: 0.4
+  - trend: 0.4
     affectsStockIDs: ["AAPL"]
     offset: P1M1WT22M04S
     duration: P1W
 
-
 - eventID: "microsoft-releases-new-car"
   title: "Microsoft to not lose after-war against Apple, launches blueprint for a new car"
-  description: "Microsoft is still fighting hard after their near miss win against Apple last year and is deciding 
-  to launch their own brand car. Blueprints available, to be produced in 2025."
+  description: >-
+    Microsoft is still fighting hard after their near miss win against Apple last year and is deciding 
+    to launch their own brand car. Blueprints available, to be produced in 2025.
   
   type: "fixed"
   fixedDate: 2025-02-09 14:04:29
 
   dependencies: ["microsoft-declares-war-against-apple-and-loses"]
-  effects: null
+  effects: []
 
-  - tags:
-  affectsTags: ["tech"]
-  minTrend: 0.4
-  maxTrend: 1.2
-  affectsStockID: ["MSFT"]
-  offset: PT2H
-  duration: P2M28D
+  tags:
+  - minTrend: 0.4
+    maxTrend: 1.2
+    affectsStockID: ["MSFT"]
+    offset: PT2H
+    duration: P2M28D
 
 - eventID: "microsoft-releases-new-console"
   title: "Microsoft to release new console in Q4 2024"
-  description: "Microsoft is releasing a new console, Ghost X Microsoft tm, to be launched late this year. It is expected to have cloud gaming as well as supporting
-  Microsoft SkyGlasses tm, their branded glasses supported for gaming and everyday life." 
+  description: >-
+    Microsoft is releasing a new console, Ghost X Microsoft tm, to be launched late this year. It is expected to have cloud gaming as well as supporting
+    Microsoft SkyGlasses tm, their branded glasses supported for gaming and everyday life.
 
   type: "fixed"
   fixedDate: 2024-08-10 04:09:22
 
-  dependencies: null
-  effects: null 
+  dependencies: []
+  effects: [] 
 
   tags: 
   - affectsTags: ["tech"]
@@ -678,19 +655,19 @@
     offset: P2MT1H22M4S
     duration: P1M
 
-
 - eventID: "AXP-releases-crypto-credit-card"
   title: "American Express to release brand new crypto card"
-  description: "Banking company American Express has been on the planning board to release their own crypto American Express card, to be launched mid-2025.
-  We've seen the success of VISA crypto cards from startups such as Nexo and crypto.com with yearly revenue in the billions, so how will
-  the American Express crypto card stand against the VISA? American Express is also planning
-  to release a 9% APR for the first 10000 users and a credit line starting at $1000."
+  description: >-
+    Banking company American Express has been on the planning board to release their own crypto American Express card, to be launched mid-2025.
+    We've seen the success of VISA crypto cards from startups such as Nexo and crypto.com with yearly revenue in the billions, so how will
+    the American Express crypto card stand against the VISA? American Express is also planning
+    to release a 9% APR for the first 10000 users and a credit line starting at $1000.
 
   type: "fixed"
   fixedDate: 2025-02-02 19:22:49 # (card released 18.06.2025)
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
 
   duration: P18M2DT6H
 
@@ -719,91 +696,85 @@
     offset: P4MT2H20M49S
     duration: P1M
   
-  -- affectsTags: ["financial"]
+  - affectsTags: ["financial"]
     trend: 0.6
     affectsStockIDs: ["AXP"]
     offset: P5MT2H20M49S
     duration: P1M
 
-
 - eventID: "bitcoin-drops-to-2-year-low"
   title: "Bitcoin dropped to $2355, reaching it's 7-year record low"
-  description: "Leading cryptocurrency Bitcoin has dropped to a mere $2355.02 today 9:30 UTC, reaching a 7-year record low, after 
-  $2814.05 in mid-2018. Analysts and reporters claim that it was due to a bigger sell-off of cryptocurrencies, even bigger than the one in 2018,
-  which made Bitcoin fall 65%."
+  description: >-
+    Leading cryptocurrency Bitcoin has dropped to a mere $2355.02 today 9:30 UTC, reaching a 7-year record low, after 
+    $2814.05 in mid-2018. Analysts and reporters claim that it was due to a bigger sell-off of cryptocurrencies, even bigger than the one in 2018,
+    which made Bitcoin fall 65%.
 
   type: "fixed"
   fixedDate: 2025-07-04 09:48:02
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
   
-
   tags:
-  - affectsTags: ["financial"]
-    trend: -0.6
+  - trend: -0.6
     affectsStockIDs: ["JPM"]
     offset: PT2H44M49S
     duration: P1M5D
 
-  - affectsTags: ["financial"]
-    trend: -0.2
+  - trend: -0.2
     affectsStockIDs: ["GS"]
     offset: PT2H44M49S
     duration: P1M5D
 
-    - affectsTags: ["financial"]
-    trend: -1.4
+  - trend: -1.4
     affectsStockIDs: ["AXP"]
     offset: PT2H44M49S
     duration: P1M5D
 
 - eventID: "facebook-facing-bankrupcy"
   title: "Facebook faces bankrupcy after dealing with privacy scandals"
-  description: "In 2018, Facebook was threated by a fallout of a string of data-privacy scandals which made the company
-  subject to increased regulation from government bodies. This year, Facebook faced a huge privacy threat again as 5 attempts throughout the month
-  was made by hackers to dive into their main system and steal information. Many users have felt threatened this time and is deciding to back out from 
-  the social media platform, with investors and business mangates also backing out from their investments."
+  description: >-
+    In 2018, Facebook was threated by a fallout of a string of data-privacy scandals which made the company
+    subject to increased regulation from government bodies. This year, Facebook faced a huge privacy threat again as 5 attempts throughout the month
+    was made by hackers to dive into their main system and steal information. Many users have felt threatened this time and is deciding to back out from 
+    the social media platform, with investors and business mangates also backing out from their investments.
 
   type: "fixed"
   fixedDate: 2025-08-07 10:38:06
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
   
   duration: P21D
 
   tags:
-  - affectsTags: ["tech"]
-    trend: -1.2
+  - trend: -1.2
     affectsStockIDs: ["FB"]
     offset: PT39M22S
     duration: P1W
 
-   - affectsTags: ["tech"]
-    trend: -1.7
+  - trend: -1.7
     affectsStockIDs: ["FB"]
     offset: P1WT39M22S
     duration: P1W
 
-   - affectsTags: ["tech"]
-    trend: -0.4
+  - trend: -0.4
     affectsStockIDs: ["FB"]
     offset: P2WT39M22S
     duration: P1W
 
-
 - eventID: "upcoming-cloud-storm-to-threaten-solar-power-companies"
   title: "An expected 'cloud storm' to threaten solar power companies"
-  description: "Several solar power companies should wary about the upcoming 'cloud storm' that would severely limit sunlight hours into the Earth's
-  atmosphere, reducing the amount of solar power generated from solar panels. These companies may face less demand for solar panels and therefore would
-  also reduce revenue levels."
+  description: >-
+    Several solar power companies should wary about the upcoming 'cloud storm' that would severely limit sunlight hours into the Earth's
+    atmosphere, reducing the amount of solar power generated from solar panels. These companies may face less demand for solar panels and therefore would
+    also reduce revenue levels.
 
   type: "fixed"
   fixedDate: 2025-09-12 18:04:46
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
 
   tags:
   - affectsTags: ["energy"]
@@ -812,18 +783,18 @@
     offset: PT1H22M44S
     duration: P1M6D
 
-
 - eventID: "buffett-employees-to-sell-davita-shares"
   title: "Berkshire Hathaway to sell remaining Davita shares of Warren Buffett after his passing"
-  description: "Berkshire Hathaway is planning to sell $350M shares of Davita that was remained by Warren Buffett after his death
-  4 years ago. Investors and entrepreneurs are tracking this movement and may also plan to sell their shares due to an expected
-  downturn in Davita's share after a huge sell-off from Berkshire Hathaway."
+  description: >-
+    Berkshire Hathaway is planning to sell $350M shares of Davita that was remained by Warren Buffett after his death
+    4 years ago. Investors and entrepreneurs are tracking this movement and may also plan to sell their shares due to an expected
+    downturn in Davita's share after a huge sell-off from Berkshire Hathaway.
 
   type: "fixed"
   fixedDate: 2025-10-29 19:00:07
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
 
   tags:
   - affectsTags: ["healthcare"]
@@ -850,186 +821,168 @@
     offset: P5WT3H9M06S
     duration: P1W
 
-
 - eventID: "american-express-to-launch-into-tech"
   title: "American Express plans to jump into tech"
-  description: "Financial and banking company American Express is currently planning to dive into the 
-  tech industry and is planning to build their first line of laptops at the end of this year or latest Spring 2026.
-  These laptops are thought to have implemented Amex apps and technologies to provide support
-  for existing credit cards and can even act as a credit card, with the added card chip at the bottom of the laptop. 
-  With Intel X15 12-core CPUs and a graphics card of up to GTX 4220 Turbo Ti, this laptop is one to have."
+  description: >-
+    Financial and banking company American Express is currently planning to dive into the 
+    tech industry and is planning to build their first line of laptops at the end of this year or latest Spring 2026.
+    These laptops are thought to have implemented Amex apps and technologies to provide support
+    for existing credit cards and can even act as a credit card, with the added card chip at the bottom of the laptop. 
+    With Intel X15 12-core CPUs and a graphics card of up to GTX 4220 Turbo Ti, this laptop is one to have.
 
   type: "fixed"
   fixedDate: 2025-11-11 06:44:19 #(19.12.2025 launch of laptop)
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
 
   duration: P2M10D
 
   tags:
-  - affectsTags: ["financial"]
-    trend: 0.4 for first week, 0.9 for second, 0.5 for third, 1.2 for first month of launch, 0.2 until end
+  - trend: 0.4
     affectsStockIDs: ["AXP"]
     offset: PT29M44S
     duration: P1W
 
-   - affectsTags: ["financial"]
-    trend: 0.9
+  - trend: 0.9
     affectsStockIDs: ["AXP"]
     offset: P1WT29M44S
     duration: P1W
 
-   - affectsTags: ["financial"]
-    trend: 0.5
+  - trend: 0.5
     affectsStockIDs: ["AXP"]
     offset: P2WT29M44S
     duration: P1W
   
-   - affectsTags: ["financial"]
-    trend: 1.2
+  - trend: 1.2
     affectsStockIDs: ["AXP"]
     offset: P3WT29M44S
     duration: P1M
   
-   - affectsTags: ["financial"]
-    trend: 0.2
+  - trend: 0.2
     affectsStockIDs: ["AXP"]
     offset: P1M3WT29M44S
     duration: P30D
-  
 
 - eventID: "boeing-huge-buy-off-for-fighter-planes"
   title: "Boeing to sell over 15,000 fighter planes to the U.S army"
-  description: "Boeing Chief David Calhoun has created a deal to sell over 15,000 fighter planes to the U.S army
-  as a 'restock plan'. With a potential end revenue of 1.17 trillion USD (not including expenditure), Boeing is 
-  looking for a sharp incline towards growth. Stock values may increase rapidly during the buy-off."
+  description: >-
+    Boeing Chief David Calhoun has created a deal to sell over 15,000 fighter planes to the U.S army
+    as a 'restock plan'. With a potential end revenue of 1.17 trillion USD (not including expenditure), Boeing is 
+    looking for a sharp incline towards growth. Stock values may increase rapidly during the buy-off.
 
   type: "fixed"
   fixedDate: 2026-01-09 14:02:00
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
   
   duration: P1M24D
 
   tags:
-  - affectsTags: ["aviation"]
-    trend: 0.4
+  - trend: 0.4
     affectsStockIDs: ["BA"]
     offset: P2DT44M20S
     duration: P22D
 
-  - affectsTags: ["aviation"]
-    trend: 1.8
+  - trend: 1.8
     affectsStockIDs: ["BA"]
     offset: P22DT44M20S
     duration: P1M
 
-   - affectsTags: ["aviation"]
-    trend: -0.3
+  - trend: -0.3
     affectsStockIDs: ["BA"]
     offset: P1M22DT44M20S
     duration: P1M
-  
 
 - eventID: "microsoft-buys-facebook-amidst-crisis"
   title: "Microsoft to buy Facebook amidst year-long crisis"
-  description: "After a rough decade for Facebook with the increased amount of data breach, privacy issues,
-  as well as hackers finding their way through the supposedly 'encrypted and secured' main system, Facebook has been suffering through
-  a severe time for investors to trust the tech company. As stocks keep plummeting, Facebook has no other choice but to be 
-  sold off by Microsoft for 1.9B USD."
+  description: >-
+    After a rough decade for Facebook with the increased amount of data breach, privacy issues,
+    as well as hackers finding their way through the supposedly 'encrypted and secured' main system, Facebook has been suffering through
+    a severe time for investors to trust the tech company. As stocks keep plummeting, Facebook has no other choice but to be 
+    sold off by Microsoft for 1.9B USD.
 
   type: "fixed"
   fixedDate: 2026-04-03 09:44:49
   
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
 
   duration: P2M1D
 
   tags:
-  - affectsTags: ["tech"]
-    trend: -0.9
+  - trend: -0.9
     affectsStockIDs: ["FB"]
     offset: PT29M44S
     duration: P28D
 
-  - affectsTags: ["tech"]
-    trend: 0.8
+  - trend: 0.8
     affectsStockIDs: ["MSFT"]
     offset: PT29M44S
     duration: P28D
 
-  - affectsTags: ["tech"]
-    trend: -0.5
+  - trend: -0.5
     affectsStockIDs: ["FB"]
     offset: P28DT29M44S
     duration: P1M
 
-  - affectsTags: ["tech"]
-    trend: 1.2
+  - trend: 1.2
     affectsStockIDs: ["MSFT"]
     offset: P28DT29M44S
     duration: P1M
   
-   - affectsTags: ["tech"]
-    trend: 0.2
+  - trend: 0.2
     affectsStockIDs: ["FB"]
     offset: P1M28DT29M44S
     duration: P1M
   
-   - affectsTags: ["tech"]
-    trend: 0.8
+  - trend: 0.8
     affectsStockIDs: ["MSFT"]
     offset: P1M28DT29M44S
     duration: P1M
-
 
 - eventID: "netflix-to-obtain-copyright-permission-from-HBO"
   title: "Netflix plans to obtain copyright permission from HBO"
-  description: "Streaming company Netflix has negotiated with HBO CEO Richard Plepler to obtain
-  copyright permissions to stream HBO TV shows to provide even more diversity and choices for fellow
-  Netflix streamers."
+  description: >-
+    Streaming company Netflix has negotiated with HBO CEO Richard Plepler to obtain
+    copyright permissions to stream HBO TV shows to provide even more diversity and choices for fellow
+    Netflix streamers.
 
   type: "fixed"
   fixedDate: 2026-04-14 12:04:09
 
-  dependencies: null
-  effects: null
+  dependencies: []
+  effects: []
 
   duration: P3M1DT10S
 
   tags:
-  - affectsTags: ["tech"]
-    trend: 0.3
+  - trend: 0.3
     affectsStockIDs: ["NFLX"]
     offset: PT49M22S
     duration: P1M
 
-  - affectsTags: ["tech"]
-    trend: 0.9
+  - trend: 0.9
     affectsStockIDs: ["NFLX"]
     offset: P1MT49M22S
     duration: P1M
 
-    - affectsTags: ["tech"]
-    trend: 0.5
+  - trend: 0.5
     affectsStockIDs: ["NFLX"]
     offset: P2MT49M22S
     duration: P1M
 
-
-
 - eventID: "apple-new-iphone-huge-issues"
-  title: "Multinational technology company Apple has received plentiful amounts of complains
-  with regards to their newly launched iPhone 18 this summer. Users have reported multi-app crashes,
-  limited functionality to bluetooth and wi-fi support, and even overheating."
+  title: >-
+    Multinational technology company Apple has received plentiful amounts of complains
+    with regards to their newly launched iPhone 18 this summer. Users have reported multi-app crashes,
+    limited functionality to bluetooth and wi-fi support, and even overheating.
 
   type: "fixed"
   fixedDate: 2026-06-19 04:32:25
 
-  dependencies: null
+  dependencies: []
   effects: [{
     chance: 0.99999999999941982731298372981, # why?
     eventID: "apple-to-release-quick-fixes"
@@ -1038,66 +991,57 @@
   duration: P2M1DT9M12S
 
   tags:
-  - affectsTags: ["tech"]
-    trend: -1.2
+  - trend: -1.2
     affectsStockIDs: ["AAPL"]
     offset: PT44M29S
     duration: P1M
   
-   - affectsTags: ["tech"]
-    trend: -0.4
+  - trend: -0.4
     affectsStockIDs: ["AAPL"]
     offset: P1MT44M29S
     duration: P1M
 
-   - affectsTags: ["tech"]
-    trend: -0.9
+  - trend: -0.9
     affectsStockIDs: ["AAPL"]
     offset: P2MT44M29S
     duration: P1M
 
-
-
 - eventID: "apple-to-release-quick-fixes"
   title: "After the latest fiasco, Apple plans to provide quick response and fixes to hugely negative critiques."
-  description: "With the huge debacle of the release of the iPhone 18, Apple is planning to release weekly updates for the next
-  5 months to ensure that bugs and crashes will be fixed."
+  description: >-
+    With the huge debacle of the release of the iPhone 18, Apple is planning to release weekly updates for the next
+    5 months to ensure that bugs and crashes will be fixed.
 
   type: "fixed"
   fixedDate: 2026-06-28 04:44:59
 
   dependencies: ["apple-new-iphone-huge-issues"]
-  effects: null
+  effects: []
 
   duration: P6M
 
   tags:
-  - affectsTags: ["tech"]
-    trend: -1.2
+  - trend: -1.2
     affectsStockIDs: ["AAPL"]
     offset: PT58M24S
     duration: P1M
 
-  - affectsTags: ["tech"]
-    trend: -0.4
+  - trend: -0.4
     affectsStockIDs: ["AAPL"]
     offset: P1MT58M24S
     duration: P1M
 
-  - affectsTags: ["tech"]
-    trend: -0.9
+  - trend: -0.9
     affectsStockIDs: ["AAPL"]
     offset: P2MT58M24S
     duration: P1M
 
-  - affectsTags: ["tech"]
-    trend: 0.1
+  - trend: 0.1
     affectsStockIDs: ["AAPL"]
     offset: P3MT58M24S
     duration: P1M
 
-  - affectsTags: ["tech"]
-    trend: 0.3
+  - trend: 0.3
     affectsStockIDs: ["AAPL"]
     offset: P4MT58M24S
     duration: P1M

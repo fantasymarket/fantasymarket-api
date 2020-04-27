@@ -15,8 +15,8 @@ type Order struct {
 	User      User `gorm:"ForeignKey:UserID;AssociationForeignKey:UserID"`
 	CreatedAt time.Time
 
-	Type   string `json:"type"`// the type of the asset (so only stock for now)
-	Symbol string `json:"symbol"`// the symbol of the stock
+	Type   string // the type of the asset (so only stock for now)
+	Symbol string // the symbol of the stock
 	Side   string // buy or sell
 	Status string // filled, waiting or canceled
 	Amount int64  // amount of stocks in the order
