@@ -25,7 +25,13 @@
 
 - [go >=1.13](https://golang.org/dl/)
 - [Task](https://taskfile.dev/#/installation)
-- Revive (optional) To install, you can also run `$ task install-linter` after installing task. 
+- Revive (optional) To install, you can also run `$ task install-linter` after installing task.
+- Windows:
+	- [gcc](https://sourceforge.net/projects/tdm-gcc/)
+- OSX:
+	- You might need to install [sqlite](https://github.com/mattn/go-sqlite3#mac-osx) (should be installed already)
+- Linux:
+	- You need to have the [development tools package for your distro](https://github.com/mattn/go-sqlite3#linux) installed
 
 ### 2. Clone Repo
 
