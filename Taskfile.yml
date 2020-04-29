@@ -42,7 +42,7 @@ tasks:
     desc: "run ci scripts (should only be run in ci environments)"
     cmds:
       - go mod download
-      - task: install-linter
+      - task: install-deps
       - task: lint
       - task: test
 
