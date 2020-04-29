@@ -85,15 +85,15 @@ func startLoop(s *Service) {
 }
 
 // GetRandomEventEffect selects a random effect from an event
-func (s *Service) GetRandomEventEffect(e models.Event) (string, error) {
-	event := s.EventDetails[e.EventID]
+func (s *Service) GetRandomEventEffect(eventID string) (string, error) {
+	event := s.EventDetails[eventID]
 
 	effects := make(map[string]float64)
 	for _, e := range event.Effects {
 		effects[e.EventID] = e.Chance
 	}
 
-	seed := e.EventID + strconv.FormatInt(s.TicksSinceStart, 10)
+	seed := eventID + strconv.FormatInt(s.TicksSinceStart, 10)
 	randomNumber := hash.Float64Hash(seed)
 	return utils.SelectRandomWeightedItem(effects, randomNumber)
 }
@@ -140,7 +140,7 @@ func (s Service) removeInactiveEvents(events []models.Event) {
 		endDate := eventDetails.Duration.Shift(event.CreatedAt)
 
 		if !currentDate.Before(endDate) {
-			s.DB.RemoveEvent(event.ID)
+			s.DB.RemoveEvent(event.EventID)
 		}
 	}
 }
