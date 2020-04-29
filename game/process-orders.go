@@ -25,7 +25,8 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 			} else if CurrentStockPrice >= order.SellAtValue {
 				s.DB.FillOrder(order.OrderID, order.UserID, CurrentStockPrice[order.Symbol].Index, getCurrentDate())
 			}
-		case ""
+		case "Trailing Stop":
+			
 		}
 	}
 	return nil
