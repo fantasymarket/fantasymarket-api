@@ -42,20 +42,20 @@ func (api *APIHandler) updateSelf(w http.ResponseWriter, r *http.Request) {
 
 	var req updateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error parsing request")
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing Request")
 		return
 	}
 
 	if req.newPassword != "" && req.password != "" {
 		if err := api.DB.ChangePassword(req.username, req.password, req.newPassword); err != nil {
-			responses.ErrorResponse(w, http.StatusInternalServerError, "error updating password")
+			responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing Password")
 			return
 		}
 	}
 
 	if req.username != "" {
 		if err := api.DB.RenameUser(user.UserID, user.Username, req.username); err != nil {
-			responses.ErrorResponse(w, http.StatusInternalServerError, "error updating username")
+			responses.ErrorResponse(w, http.StatusInternalServerError, "Error updating Username")
 			return
 		}
 		user.Username = req.username
@@ -63,7 +63,7 @@ func (api *APIHandler) updateSelf(w http.ResponseWriter, r *http.Request) {
 
 	token, err := jwt.CreateToken(api.Config.TokenSecret, user.Username, user.UserID)
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error generating user token")
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error generating User Token")
 		return
 	}
 
@@ -80,13 +80,13 @@ func (api *APIHandler) createUser(w http.ResponseWriter, r *http.Request) {
 	user, err := api.DB.CreateGuest()
 
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error creating new user account")
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error creating new User Account")
 		return
 	}
 
 	token, err := jwt.CreateToken(api.Config.TokenSecret, user.Username, user.UserID)
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error generating user token")
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error generating User Token")
 		return
 	}
 
@@ -108,7 +108,7 @@ func (api *APIHandler) loginUser(w http.ResponseWriter, r *http.Request) {
 
 	var req loginUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error parsing request")
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing Request")
 		return
 	}
 
