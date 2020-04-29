@@ -1,8 +1,6 @@
 package database
 
 import (
-	"fmt"
-
 	"github.com/rs/zerolog/log"
 
 	"fantasymarket/database/models"
@@ -25,7 +23,6 @@ func Connect(config *config.Config) (*Service, error) {
 	db, err := gorm.Open("sqlite3", "database.db")
 
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

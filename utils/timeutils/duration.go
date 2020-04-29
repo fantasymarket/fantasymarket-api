@@ -1,7 +1,6 @@
 package timeutils
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -35,8 +34,6 @@ func timeDuration(d Duration) time.Duration {
 // UnmarshalJSON implements `json.Unmarshaler`
 func (d *Duration) UnmarshalJSON(b []byte) (err error) {
 
-	fmt.Println("fuck")
-
 	s := strings.Trim(string(b), "\"")
 	if s == "null" {
 		d.Duration = duration.Duration{}
@@ -50,21 +47,13 @@ func (d *Duration) UnmarshalJSON(b []byte) (err error) {
 
 // UnmarshalYAML implements `yaml.Unmarshaler`
 func (d *Duration) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var b = ""
+	var b string
 	err := unmarshal(&b)
 	if err != nil {
 		return err
 	}
 
-	s := strings.Trim(string(b), "\"")
-	if s == "null" {
-		d.Duration = duration.Duration{}
-		return nil
-	}
-
-	d.Duration, err = duration.ParseISO8601(s)
-
-	return nil
+	return d.UnmarshalJSON([]byte(b))
 }
 
 // MarshalJSON implements `json.Marshaler`

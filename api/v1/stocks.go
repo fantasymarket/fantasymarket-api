@@ -3,7 +3,6 @@ package v1
 import (
 	"fantasymarket/game/details"
 	"fantasymarket/utils/http/responses"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -11,17 +10,17 @@ import (
 )
 
 func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
-	allStocks, err := ioutil.ReadFile("game/stocks.yaml")
+	allStocks, err := details.StocksYamlBytes()
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error getting list of stocks")
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error getting list of stocks")
 		return
 	}
 
-	m := []details.StockDetails{} // Test again if this works, I checked the docs and in theory when the map is already initialized it should still work. If not change it back again
+	m := []details.StockDetails{}
 	err = yaml.Unmarshal(allStocks, &m)
 
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error parsing stocks")
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing the stocks")
 		return
 	}
 
@@ -30,24 +29,24 @@ func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 
 func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 	symbol := chi.URLParam(r, "symbol")
-	yamlData, err := ioutil.ReadFile("game/stocks.yaml")
 
+	yamlData, err := details.StocksYamlBytes()
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error getting list of stocks")
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error getting Stock Details")
 	}
 
-	var stocks []details.StockDetails
+	var myStocks []details.StockDetails
 
-	if err := yaml.Unmarshal(yamlData, &stocks); err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "error parsing stock")
+	if err := yaml.Unmarshal(yamlData, &myStocks); err != nil {
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing the stock")
 	}
 
-	for i := range stocks {
-		if stocks[i].Symbol == symbol {
-			responses.CustomResponse(w, stocks[i], 200)
+	for i := range myStocks {
+		if myStocks[i].Symbol == symbol {
+			responses.CustomResponse(w, myStocks[i], 200)
 			return
 		}
 	}
 
-	responses.ErrorResponse(w, http.StatusNotFound, "no stock with symbol available")
+	responses.ErrorResponse(w, http.StatusInternalServerError, "Error getting the Stock Detail")
 }

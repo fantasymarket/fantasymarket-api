@@ -191,7 +191,11 @@ func (s Service) GetActiveEventTags(activeEvents []models.Event) []details.TagOp
 				continue
 			}
 
-			activeTags = append(activeTags, tag)
+			activeTags = append(activeTags, details.TagOptions{
+				AffectsTags:   tag.AffectsTags,
+				AffectsStocks: tag.AffectsStocks,
+				Trend:         tag.Trend,
+			})
 		}
 	}
 
