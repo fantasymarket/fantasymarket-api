@@ -26,6 +26,7 @@
 - [go >=1.13](https://golang.org/dl/)
 - [Task](https://taskfile.dev/#/installation)
 - Revive (optional) To install, you can also run `$ task install-linter` after installing task.
+- go-bindata - To install, you can also run `$ task install-bindata` after installing task.
 - Windows:
 	- [gcc](https://sourceforge.net/projects/tdm-gcc/)
 - OSX:

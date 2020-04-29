@@ -3,7 +3,6 @@ package v1
 import (
 	"fantasymarket/game/details"
 	"fantasymarket/utils/http/responses"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -11,7 +10,7 @@ import (
 )
 
 func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
-	allStocks, err := ioutil.ReadFile("game/stocks.yaml")
+	allStocks, err := details.StocksYamlBytes()
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, "error getting list of stocks")
 		return
@@ -30,8 +29,8 @@ func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 
 func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 	symbol := chi.URLParam(r, "symbol")
-	yamlData, err := ioutil.ReadFile("game/stocks.yaml")
 
+	yamlData, err := details.StocksYamlBytes()
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, "error getting list of stocks")
 	}

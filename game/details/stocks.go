@@ -1,8 +1,6 @@
 package details
 
 import (
-	"io/ioutil"
-
 	"gopkg.in/yaml.v2"
 )
 
@@ -10,7 +8,7 @@ import (
 func LoadStockDetails() (map[string]StockDetails, error) {
 	stockSettings := []StockDetails{}
 
-	stockData, err := ioutil.ReadFile("./game/stocks.yaml")
+	stockData, err := StocksYamlBytes()
 	if err != nil {
 		return nil, err
 	}
