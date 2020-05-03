@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"fantasymarket/database/models"
 	"fantasymarket/game/details"
 	"time"
@@ -21,6 +22,9 @@ func (s *Service) GetEvents(currentDate time.Time) ([]models.Event, error) {
 
 // AddEvent adds an event to the event table
 func (s *Service) AddEvent(event details.EventDetails, createdAt time.Time) error {
+	if event.EventID == "" {
+		return errors.New("error: attempting to add empty event")
+	}
 	return s.DB.Create(&models.Event{
 		EventID:   event.EventID,
 		Title:     event.Title,
@@ -32,7 +36,7 @@ func (s *Service) AddEvent(event details.EventDetails, createdAt time.Time) erro
 
 // RemoveEvent marks an event as inactive so it won't affect stocks in the GameLoop anymore
 func (s *Service) RemoveEvent(eventID string) error {
-	return s.DB.Where(models.Event{Active: true, EventID: eventID}).Update("active", false).Error
+	return s.DB.Model(&models.Event{}).Where(models.Event{Active: true, EventID: eventID}).Update("active", false).Error
 }
 
 // GetEventHistory returns all the events that ran at some point as a map
