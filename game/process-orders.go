@@ -2,12 +2,13 @@ package game
 
 import (
 	"fantasymarket/database/models"
+
 	"github.com/rs/zerolog/log"
 )
 
 //ProcessOrders processes the order if it matches any of the order types.
 func (s *Service) ProcessOrders(orders []models.Order) error {
-	
+
 	currentDate := s.GetCurrentDate()
 
 	currentStocks, err := s.DB.GetStockMapAtTick(s.TicksSinceStart)
@@ -21,12 +22,11 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 	}
 
 	for _, order := range orders {
-		currentStock := currentStocks[order.Symbol];
-		lastStock := lastStocks[order.Symbol];
-
+		currentStock := currentStocks[order.Symbol]
+		lastStock := lastStocks[order.Symbol]
 
 		cancelOrder := func() {
-			log.Error().Err(err).Str("orderID", order.OrderID).Msg("error filling order")
+			log.Error().Err(err).Str("orderID", order.OrderID.String()).Msg("error filling order")
 			s.DB.CancelOrder(order.OrderID, currentDate)
 		}
 
@@ -41,15 +41,14 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 		case "market":
 			// the order will sell at the next best available price.
 			s.DB.FillOrder(order.OrderID, order.UserID, currentStock.Index, currentDate)
-			
+
 		case "stop-loss":
-			
-			
+
 			// Stop Loss sell orders trigger a market order to sell when the stop price is met.
 			// Ex. XYZ stock is trading at $25. A stop order can be placed at $20 to trigger
 			// a market sell order when a trade executes at $20 or lower.
 			if order.Side == "sell" {
-				if currentStocks[order.Symbol].Index >= order.StopLossValue {
+				if currentStocks[order.Symbol].Index >= order.StopLossPrice {
 					fillOrder()
 				}
 			}
@@ -59,12 +58,11 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 			// Ex. ABC stock is trading at $10. A stop order can be placed at $11 to trigger a market buy order
 			// when a trade executes at $11 or higher.
 			if order.Side == "buy" {
-				if currentStocks[order.Symbol].Index <= order.StopLossValue {
+				if currentStocks[order.Symbol].Index <= order.StopLossPrice {
 					fillOrder()
 				}
 			}
-		
-			
+
 		case "limit":
 			// Limit orders specify the minimum amount you are willing to receive when selling a stock.
 			if order.Side == "sell" {
@@ -80,9 +78,7 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 				}
 
 			}
-		
 
-			
 		case "trailing-stop":
 
 			difference := currentStock.Index - lastStock.Index
@@ -90,11 +86,10 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 				cancelOrder()
 			}
 
-
-			// trailing stop for sell: Say Stock A is at $100. A user puts the trailing stop of 10% meaning that the stop value is $90. As long 
+			// trailing stop for sell: Say Stock A is at $100. A user puts the trailing stop of 10% meaning that the stop value is $90. As long
 			// as CurrentStock.Index is between 90 and 100, the stop value doesn't change. If it goes above $100, the stop value goes up by the percentage.
 			// If the CurrentStock.Index reaches $90 or below, the order gets executed.
-			
+
 			// current price: 100
 			// trailing stop: 10%
 			// starting stop value: 90$
@@ -103,24 +98,24 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 			// stock price changes to 102
 			// -> newPrice 91.8
 			// we update
-			
+
 			// scenario 2
 			// stock price changes to 98
-			// -> 88.2
+			// -> newPrice88.2
 			// 88.2 < 90 => we dont updates
 
 			// scanerio 3
 			// stock price changes to <=90
-			// fillOrder() is called 
+			// fillOrder() is called
 
 			if order.Side == "sell" {
 				if currentStock.Index <= order.Price {
 					fillOrder()
 					break
 				}
-				
-				newPrice := currentStock.Index - currentStock.Index * order.TrailingPercentage
-			
+
+				var newPrice float64 = currentStock.Index - currentStock.Index*order.TrailingPercentage
+
 				//if the newPrice stays between the stop value
 				// the limit can never go down
 				if newPrice > order.Price {
@@ -149,12 +144,11 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 					break
 				}
 
-				newPrice := currentStock.Index + currentStock.Index * order.TrailingPercentage
+				newPrice := currentStock.Index + currentStock.Index*order.TrailingPercentage
 				if newPrice < order.Price {
 					// Update price if some shit is true
 				}
 			}
-
 		}
 	}
 	return nil
