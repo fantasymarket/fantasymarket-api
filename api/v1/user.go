@@ -14,7 +14,7 @@ func (api *APIHandler) getUser(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := api.DB.GetSelf(username)
 	if err != nil {
-		responses.ErrorResponse(w, err.Error(), http.StatusNotFound)
+		responses.ErrorResponse(w, http.StatusNotFound, err.Error())
 	}
 
 	responses.CustomResponse(w, resp, 200)
@@ -26,7 +26,7 @@ func (api *APIHandler) getSelf(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := api.DB.GetSelf(user.Username)
 	if err != nil {
-		responses.ErrorResponse(w, err.Error(), http.StatusNotFound)
+		responses.ErrorResponse(w, http.StatusNotFound, err.Error())
 	}
 
 	responses.CustomResponse(w, resp, 200)
@@ -42,20 +42,20 @@ func (api *APIHandler) updateSelf(w http.ResponseWriter, r *http.Request) {
 
 	var req updateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		responses.ErrorResponse(w, "Error parsing Request", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing Request")
 		return
 	}
 
 	if req.newPassword != "" && req.password != "" {
 		if err := api.DB.ChangePassword(req.username, req.password, req.newPassword); err != nil {
-			responses.ErrorResponse(w, "Error parsing Password", http.StatusInternalServerError)
+			responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing Password")
 			return
 		}
 	}
 
 	if req.username != "" {
 		if err := api.DB.RenameUser(user.UserID, user.Username, req.username); err != nil {
-			responses.ErrorResponse(w, "Error updating Username", http.StatusInternalServerError)
+			responses.ErrorResponse(w, http.StatusInternalServerError, "Error updating Username")
 			return
 		}
 		user.Username = req.username
@@ -63,7 +63,7 @@ func (api *APIHandler) updateSelf(w http.ResponseWriter, r *http.Request) {
 
 	token, err := jwt.CreateToken(api.Config.TokenSecret, user.Username, user.UserID)
 	if err != nil {
-		responses.ErrorResponse(w, "Error generating User Token", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error generating User Token")
 		return
 	}
 
@@ -80,13 +80,13 @@ func (api *APIHandler) createUser(w http.ResponseWriter, r *http.Request) {
 	user, err := api.DB.CreateGuest()
 
 	if err != nil {
-		responses.ErrorResponse(w, "Error creating new User Account", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error creating new User Account")
 		return
 	}
 
 	token, err := jwt.CreateToken(api.Config.TokenSecret, user.Username, user.UserID)
 	if err != nil {
-		responses.ErrorResponse(w, "Error generating User Token", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error generating User Token")
 		return
 	}
 
@@ -108,13 +108,13 @@ func (api *APIHandler) loginUser(w http.ResponseWriter, r *http.Request) {
 
 	var req loginUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		responses.ErrorResponse(w, "Error parsing Request", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing Request")
 		return
 	}
 
 	user, err := api.DB.LoginUser(req.username, req.password)
 	if err != nil {
-		responses.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 	}
 
 	responses.CustomResponse(w, user, 200)

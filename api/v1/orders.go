@@ -5,16 +5,17 @@ import (
 	"fantasymarket/database/models"
 	"fantasymarket/utils/http/middleware/jwt"
 	"fantasymarket/utils/http/responses"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"gopkg.in/yaml.v3"
 )
 
 type customOrder struct {
-	Order models.Order `json:"order"`
-	Limit int `json:"limit"`
-	Offset int `json:"offset"`
+	Order  models.Order `json:"order"`
+	Limit  int          `json:"limit"`
+	Offset int          `json:"offset"`
 }
 
 func (api *APIHandler) ordersForUser(w http.ResponseWriter, r *http.Request) {
@@ -41,24 +42,23 @@ func (api *APIHandler) ordersForUser(w http.ResponseWriter, r *http.Request) {
 
 	orders, err := api.DB.GetOrders(allOrders.Order, allOrders.Limit, allOrders.Offset)
 	if err != nil {
-		responses.ErrorResponse(w, err.Error(), 500)
+		responses.ErrorResponse(w, 500, err.Error())
 		return
 	}
 	responses.CustomResponse(w, orders, 200)
 
 }
 
-
 func (api *APIHandler) ordersID(w http.ResponseWriter, r *http.Request) {
 	var requestOrder models.Order
 	if err := json.NewDecoder(r.Body).Decode(&requestOrder); err != nil {
-		responses.ErrorResponse(w, "Error Parsing Request", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error Parsing Request")
 		return
 	}
 
 	orders, err := api.DB.GetOrderByID(requestOrder.OrderID)
 	if err != nil {
-		responses.ErrorResponse(w, err.Error(), 500)
+		responses.ErrorResponse(w, 500, err.Error())
 		return
 	}
 	responses.CustomResponse(w, orders, 200)
@@ -69,50 +69,30 @@ func (api *APIHandler) addOrder(w http.ResponseWriter, r *http.Request) {
 
 	var requestOrder *models.Order
 	if err := json.NewDecoder(r.Body).Decode(&requestOrder); err != nil {
-		responses.ErrorResponse(w, "Error Parsing Request", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error Parsing Request")
 		return
 	}
 
 	time := api.Config.Game.StartDate
 	err := api.DB.AddOrder(*requestOrder, user.UserID, time.Time)
 	if err != nil {
-		responses.ErrorResponse(w, "Order couldn't be added" , 500)
+		responses.ErrorResponse(w, 500, "Order couldn't be added")
 	}
 }
 
 func (api *APIHandler) deleteOrder(w http.ResponseWriter, r *http.Request) {
 	var requestOrder *models.Order
 	if err := json.NewDecoder(r.Body).Decode(&requestOrder); err != nil {
-		responses.ErrorResponse(w, "Error Parsing Request", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Error Parsing Request")
 		return
 	}
 
 	time := api.Config.Game.StartDate
 	err := api.DB.CancelOrder(requestOrder.OrderID, time.Time)
 	if err != nil {
-		responses.ErrorResponse(w, "Order couldn't be deleted", 500)
+		responses.ErrorResponse(w, 500, "Order couldn't be deleted")
 		return
 	}
 
 	responses.CustomResponse(w, requestOrder, 200)
 }
-
-func (api *APIHandler) fillOrder(w http.ResponseWriter, r *http.Request) {
-	user := jwt.GetUserFromContext(r.Context())
-
-	var requestOrder models.Order
-	if err := json.NewDecoder(r.Body).Decode(&requestOrder); err != nil {
-		responses.ErrorResponse(w, "Error Parsing Request", http.StatusInternalServerError)
-		return
-	}
-
-	time := api.Config.Game.StartDate
-	err := api.DB.FillOrder(requestOrder.OrderID, user.UserID, time.Time)
-	if err != nil {
-		responses.ErrorResponse(w, "Order couldn't be deleted", 500)
-	}
-
-	responses.CustomResponse(w, requestOrder.OrderID, 200)
-
-}
-

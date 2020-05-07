@@ -5,8 +5,9 @@ import (
 	"fantasymarket/game"
 	"fantasymarket/utils/config"
 	"fantasymarket/utils/http/middleware/jwt"
-	"github.com/go-chi/chi"
 	"net/http"
+
+	"github.com/go-chi/chi"
 )
 
 // APIHandler holds the dependencies for http handlers
@@ -51,8 +52,6 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 		r.Post("/", api.addOrder)
 
 		r.Get("/{orderID}", api.ordersID)
-
-		r.Post("/fill/{orderID}", api.fillOrder)
 
 		r.Delete("/{orderID}", api.deleteOrder)
 	})

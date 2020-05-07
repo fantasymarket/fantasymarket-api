@@ -1,8 +1,6 @@
 package details
 
 import (
-	"io/ioutil"
-
 	"gopkg.in/yaml.v2"
 )
 
@@ -12,7 +10,7 @@ func LoadEventDetails() (map[string]EventDetails, error) {
 	//return map[string]EventDetails{}, nil
 	eventDetails := []EventDetails{}
 
-	eventData, err := ioutil.ReadFile("./game/events.yaml")
+	eventData, err := EventsYamlBytes()
 	if err != nil {
 		return nil, err
 	}

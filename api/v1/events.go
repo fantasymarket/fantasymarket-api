@@ -10,7 +10,7 @@ func (api *APIHandler) getEvents(w http.ResponseWriter, r *http.Request) {
 	events, err := api.DB.GetEvents(t.Time)
 
 	if err != nil {
-		responses.ErrorResponse(w, "Events couldn't be fetched", http.StatusInternalServerError)
+		responses.ErrorResponse(w, http.StatusInternalServerError, "Events couldn't be fetched")
 	}
 
 	responses.CustomResponse(w, events, 200)
