@@ -17,8 +17,18 @@ jobs:
     - name: Install Taskfile
       uses: Arduino/actions/setup-taskfile@master
     
-    - name: Run Tests
+    - name: Run CI Scripts
       run: task ci
+
+    - name: Run tests & publish code coverage
+      uses: paambaati/codeclimate-action@v2.6.0
+      env:
+        CC_TEST_REPORTER_ID: ${{ secrets.CODE_CLIMATE_COVERAGE }}
+      with:
+        coverageCommand: task test-coverage
+        debug: true
+        coverageLocations: |
+          ${{github.workspace}}/coverage.out:cover
 
     - name: Build Binary
       run: task build

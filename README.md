@@ -1,6 +1,4 @@
-# fantasymarket-api
-
-![CI](https://github.com/explodingcamera/fantasymarket-api/workflows/CI/badge.svg?branch=develop)
+# fantasymarket-api ![CI](https://github.com/fantasymarket/fantasymarket-api/workflows/CI/badge.svg) [![Maintainability](https://api.codeclimate.com/v1/badges/0702b9a5e11f3a0b7629/maintainability)](https://codeclimate.com/github/fantasymarket/fantasymarket-api/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/0702b9a5e11f3a0b7629/test_coverage)](https://codeclimate.com/github/fantasymarket/fantasymarket-api/test_coverage)
 
 ## Table of Contents
 
@@ -10,7 +8,7 @@
   - [Recommended Tools](#recommended-tools)
   - [Testing](#testing)
   - [Running](#running-beta)
- - [Situation](#situation)
+- [Our Current Situation](#our-current-situation)
 
 ## Structure
 
@@ -26,7 +24,7 @@
 ### 1. Install Requirements
 
 - [go >=1.13](https://golang.org/dl/)
-- [Task](https://taskfile.dev/#/installation)
+- [Task](https://taskfile.dev/#/installation) (optional)
 - Revive (optional) To install, you can also run `$ task install-linter` after installing task.
 - go-bindata - To install, you can also run `$ task install-bindata` after installing task.
 - Windows:
@@ -51,41 +49,45 @@ VSCode with the official GO extension or goland
 
 ### Testing
 
-Linux:
+With `Task` installed:
 
 ```bash
 $ task test # run tests
 $ task lint # lint code
 ```
 
-Windows:
-
+Alternative:
 ```bash
 $ go test ./...
 ```
 
 ### Running Beta:
 
-After installing all the requirements, start the program by running ```go run main.go```.
-The console should output infomation about the status of the program:
+After installing all the requirements, start the program by running `$ go run main.go`.\
+The console should output information about the status of the program:
 
-      INF successfully connected to the database
-      INF successfully started the game loop
-      INF successfully started the http server address=localhost:5000
+```bash
+INF successfully connected to the database
+INF successfully started the game loop
+INF successfully started the http server address=localhost:5000
+```
 
 It will then load the last tick from the Database before printing it and the ingame time:
 
-    DBG running tick date="2020-01-01 00:00:00 +0000 UTC" tick=2
+```bash
+DBG running tick date="2020-01-01 00:00:00 +0000 UTC" tick=2
+```
 
 After this setup, the program prints the indices from the two currently implemented stocks **Google** and **Apple**. 
 This is done every 10 seconds, like this:
 
-    DBG updated stock index=60032 name=GOOG
-    DBG updated stock index=60024 name=APPL
+```bash
+DBG updated stock index=60032 name=GOOG
+DBG updated stock index=60024 name=APPL
+```
+## Our Current Situation
 
-## Situation:
-
-Currently, the project needs some final refactoring, some last bits of database logic and ultimatly testing. 
+Currently, the project needs some final refactoring, some last bits of database logic and ultimately testing. 
 Even though some tests are already completed, more are needed to ensure a well tested project.
-We are also looking to start linking the frontend to the backend to complete. 
-If all that goes smoothly, we will be able to release the project fully.
+Finally, we have also started to link the frontend to the backend so we can complete our MVP. 
+If all goes smoothly, we will be able to release the project fully by the end of summer.
