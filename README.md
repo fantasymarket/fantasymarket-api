@@ -1,4 +1,5 @@
-# fantasymarket-api ![CI](https://github.com/fantasymarket/fantasymarket-api/workflows/CI/badge.svg) [![Maintainability](https://api.codeclimate.com/v1/badges/0702b9a5e11f3a0b7629/maintainability)](https://codeclimate.com/github/fantasymarket/fantasymarket-api/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/0702b9a5e11f3a0b7629/test_coverage)](https://codeclimate.com/github/fantasymarket/fantasymarket-api/test_coverage)
+# fantasymarket-api ![CI](https://github.com/fantasymarket/fantasymarket-api/workflows/CI/badge.svg) [![Maintainability](https://api.codeclimate.com/v1/badges/0702b9a5e11f3a0b7629/maintainability)](https://codeclimate.com/github/fantasymarket/fantasymarket-api/maintainability) [![codecov](https://codecov.io/gh/fantasymarket/fantasymarket-api/branch/develop/graph/badge.svg)](https://codecov.io/gh/fantasymarket/fantasymarket-api)
+
 
 ## Table of Contents
 
@@ -26,7 +27,7 @@
 - [go >=1.13](https://golang.org/dl/)
 - [Task](https://taskfile.dev/#/installation) (optional)
 - Revive (optional) To install, you can also run `$ task install-linter` after installing task.
-- go-bindata - To install, you can also run `$ task install-bindata` after installing task.
+- go-bindata (required for building a binary) - To install, you can also run `$ task install-bindata` after installing task.
 - Windows:
 	- [gcc](https://sourceforge.net/projects/tdm-gcc/)
 - OSX:
@@ -37,7 +38,7 @@
 ### 2. Clone Repo
 
 ```bash
-$ git clone https://github.com/explodingcamera/fantasymarket-app.git
+$ git clone https://github.com/fantasymarket/fantasymarket-app.git
 $ cd fantasymarket-app
 ```
 
