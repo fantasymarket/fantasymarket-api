@@ -49,6 +49,7 @@ tasks:
       - go mod download
       - task: install-deps
       - task: lint
+      - task: test
 
   build:
     env:

@@ -28,7 +28,7 @@ jobs:
         coverageCommand: task test-coverage
         debug: true
         coverageLocations: |
-          ${{github.workspace}}/coverage.out:cover
+          ${{github.workspace}}/coverage.out:gocov
 
     - name: Build Binary
       run: task build
