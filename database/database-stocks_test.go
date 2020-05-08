@@ -14,7 +14,7 @@ type CreateInitialStocksTestData struct {
 
 var testCreateInitialStocksData = []CreateInitialStocksTestData{
 	{
-		stock: map[string]details.StockDetails{"HELLO": details.StockDetails{
+		stock: map[string]details.StockDetails{"HELLO": {
 			Symbol: "HELLO",
 			Index:  100,
 			Name:   "Hello Stock",
@@ -27,7 +27,7 @@ var testCreateInitialStocksData = []CreateInitialStocksTestData{
 		},
 	},
 	{
-		stock: map[string]details.StockDetails{"": details.StockDetails{
+		stock: map[string]details.StockDetails{"": {
 			Symbol: "",
 			Index:  401,
 			Name:   "Not Hello Stock",
@@ -101,15 +101,109 @@ func (suite *DatabaseTestSuite) TestAddStock() {
 		assert.Equal(suite.T(), nil, err)
 		assert.Equal(suite.T(), false, suite.dbService.DB.Where("symbol = ?", test.stock.Symbol).Find(&models.Stock{}).RecordNotFound())
 	}
+	suite.dbService.DB.Close()
 }
 
-// AddStock adds a stock to the stock table
-// func (s *Service) AddStock(stock models.Stock, tick int64) error {
-// 	return s.DB.Create(&models.Stock{
-// 		Symbol: stock.Symbol,
-// 		Name:   stock.Name,
-// 		Index:  stock.Index,
-// 		Volume: stock.Volume,
-// 		Tick:   tick,
-// 	}).Error
+type GetNextTickTestData struct {
+	stock       models.Stock
+	expectation int64
+}
+
+var testGetNextTickData = []GetNextTickTestData{
+	{
+		stock: models.Stock{
+			Tick: 0,
+		},
+		expectation: 1,
+	},
+	{
+		stock:       models.Stock{},
+		expectation: 1,
+	},
+	{
+		expectation: 1,
+	},
+}
+
+func (suite *DatabaseTestSuite) TestGetNextTick() {
+	for _, test := range testGetNextTickData {
+		err := suite.dbService.DB.Create(&test.stock).Error
+		assert.Equal(suite.T(), nil, err)
+		result, err := suite.dbService.GetNextTick()
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), test.expectation, result)
+	}
+	suite.dbService.DB.Close()
+}
+
+type GetStocksAtTickTestData struct {
+	tick        int64
+	stock       models.Stock
+	expectation []models.Stock
+}
+
+var testGetStocksAtTickData = []GetStocksAtTickTestData{
+	{
+		tick: 1,
+		stock: models.Stock{
+			Symbol: "HELLO",
+			Index:  100,
+			Name:   "Hello Stock",
+			Tick:   1,
+		},
+		expectation: []models.Stock{
+			{
+				Symbol: "HELLO",
+				Index:  100,
+				Name:   "Hello Stock",
+				Tick:   1,
+			},
+		},
+	},
+	{
+		tick: 2,
+		stock: models.Stock{
+			Symbol: "NOTHEL",
+			Index:  100,
+			Name:   "Not Hello Stock",
+			Tick:   2,
+		},
+		expectation: []models.Stock{
+			{
+				Symbol: "NOTHEL",
+				Index:  100,
+				Name:   "Not Hello Stock",
+				Tick:   2,
+			},
+		},
+	},
+	{},
+}
+
+func (suite *DatabaseTestSuite) TestGetStockAtTick() {
+	for _, test := range testGetStocksAtTickData {
+		err := suite.dbService.DB.Create(&test.stock).Error
+		assert.Equal(suite.T(), nil, err)
+		result, err := suite.dbService.GetStocksAtTick(test.tick)
+		assert.Equal(suite.T(), nil, err)
+
+		for j := 0; j < len(test.expectation); j++ {
+			//I need to find a way to fix this
+			assert.Equal(suite.T(), test.expectation[j].Symbol, result[j].Symbol)
+			assert.Equal(suite.T(), test.expectation[j].Index, result[j].Index)
+			assert.Equal(suite.T(), test.expectation[j].Name, result[j].Name)
+			assert.Equal(suite.T(), test.expectation[j].Tick, result[j].Tick)
+		}
+	}
+	suite.dbService.DB.Close()
+}
+
+// // GetStocksAtTick fetches the value of all stocks at a specific tick
+// func (s *Service) GetStocksAtTick(lastTick int64) ([]models.Stock, error) {
+// 	var stocks []models.Stock
+// 	if err := s.DB.Where(models.Stock{Tick: lastTick}).Find(&stocks).Error; err != nil {
+// 		return nil, err
+// 	}
+
+// 	return stocks, nil
 // }
