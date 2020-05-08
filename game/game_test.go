@@ -144,7 +144,7 @@ var testActiveTagsData = activeEventsTestData{
 		},
 	},
 	expectation: []details.TagOptions{
-		details.TagOptions{
+		{
 			AffectsTags: []string{"some-type-only-event1-affects"},
 		},
 		{
@@ -197,7 +197,7 @@ var getRandomEventEffectData = []getRandomEventEffectTestData{
 		EventID:     "testEvent1",
 		expectation: "newEvent1",
 		eventDetails: map[string]details.EventDetails{
-			"testEvent1": details.EventDetails{
+			"testEvent1": {
 				Effects: []details.EventEffect{
 					{
 						Chance:  0.2,
@@ -219,7 +219,7 @@ var getRandomEventEffectData = []getRandomEventEffectTestData{
 		EventID:     "testEvent2",
 		expectation: "newEvent1",
 		eventDetails: map[string]details.EventDetails{
-			"testEvent2": details.EventDetails{
+			"testEvent2": {
 				Effects: []details.EventEffect{
 					{
 						Chance:  0.001,
@@ -241,7 +241,7 @@ var getRandomEventEffectData = []getRandomEventEffectTestData{
 		EventID:     "testEvent3",
 		expectation: "",
 		eventDetails: map[string]details.EventDetails{
-			"testEvent2": details.EventDetails{},
+			"testEvent2": {},
 		},
 	},
 }
