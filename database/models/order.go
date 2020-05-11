@@ -21,10 +21,10 @@ type Order struct {
 	Status string // filled, waiting or canceled
 	Amount int64  // amount of stocks in the order
 
-	Price         float64
-	StopLossPrice float64
+	Price         int64
+	StopLossPrice int64
 
-	TrailingPercentage float64
+	TrailingPercentage int64
 
 	CanceledAt time.Time
 	FilledAt   time.Time

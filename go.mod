@@ -14,6 +14,7 @@ require (
 	github.com/rs/zerolog v1.18.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/senseyeio/duration v0.0.0-20180430131211-7c2a214ada46
+	github.com/shopspring/decimal v1.2.0
 	github.com/stretchr/testify v1.4.0
 	go.uber.org/config v1.4.0
 	go.uber.org/multierr v1.5.0 // indirect

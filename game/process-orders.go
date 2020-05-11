@@ -4,6 +4,7 @@ import (
 	"fantasymarket/database/models"
 
 	"github.com/rs/zerolog/log"
+	"github.com/shopspring/decimal"
 )
 
 //ProcessOrders processes the order if it matches any of the order types.
@@ -35,12 +36,17 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 			if err != nil {
 				cancelOrder()
 			}
+			return err
 		}
+		//Decimalizes the prices of the stock and the trailing percentage for the stop-loss order to improve precision
+		currentStockIndex := decimal.NewFromInt(currentStock.Index)
+		trailingPercentage := decimal.NewFromInt(order.TrailingPercentage).Div(decimal.NewFromInt(10))
+		newPrice := currentStockIndex.Add(currentStockIndex.Mul(trailingPercentage)).Round(0).IntPart()
 
 		switch order.Type {
 		case "market":
 			// the order will sell at the next best available price.
-			s.DB.FillOrder(order.OrderID, order.UserID, currentStock.Index, currentDate)
+			fillOrder()
 
 		case "stop-loss":
 
@@ -114,7 +120,7 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 					break
 				}
 
-				var newPrice float64 = currentStock.Index - currentStock.Index*order.TrailingPercentage
+				var newPrice float64 = currentStockIndex - currentStockIndex*trailingPercentage
 
 				//if the newPrice stays between the stop value
 				// the limit can never go down
@@ -139,14 +145,15 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 			// fillOrder() is called
 
 			if order.Side == "buy" {
-				if currentStock.Index >= order.Price {
+				if currentStockIndex >= order.Price {
 					fillOrder()
 					break
 				}
 
-				newPrice := currentStock.Index + currentStock.Index*order.TrailingPercentage
+				newPrice := currentStockIndex + currentStockIndex*trailingPercentage
 				if newPrice < order.Price {
 					// Update price if some shit is true
+
 				}
 			}
 		}
