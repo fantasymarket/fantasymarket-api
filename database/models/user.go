@@ -17,7 +17,7 @@ type User struct {
 	Portfolio Portfolio `gorm:"foreignkey:UserID;association_foreignkey:UserID"`
 
 	// Stock Name e.g Alphabet Inc.
-	Username string `gorm:"not null;unique" valid:"required;stringlength(3"`
+	Username string `gorm:"not null;unique" valid:"required;stringlength(3)"`
 	Password string
 }
 

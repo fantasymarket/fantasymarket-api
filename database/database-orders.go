@@ -6,6 +6,8 @@ import (
 	"fantasymarket/utils"
 	"time"
 
+	"encoding/json"
+
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -74,21 +76,70 @@ func (s *Service) CancelOrder(orderID uuid.UUID, currentDate time.Time) error {
 	return ErrOrderFilledOrCancelled
 }
 
+// DONT READ BEYOND THIS LINE
+// HERE BE DRAGONS
+
+//  _   _     _       _        __ _
+// | | | |   (_)     (_)      / _(_)
+// | |_| |__  _ ___   _ ___  | |_ _ _ __   ___
+// | __| '_ \| / __| | / __| |  _| | '_ \ / _ \
+// | |_| | | | \__ \ | \__ \ | | | | | | |  __/
+//  \__|_| |_|_|___/ |_|___/ |_| |_|_| |_|\___|
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// @@@@@@@@@@@@@@@@@@#####@@@@@@@@@@@@@#@@@@@@@@@@@@@@@###@@@@@@@@@@@@@@@@@#######@
+// ###@@@@@@@@@@#############################@@@@@@###########@@@@@@@@@############
+// ###@#######@###############@@##########@################@@@@@@@###@####@#####@@@
+// ############@###@@@@@@@#####@..+@@@+`    @@########@@@#####@##@@###@@@##########
+// #######@#####@@@#######@@@;                      ;;;;;;';'';;;;@@@######@+  ;@@@
+// @####@:                                          '';#########+;;    ``
+//                              `,:''               ;;;#########+;@
+//             @@@@@@@@@@@@@@@@@@@@@@               ;;;##@######';#
+//             @                  @@@               ';;####@####;;@
+//       @`    @        `      `  @@@               ;;;######@##''@
+//      @@@    @     #@@       @;::@@               ;;;#########;'@          @
+//     @@@@@   @   #@@@.   @  @:::;+@@:'`           ;;;#####@##@;;@          @@:
+//    @@@@@@   @  @@@@@    @@  ;@@@@;::;`           ;';''''''+#;;;.          .@@`
+//   @@@@@@#   @ @@@@@@   @@@@::::::::#+;;;@        #;;;;;;;;;;;;@            @@@
+//   @@@@@@@   @@@@,@@@  ;@@@@@:::;+@;;::::@'#.                              ,@@@
+// @.@@@,@@@   @@@,,:@@@ @@:,@@ @;;:+#;;:+  @@@@                   '         @@@@`@
+// @@@@@,@@@ ' @@@,,,@@@@@@,,,@@@;+ .. @;@ @@@@+                 @@         @@@@@@@
+// @@@@@,@@  @+'@,,,,,@@@@,,@@@@@: '@@@ @+` @@@@#@@@@@@+       ;@@#        @@@:@@@@
+// @@@@@,@@  @@#,,,,,,,:@,,@@@@@@: @@@@ #:;+::::;@@@@@@@      @@#@@       @@@,,@@@@
+// ,@@@@,@@  @@@:,,,,,,,,,@@@@@@@;+   `@;;:;::::;;@@@@@     `@@,'@@+     #@@#,,+@@,
+// ,,@@,,@@ ,@@@@,,,,,,,,:@@@@@@:::::::::;+##:;;;;::++ ,   @@@,@++++++#@ @@@:,,,@,,
+// ,,,,,@@+ @@@@@,,,,,,,+''@@@#;;:::::;:;:::;@  ..`   @@  @@@,,@,;@@@+,@.,@@,,,,,,,
+// ,,,,,@@@ @@@@@,,,,,,:+''@'@;::;;:;;:::::::@       @@@ @#@,,,#,......@,,
+// ,,,,,@@@#@@@@@,,,,,,,'''@'@;;;@;@;::::::;;'@     .@@@@#@,,  @,......@'
+// ,,,,,'@@@@@,@@,,,,,::+''@'@;;;+;@;:::::::;;'     '@@:@@;    @:....,.@
+// ,,,,,,@@@@@,@@::::::,@''@''';;:+;#:::;:::;+:,    :@@,,@,,
+// ,,,,,,:@@@,,@@:::::::@''''+@';;;#;'@@@@@'#:#@#   `@@:,,,,,,,,,,.,,,,,,,,,,,,,,,,
+// ,,,,,,,+@,,,@@;;;;'',:@''''''@#;;;;;#@;;@''#:; , `@@+,,,,,,,,,,,,,,,,,,,,,,,,,,,
+// ,,,,@,,,:,,:@@::::,,::::@''''''''''''@;::#@@;:;;@.@@#,,,,,,,,,,,.,,@@,,,,,,,,,,@
+// ,,,,;,,,,,,:@@::::@@,:::,@@@####@@@@@@;:;;#@#@@  @@@,,,,,,,,@@@@##@@@########@@@
+// ,,,,:,,,,,,,@@'::@@@:::::::#''+++++@@@##@@@@@@@#@@@@,,,@@,,,@@@@@@@@@#######@@@@
+// ,,,,,,,,,,,,@@@,@@@@@:,::::+''+::,,@@@'':+@@@:::@@,,;@:@,,,,@@@@@@@@@######@@@@:
+// ,,;,,+,,,,,,,@@@@@'@@,:,@,,,''+::::@@@'':'@@@::,:::::,@#+:,#@@@@@@@@#####@@@@@+,
+// ,,+,,@,,#,@,,,@@@@,@@@,@@:::''+:::,@@@''::@@@::::::::::::@@@#@+,@@@@####@@@@@@,,
+// ,,,,,;,,:,,,,,,@@@,,@@@@@:::'''::::@@@'',:@@@:::::::,::#@@@@@,,,@@@@##@@@@@@@,,,
+// ,,,,,,',,#,;,,,,:@,,,#@@@:::#@:::::,:@''::@@,::::::::;@@@@@;,,,,@@@@@@@@@@@:,,,,
+// ,,,,,,,,,,,,,,,,,,,,,,,@##:,,::::::::,::::::::::::::,@@@#@:,,,,,:@@@@@@@@,,,,,,,
+// ,,,,,,,,,,,,,,,,,,,,,,,'@:::::::::::,::::::::::::::,@@@@@@,,,,,,,,'@@@@,,,,,,,,,
+// ,,,,,,,,,,,,,,,,,,,,,:@::::::::::::::::::::::::::::,@@@@@,,,,,,,,,,,;#,,,,,,,,,,
+
 // FillOrder "completes" the order
 // Note: this is only supposed to be called from the game code
 // This should ONLY be called if the order is actually supposed to run
 // and things like the order type, limit prices etc. have been checked
 // (since we only check if the user has enough money in his portfolio)
 func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentIndex int64, currentDate time.Time) error {
-	var order models.Order
-	var user models.User
-
-	if err := s.DB.Where(models.Order{
-		OrderID: orderID,
-	}).Find(&order).Error; err != nil {
+	order, err := s.GetOrderByID(orderID)
+	if err != nil {
 		return err
 	}
 
+	var user models.User
 	if err := s.DB.Where(models.User{
 		UserID: userID,
 	}).Preload("Portfolio").Find(&user).Error; err != nil {
@@ -134,7 +185,14 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentIndex in
 	}
 
 	newBalance := user.Portfolio.Balance - price
-	if err := s.updatePortfolioItem(user.Portfolio.PortfolioID, affectedPortfolioItem.PortfolioItemID, newAmount, newBalance); err != nil {
+	newPortfolio, err := s.updatePortfolioItem(
+		user.Portfolio.PortfolioID,
+		affectedPortfolioItem.PortfolioItemID,
+		newAmount,
+		newBalance,
+	)
+
+	if err != nil || s.createPortfolioSnapshot(newPortfolio, currentDate) != nil {
 		s.CancelOrder(order.OrderID, currentDate)
 		return err
 	}
@@ -142,7 +200,21 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentIndex in
 	return s.DB.Where(models.Order{OrderID: orderID}).Updates(models.Order{Status: "filled", FilledAt: currentDate}).Error
 }
 
-func (s *Service) updatePortfolioItem(portfolioID uuid.UUID, itemID uuid.UUID, newAmount int64, newBalance int64) error {
+func (s *Service) createPortfolioSnapshot(portfolio *models.Portfolio, currentDate time.Time) error {
+	snapshotData, err := json.Marshal(portfolio)
+	if err != nil {
+		return err
+	}
+
+	return s.DB.Create(&models.PortfolioSnapshot{
+		UserID:      portfolio.UserID,
+		PortfolioID: portfolio.PortfolioID,
+		CreatedAt:   currentDate,
+		Data:        string(snapshotData),
+	}).Error
+}
+
+func (s *Service) updatePortfolioItem(portfolioID uuid.UUID, itemID uuid.UUID, newAmount int64, newBalance int64) (*models.Portfolio, error) {
 	// we use a transactions since if updating
 	// balance fails, we also need to rollback
 	// the portfolioItem's amount
@@ -154,17 +226,23 @@ func (s *Service) updatePortfolioItem(portfolioID uuid.UUID, itemID uuid.UUID, n
 		Amount: newAmount,
 	}).Error; err != nil {
 		tx.Rollback()
-		return err
+		return nil, err
 	}
 
+	var portfolio models.Portfolio
 	if err := tx.Where(&models.Portfolio{
 		PortfolioID: portfolioID,
-	}).Updates(models.Portfolio{
+	}).Find(&portfolio).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Model(portfolio).Updates(models.Portfolio{
 		Balance: newBalance,
 	}).Error; err != nil {
 		tx.Rollback()
-		return err
+		return nil, err
 	}
 
-	return tx.Commit().Error
+	return &portfolio, tx.Commit().Error
 }

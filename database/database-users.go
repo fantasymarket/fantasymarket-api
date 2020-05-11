@@ -147,14 +147,10 @@ func (s *Service) GetUser(username string) (*models.User, error) {
 		CreatedAt: user.CreatedAt,
 		UserID:    user.UserID,
 		Username:  user.Username,
-		Portfolio: models.Portfolio{
-			Balance: user.Portfolio.Balance,
-			Items:   user.Portfolio.Items,
-		},
 	}, nil
 }
 
-// GetSelf searches the db for a user (includes private information`)
+// GetSelf searches the db for a user (includes private information)
 func (s *Service) GetSelf(username string) (*models.User, error) {
 
 	var user models.User
@@ -168,9 +164,5 @@ func (s *Service) GetSelf(username string) (*models.User, error) {
 		CreatedAt: user.CreatedAt,
 		UserID:    user.UserID,
 		Username:  user.Username,
-		Portfolio: models.Portfolio{
-			Balance: user.Portfolio.Balance,
-			Items:   user.Portfolio.Items,
-		},
 	}, nil
 }

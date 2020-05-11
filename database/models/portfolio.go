@@ -1,9 +1,21 @@
 package models
 
 import (
+	"time"
+
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
 )
+
+// PortfolioSnapshot are snapshots of user's portfolios
+// taken after each successful order
+type PortfolioSnapshot struct {
+	PortfolioID uuid.UUID
+	UserID      uuid.UUID
+
+	CreatedAt time.Time
+	Data      string `gorm:"type:text"`
+}
 
 // Portfolio is the Portfolio "Class"
 type Portfolio struct {

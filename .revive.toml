@@ -3,7 +3,7 @@ severity = "warning"
 confidence = 0.8
 errorCode = 0
 warningCode = 0
-cyclomatic = 12
+cyclomatic = 11
 
 [rule.blank-imports]
 [rule.context-as-argument]
