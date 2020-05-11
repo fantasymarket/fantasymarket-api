@@ -1,0 +1,9 @@
+*.md
+*.vscode
+*.github
+
+.example.yaml
+.toml
+.gitignore
+
+Dockerfile

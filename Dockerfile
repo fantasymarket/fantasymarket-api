@@ -9,7 +9,7 @@ FROM alpine
 ARG VERSION=V1.0
 ARG PORT=3000
 LABEL com.FantasyMarket.version=$VERSION
-ENV GOLANG_ENV="production"
+ENV STATUS="production"
 COPY --from=build /var/FantasyMarket /var/FantasyMarket
 WORKDIR /var/FantasyMarket
 EXPOSE $PORT
