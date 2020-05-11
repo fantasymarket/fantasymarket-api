@@ -74,6 +74,11 @@ func (s *Service) CancelOrder(orderID uuid.UUID, currentDate time.Time) error {
 	return ErrOrderFilledOrCancelled
 }
 
+// UpdateOrder updates a order
+func (s *Service) UpdateOrder(orderID uuid.UUID, update models.Order) error {
+	return s.DB.Table("orders").Where(models.Order{OrderID: orderID}).Updates(&update).Error
+}
+
 // FillOrder "completes" the order
 // Note: this is only supposed to be called from the game code
 // This should ONLY be called if the order is actually supposed to run

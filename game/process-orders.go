@@ -17,54 +17,47 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 		return err
 	}
 
-	lastStocks, err := s.DB.GetStockMapAtTick(s.TicksSinceStart - 1)
-	if err != nil {
-		return err
-	}
-
 	for _, order := range orders {
+
 		currentStock := currentStocks[order.Symbol]
-		lastStock := lastStocks[order.Symbol]
+
+		// Decimalizes the prices of the stock and the trailing percentage for the stop-loss order to improve precision
+		currentStockIndex := decimal.NewFromInt(currentStock.Index)
+		trailingPercentage := decimal.NewFromInt(order.TrailingPercentage).Div(decimal.NewFromInt(100))
 
 		cancelOrder := func() {
 			log.Error().Err(err).Str("orderID", order.OrderID.String()).Msg("error filling order")
 			s.DB.CancelOrder(order.OrderID, currentDate)
 		}
 
-		fillOrder := func() error {
-			err := s.DB.FillOrder(order.OrderID, order.UserID, currentStock.Index, currentDate)
-			if err != nil {
+		fillOrder := func() {
+			if err := s.DB.FillOrder(order.OrderID, order.UserID, currentStock.Index, currentDate); err != nil {
 				cancelOrder()
+				log.Error().Err(err).Str("orderID", order.OrderID.String()).Msg("failed to execute order")
 			}
-			return err
 		}
-		//Decimalizes the prices of the stock and the trailing percentage for the stop-loss order to improve precision
-		currentStockIndex := decimal.NewFromInt(currentStock.Index)
-		trailingPercentage := decimal.NewFromInt(order.TrailingPercentage).Div(decimal.NewFromInt(10))
-		newPrice := currentStockIndex.Add(currentStockIndex.Mul(trailingPercentage)).Round(0).IntPart()
+
+		updateOrder := func(update models.Order) {
+			if err := s.DB.UpdateOrder(order.OrderID, update); err != nil {
+				cancelOrder()
+				log.Error().Err(err).Str("orderID", order.OrderID.String()).Msg("failed to update order")
+			}
+		}
 
 		switch order.Type {
 		case "market":
 			// the order will sell at the next best available price.
 			fillOrder()
 
-		case "stop-loss":
-
-			// Stop Loss sell orders trigger a market order to sell when the stop price is met.
-			// Ex. XYZ stock is trading at $25. A stop order can be placed at $20 to trigger
-			// a market sell order when a trade executes at $20 or lower.
+		case "stop":
 			if order.Side == "sell" {
-				if currentStocks[order.Symbol].Index >= order.StopLossPrice {
+				if currentStock.Index <= order.Price {
 					fillOrder()
 				}
 			}
-
-			// Stop Loss buy orders trigger a market order to buy when the stop price is reached.
-			// Stop loss orders are sent as stop limit orders with the limit price collared up to 5% above the stop price.
-			// Ex. ABC stock is trading at $10. A stop order can be placed at $11 to trigger a market buy order
-			// when a trade executes at $11 or higher.
+			//Buy stop order: set a stop price above the current price of the stock. If stock rises to stop price buy stop order becomes buy market order.
 			if order.Side == "buy" {
-				if currentStocks[order.Symbol].Index <= order.StopLossPrice {
+				if currentStock.Index >= order.Price {
 					fillOrder()
 				}
 			}
@@ -72,22 +65,20 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 		case "limit":
 			// Limit orders specify the minimum amount you are willing to receive when selling a stock.
 			if order.Side == "sell" {
-				if currentStocks[order.Symbol].Index >= order.Price {
+				if currentStock.Index >= order.Price {
 					fillOrder()
 				}
 			}
 
 			// Limit orders specify the maximum amount you are willing to pay for a stock.
 			if order.Side == "buy" {
-				if currentStocks[order.Symbol].Index <= order.Price {
+				if currentStock.Index <= order.Price {
 					fillOrder()
 				}
-
 			}
 
 		case "trailing-stop":
 
-			difference := currentStock.Index - lastStock.Index
 			if order.TrailingPercentage < 0 || order.TrailingPercentage > 1 {
 				cancelOrder()
 			}
@@ -120,13 +111,17 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 					break
 				}
 
-				var newPrice float64 = currentStockIndex - currentStockIndex*trailingPercentage
+				newPrice := currentStockIndex.Sub(currentStockIndex.Mul(trailingPercentage)).Round(0).IntPart()
 
-				//if the newPrice stays between the stop value
+				// If the newPrice stays between the stop value
 				// the limit can never go down
-				if newPrice > order.Price {
-					// increase the limit price
+				if newPrice <= order.Price {
+					break
 				}
+
+				updateOrder(models.Order{
+					Price: newPrice,
+				})
 			}
 
 			// trailing stop for buy: Say Stock A is priced at $110. Trailing percentage is 5%, starting stop value : $115.50
@@ -145,18 +140,23 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 			// fillOrder() is called
 
 			if order.Side == "buy" {
-				if currentStockIndex >= order.Price {
+				if currentStock.Index >= order.Price {
 					fillOrder()
 					break
 				}
 
-				newPrice := currentStockIndex + currentStockIndex*trailingPercentage
-				if newPrice < order.Price {
-					// Update price if some shit is true
+				newPrice := currentStockIndex.Add(currentStockIndex.Mul(trailingPercentage)).Round(0).IntPart()
 
+				if newPrice >= order.Price {
+					break
 				}
+
+				updateOrder(models.Order{
+					Price: newPrice,
+				})
 			}
 		}
 	}
+
 	return nil
 }
