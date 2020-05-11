@@ -3,12 +3,12 @@ package game
 import (
 	"fantasymarket/database"
 	"fantasymarket/database/models"
-	"fantasymarket/game/events"
-	"fantasymarket/game/stocks"
+	"fantasymarket/game/details"
 	"fantasymarket/utils"
 	"fantasymarket/utils/config"
 	"fantasymarket/utils/hash"
 	"fantasymarket/utils/timeutils"
+	"fmt"
 
 	"strconv"
 	"time"
@@ -18,11 +18,15 @@ import (
 
 // Service is the GameService
 type Service struct {
-	EventDetails    map[string]events.EventDetails
-	StockDetails    map[string]stocks.StockDetails
+	EventDetails    map[string]details.EventDetails
+	StockDetails    map[string]details.StockDetails
 	DB              *database.Service
 	Config          *config.Config
 	TicksSinceStart int64
+
+	// a history of all events that have run in the past
+	// map[eventID][]createdAt
+	EventHistory map[string][]time.Time
 }
 
 // GetCurrentDate returns the current in-game date
@@ -34,22 +38,19 @@ func (s *Service) GetCurrentDate() time.Time {
 // Start starts the game loop
 func Start(db *database.Service, config *config.Config) (*Service, error) {
 
-	loadedStocks, err := stocks.LoadStockDetails()
+	loadedStocks, err := details.LoadStockDetails()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("game: failed to Load stock Details: %w", err)
 	}
 
 	if err := db.CreateInitialStocks(loadedStocks); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("game: failed to initialize stocks: %w", err)
 	}
 
-	// TODO: right now, this map is empty
-	loadedEvents, err := events.LoadEventDetails()
+	loadedEvents, err := details.LoadEventDetails()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("game: failed to load events: %w", err)
 	}
-
-	// TODO: Take all Fixed events and map them where Key is startDate and value true?
 
 	s := &Service{
 		Config:       config,
@@ -59,7 +60,7 @@ func Start(db *database.Service, config *config.Config) (*Service, error) {
 	}
 
 	go startLoop(s)
-	log.Info().Msg("successfully started the game loop 😋")
+	log.Info().Msg("successfully started the game loop")
 
 	return s, nil
 }
@@ -67,10 +68,14 @@ func Start(db *database.Service, config *config.Config) (*Service, error) {
 // startLoop startsrunningticks indefinitly
 func startLoop(s *Service) {
 	s.TicksSinceStart, _ = s.DB.GetNextTick()
+	s.EventHistory, _ = s.DB.GetEventHistory()
+
 	log.Debug().Int64("ticksSinceStart", s.TicksSinceStart).Msg("loaded loaded ticksSinceStart from database")
 
 	for {
-		s.tick()
+		if err := s.tick(); err != nil {
+			log.Error().Err(err).Int64("ticksSinceStart", s.TicksSinceStart).Msg("error while running tick")
+		}
 
 		timePerTick := time.Duration(1/s.Config.Game.TicksPerSecond) * time.Second
 		time.Sleep(timePerTick)
@@ -80,37 +85,46 @@ func startLoop(s *Service) {
 }
 
 // GetRandomEventEffect selects a random effect from an event
-func (s *Service) GetRandomEventEffect(e models.Event) (string, error) {
-	event := s.EventDetails[e.EventID]
+func (s *Service) GetRandomEventEffect(eventID string) (string, error) {
+	event := s.EventDetails[eventID]
 
 	effects := make(map[string]float64)
 	for _, e := range event.Effects {
 		effects[e.EventID] = e.Chance
 	}
 
-	seed := e.EventID + strconv.FormatInt(s.TicksSinceStart, 10)
-	return utils.SelectRandomWeightedItem(effects, seed)
+	seed := eventID + strconv.FormatInt(s.TicksSinceStart, 10)
+	randomNumber := hash.Float64Hash(seed)
+	return utils.SelectRandomWeightedItem(effects, randomNumber)
 }
 
 // tick is updating the current state of our system
 func (s *Service) tick() error {
-	log.Debug().Int64("tick", s.TicksSinceStart).Msg("running tick")
+	log.Debug().Int64("tick", s.TicksSinceStart).Str("date", s.GetCurrentDate().String()).Msg("running tick")
 
-	currentlyRunningEvents, _ := s.DB.GetEvents()                      // Sub this for the DB query results
-	lastStockIndexes, _ := s.DB.GetStocksAtTick(s.TicksSinceStart - 1) // Sub this for the DB query results
+	currentlyRunningEvents, err := s.DB.GetEvents(s.GetCurrentDate())
+	if err != nil {
+		return fmt.Errorf("game: failed to get events from DB: %w", err)
+	}
 
-	// TODO: add new events to database:
-	//      - fixed events that need to be added at a fixed date
-	//		- random events
-	// 		- reccuring events
+	lastStockIndexes, err := s.DB.GetStocksAtTick(s.TicksSinceStart - 1)
+	if err != nil {
+		return fmt.Errorf("game: failed to get stocks indexes: %w", err)
+	}
+
+	if err := s.startEvents(); err != nil {
+		return fmt.Errorf("game: failed to start events: %w", err)
+	}
 
 	s.removeInactiveEvents(currentlyRunningEvents)
 	newStocks := s.ComputeStockNumbers(lastStockIndexes, currentlyRunningEvents)
+
 	if err := s.DB.AddStocks(newStocks, s.TicksSinceStart); err != nil {
-		return err
+		return fmt.Errorf("game: failed to add stocks: %w", err)
 	}
 
 	// TODO: process current orderbook
+	// s.processOrders()
 
 	return nil
 }
@@ -126,13 +140,13 @@ func (s Service) removeInactiveEvents(events []models.Event) {
 		endDate := eventDetails.Duration.Shift(event.CreatedAt)
 
 		if !currentDate.Before(endDate) {
-			s.DB.RemoveEvent(event.ID)
+			s.DB.RemoveEvent(event.EventID)
 		}
 	}
 }
 
-// CalcutaleAffectedness calculates how much a stock is affected by all currently running events
-func (s Service) CalcutaleAffectedness(stocks []models.Stock, activeEvents []models.Event) map[string]float64 {
+// CalculateAffectedness calculates how much a stock is affected by all currently running events
+func (s Service) CalculateAffectedness(stocks []models.Stock, activeEvents []models.Event) map[string]float64 {
 	var affectedness map[string]float64
 
 	activeTags := s.GetActiveEventTags(activeEvents)
@@ -155,8 +169,9 @@ func (s Service) CalcutaleAffectedness(stocks []models.Stock, activeEvents []mod
 
 // GetActiveEventTags returns a list of event tags that
 // should currently be affecting all stocks
-func (s Service) GetActiveEventTags(activeEvents []models.Event) []events.TagOptions {
-	var activeTags []events.TagOptions
+func (s Service) GetActiveEventTags(activeEvents []models.Event) []details.TagOptions {
+	var activeTags []details.TagOptions
+
 	for _, activeEvent := range activeEvents {
 		eventDetails := s.EventDetails[activeEvent.EventID]
 		for _, tag := range eventDetails.Tags {
@@ -176,7 +191,11 @@ func (s Service) GetActiveEventTags(activeEvents []models.Event) []events.TagOpt
 				continue
 			}
 
-			activeTags = append(activeTags, tag)
+			activeTags = append(activeTags, details.TagOptions{
+				AffectsTags:   tag.AffectsTags,
+				AffectsStocks: tag.AffectsStocks,
+				Trend:         tag.Trend,
+			})
 		}
 	}
 
@@ -186,7 +205,7 @@ func (s Service) GetActiveEventTags(activeEvents []models.Event) []events.TagOpt
 // ComputeStockNumbers computes the index at the next tick for a list of stocks
 func (s Service) ComputeStockNumbers(stocks []models.Stock, events []models.Event) []models.Stock {
 
-	affectedness := s.CalcutaleAffectedness(stocks, events)
+	affectedness := s.CalculateAffectedness(stocks, events)
 
 	// This computes the random and own stock, not taking into account other peoples selling
 	// As a stock drops to a % of its value, theres gonna be more buyers or more sellers

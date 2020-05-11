@@ -6,9 +6,28 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2-beta
+    - name: Checkout Files
+      uses: actions/checkout@v2
+
+    - name: Setup Go
+      uses: actions/setup-go@v2-beta
       with:
-        go-version: '^1.13.1'
-    - uses: Arduino/actions/setup-taskfile@master
-    - run: task ci
+        go-version: '^1.14.1'
+    
+    - name: Install Taskfile
+      uses: Arduino/actions/setup-taskfile@master
+    
+    - name: Run Tests
+      run: task ci
+
+    - name: Build Binary
+      run: task build
+
+    - name: Deploy (staging)
+      if: github.ref == 'refs/heads/develop'
+      run: task deploy-staging
+
+    - name: Deploy (production)
+      if: github.ref == 'refs/heads/master'
+      run: task deploy-production
+

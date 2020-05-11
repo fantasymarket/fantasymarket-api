@@ -10,13 +10,12 @@ import (
 	"fantasymarket/utils/config"
 
 	"net/http"
-
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 )
 
-const addr = "localhost:42069"
+const addr = "localhost:3277"
 
 // Start starts a new instance of our REST API
 func Start(db *database.Service, game *game.Service, config *config.Config) {
@@ -25,7 +24,7 @@ func Start(db *database.Service, game *game.Service, config *config.Config) {
 
 	// CORS Header
 	cors := cors.New(cors.Options{
-		AllowedOrigins:     []string{"https://fantasymarket.netlify.com/", "http://" + addr},
+		AllowedOrigins:     []string{"https://fantasymarket.netlify.com/", "http://localhost:3277"},
 		AllowedMethods:     []string{"GET", "POST", "PUT"},
 		AllowedHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:     []string{"Link"},

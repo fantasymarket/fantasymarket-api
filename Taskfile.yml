@@ -1,12 +1,9 @@
 version: '2'
 
 tasks:
-  default:
-    cmd: task --list
-  help:
-    cmd: task --list
-
   run:
+    env:
+      development: false
     desc: "run fantasymarket"
     cmds:
       - go run main.go
@@ -19,7 +16,13 @@ tasks:
   lint:
     desc: "lint all files"
     cmds:
-      - $(go env GOPATH)/bin/revive -config .revive.toml -exclude=./vendor/... ./...
+      - $(go env GOPATH)/bin/revive -formatter stylish -config .revive.toml -exclude=./vendor/... ./...
+
+  install-deps:
+    desc: "install all dependencies"
+    cmds:
+      - task: install-linter
+      - task: insall-bindata
 
   install-linter:
     desc: "install the revive linter"
@@ -28,10 +31,33 @@ tasks:
     cmds:
       - go get -u github.com/mgechev/revive
 
+  insall-bindata:
+    desc: "install go-bindata"
+    env:
+      GO111MODULES: off
+    cmds:
+      - go get -u github.com/go-bindata/go-bindata/...
+
   ci:
     desc: "run ci scripts (should only be run in ci environments)"
     cmds:
-      - go mod verify
-      - task install-linter
-      - task lint
-      - task test
+      - go mod download
+      - task: install-deps
+      - task: lint
+      - task: test
+
+  build:
+    env:
+      GOOS: linux
+      GOARCH: amd64
+    cmds:
+      - go generate ./...
+      - go build -ldflags="-s -w" -o bin/fantasymarket -i main.go
+
+  deploy-staging:
+    cmds:
+      - echo "deployment isn't setup yet"
+
+  deploy-production:
+    cmds:
+      - echo "deployment isn't setup yet"

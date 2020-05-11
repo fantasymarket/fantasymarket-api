@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fantasymarket/database/models"
 	"fantasymarket/utils/hash"
-	"fmt"
 
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
@@ -22,10 +21,10 @@ func (s *Service) CreateGuest() (*models.User, error) {
 	var username string
 	// we generate usenames until the username is unique so everyone
 	// starts of with a fresh account
-	for username != "" {
+	for username == "" {
 		u := petname.Generate(3, "-")
 
-		if s.DB.Where("username = ?", u).Select("username").First(models.User{}).RecordNotFound() {
+		if s.DB.Where("username = ?", u).Select("username").First(&models.User{}).RecordNotFound() {
 			username = u
 		}
 	}
@@ -117,7 +116,6 @@ func (s *Service) LoginUser(username, password string) (*models.User, error) {
 			return nil, errors.New("couldn't find user")
 		}
 
-		fmt.Println("error loging in:", err)
 		return nil, errors.New("could't find user in database")
 	}
 

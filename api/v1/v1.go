@@ -20,17 +20,18 @@ type APIHandler struct {
 // NewAPIRouter creates a new API HTTP handler
 func NewAPIRouter(db *database.Service, game *game.Service, config *config.Config) http.Handler {
 	api := &APIHandler{
-		DB:   db,
-		Game: game,
+		DB:     db,
+		Game:   game,
+		Config: config,
 	}
 
 	r := chi.NewRouter()
 
 	// Standalone GET Requests
-	r.Get("/news", api.getEvents) // Allow for query parameters
+	r.Get("/events", api.getEvents) // Allow for query parameters
 
-	r.Get("/overview", api.getOverview) // Some stats for the dashboard
-	// Top 2 Gainers / Top 2 Loosers
+	//r.Get("/overview", api.getOverview) // Some stats for the dashboard
+	// Top 2 Gainers / Top 2 Losers
 	// Maybe total + of all stock and things like that in the future
 
 	r.Get("/time", api.getTime) // Current time on the server
@@ -42,35 +43,28 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 		r.Get("/{symbol}", api.getStockDetails)
 
-		r.Post("/orders", api.addOrder)
-
 	})
 
 	r.Route("/orders", func(r chi.Router) {
 
-		r.Get("/", api.orders)
+		r.Get("/", api.ordersForUser)
 
-		r.Get("/{orderID}", api.orders)
+		r.Post("/", api.addOrder)
 
-		r.Delete("/{orderID}", api.orders)
-	})
+		r.Get("/{orderID}", api.ordersID)
 
-	r.Route("/portfolio", func(r chi.Router) {
-
-		r.Get("/", api.getPortfolio)
-
-		r.Get("/{symbol}", api.getPortfolio)
+		r.Delete("/{orderID}", api.deleteOrder)
 	})
 
 	r.Route("/user", func(r chi.Router) {
 		r.Group(func(r chi.Router) {
-			r.Use(jwt.Middleware("secret", true))
+			r.Use(jwt.Middleware(api.Config.TokenSecret, true))
 			r.Get("/{username}", api.getUser)
-			r.Post("/", api.createUser)
+			r.Put("/", api.createUser)
 		})
 
 		r.Group(func(r chi.Router) {
-			r.Use(jwt.Middleware("secret", false))
+			r.Use(jwt.Middleware(api.Config.TokenSecret, false))
 			r.Get("/", api.getSelf)
 			r.Post("/", api.updateSelf)
 		})

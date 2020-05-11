@@ -1,10 +1,22 @@
-package events
+package details
 
 import (
 	"fantasymarket/utils/hash"
 	"fantasymarket/utils/timeutils"
 	"strconv"
+	"time"
 )
+
+// StockDetails is the type for storing information about stocks
+type StockDetails struct {
+	Symbol    string   `yaml:"symbol"`     // Stock Symbol e.g GOOG
+	Name      string   `yaml:"name"`       // Stock Name e.g Alphabet Inc.
+	Index     int64    `yaml:"startPrice"` // Price per share
+	Shares    int64    `yaml:"stockCount"` // Number per share
+	Tags      []string `yaml:"tags"`       // A stock can have up to 5 tags
+	Stability float64  `yaml:"stability"`  // Shows how many fluctuations the stock will have
+	Trend     float64  `yaml:"trend"`      // Shows the generall trend of the Stock
+}
 
 // EventDetails is the type for storing information about events
 //
@@ -25,11 +37,11 @@ import (
 //
 type EventDetails struct {
 	// A unique string ID for an event (e.g `quantum-breakthrough`)
-	EventID string
+	EventID string `yaml:"eventID"`
 
 	// Used for the news-feed
-	Title       string
-	Description string
+	Title       string `yaml:"title"`
+	Description string `yaml:"description"`
 
 	// Type says when the event is run
 	// can be:
@@ -41,25 +53,26 @@ type EventDetails struct {
 	//
 	// Properties like `FixedDate` can only be used when the
 	// type is actually set to `fixed`
-	Type string
+	Type string `yaml:"type"`
 
-	FixedDate             timeutils.Time     // date the event has to be run
-	FixedDateRandomOffset timeutils.Duration // Offset from 0-n added to the fixed date
+	FixedDate             timeutils.Time     `yaml:"fixedDate"`             // date the event has to be run
+	FixedDateRandomOffset timeutils.Duration `yaml:"fixedDateRandomOffset"` // Offset from 0-n added to the fixed date
 
-	RandomChance      float64            // the chance for the event to occur in a tick [0, 1] (thould be less than .01%)
-	RecurringDuration timeutils.Duration // When an event has to happen e.g yearly
+	RandomChancePerDay float64            `yaml:"randomChancePerDay"` // the chance for the event to occur in a day [0, 1]
+	RecurringDuration  timeutils.Duration `yaml:"recurringDuration"`  // When an event has to happen e.g yearly
 
 	// these eventIDs have to have run before this event
 	// can be prefixed with `!` if the event should only be run if an event hasn't happened yet
-	Dependencies []string
+	Dependencies []string `yaml:"dependencies"`
 
 	// Effects are eventIDs that have to be run after this event is over
-	Effects []EventEffect
+	Effects []EventEffect `yaml:"events"`
 
-	RunBefore timeutils.Time // The event has to be run before this date
-	RunAfter  timeutils.Time // The event has to be run after this date
+	Duration timeutils.Duration `yaml:"duration"` // Time during which the event is the event is run every tick
 
-	Duration timeutils.Duration // Time during which the event is the event is run every tick
+	MinTimeBetweenEvents time.Duration  `yaml:"minTimeBetweenEvents"` // The event can only run again after this time has passed
+	RunBefore            timeutils.Time `yaml:"runBefore"`            // The event has to be run before this date
+	RunAfter             timeutils.Time `yaml:"runAfter"`             // The event has to be run after this date
 
 	Tags []TagOptions
 }

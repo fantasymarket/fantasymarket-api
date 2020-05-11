@@ -10,11 +10,10 @@ func Includes(slice []string, value string) bool {
 
 // Some checks if a []string includes at least one string from a slice
 func Some(slice []string, values []string) bool {
-	some := false
 	for _, v := range values {
 		if Includes(slice, v) {
-			some = true
+			return true
 		}
 	}
-	return some
+	return false
 }
