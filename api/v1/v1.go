@@ -6,7 +6,7 @@ import (
 	"fantasymarket/utils/config"
 	"fantasymarket/utils/http/middleware/jwt"
 	"net/http"
-
+	"errors"
 	"github.com/go-chi/chi"
 )
 
@@ -16,6 +16,20 @@ type APIHandler struct {
 	Game   *game.Service
 	Config *config.Config
 }
+
+// Errors for the HTTP Handler
+var (
+	fetchingError = errors.New("error fetching data")
+	orderUpdateError = errors.New("error updating error")
+	decodingError = errors.New("data could not be decoded")
+	orderDeletionError = errors.New("order could not be deleted")
+	userNotFoundError = errors.New("could not find user")
+	passwordError = errors.New("could not parse password")
+	usernameError = errors.New("could not parse username")
+	tokenError = errors.New("could not generate token")
+	accountError = errors.New("error creating new user account")
+	loginError = errors.New("could not login user")
+)
 
 // NewAPIRouter creates a new API HTTP handler
 func NewAPIRouter(db *database.Service, game *game.Service, config *config.Config) http.Handler {
@@ -27,16 +41,12 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 	r := chi.NewRouter()
 
-	// Standalone GET Requests
-	r.Get("/events", api.getEvents) // Allow for query parameters
+	r.Get("/events", api.getEvents)
 
-	//r.Get("/overview", api.getOverview) // Some stats for the dashboard
-	// Top 2 Gainers / Top 2 Losers
-	// Maybe total + of all stock and things like that in the future
 
-	r.Get("/time", api.getTime) // Current time on the server
+	r.Get("/time", api.getTime)
 
-	// API Routes
+
 	r.Route("/stocks", func(r chi.Router) {
 
 		r.Get("/", api.getAllStocks)
@@ -51,7 +61,7 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 		r.Post("/", api.addOrder)
 
-		r.Get("/{orderID}", api.ordersID)
+		r.Get("/{orderID}", api.getOrdersID)
 
 		r.Delete("/{orderID}", api.deleteOrder)
 	})

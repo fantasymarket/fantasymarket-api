@@ -13,7 +13,7 @@ import (
 func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 	allStocks, err := ioutil.ReadFile("game/stocks.yaml")
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "Error getting list of stocks")
+		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
 		return
 	}
 
@@ -21,7 +21,7 @@ func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 	err = yaml.Unmarshal(allStocks, &m)
 
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing the stocks")
+		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
 		return
 	}
 
@@ -33,13 +33,13 @@ func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 	yamlData, err := ioutil.ReadFile("game/stocks.yaml")
 
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "Error getting Stock Details")
+		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
 	}
 
 	var myStocks []details.StockDetails
 
 	if err := yaml.Unmarshal(yamlData, &myStocks); err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing the stock")
+		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
 	}
 
 	for i := range myStocks {
@@ -49,5 +49,5 @@ func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	responses.ErrorResponse(w, http.StatusInternalServerError, "Error getting the Stock Detail")
+	responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
 }
