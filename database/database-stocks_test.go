@@ -188,7 +188,7 @@ func (suite *DatabaseTestSuite) TestGetStockAtTick() {
 		assert.Equal(suite.T(), nil, err)
 
 		for j := 0; j < len(test.expectation); j++ {
-			//I need to find a way to fix this
+			//I hate my life - cant tests equals because of UUID and other stuff
 			assert.Equal(suite.T(), test.expectation[j].Symbol, result[j].Symbol)
 			assert.Equal(suite.T(), test.expectation[j].Index, result[j].Index)
 			assert.Equal(suite.T(), test.expectation[j].Name, result[j].Name)
@@ -197,13 +197,3 @@ func (suite *DatabaseTestSuite) TestGetStockAtTick() {
 	}
 	suite.dbService.DB.Close()
 }
-
-// // GetStocksAtTick fetches the value of all stocks at a specific tick
-// func (s *Service) GetStocksAtTick(lastTick int64) ([]models.Stock, error) {
-// 	var stocks []models.Stock
-// 	if err := s.DB.Where(models.Stock{Tick: lastTick}).Find(&stocks).Error; err != nil {
-// 		return nil, err
-// 	}
-
-// 	return stocks, nil
-// }
