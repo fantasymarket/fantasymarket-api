@@ -170,6 +170,12 @@ var testGetStocksAtTickData = []GetStocksAtTickTestData{
 		},
 		expectation: []models.Stock{
 			{
+				Symbol: "HELLO",
+				Index:  100,
+				Name:   "Hello Stock",
+				Tick:   2,
+			},
+			{
 				Symbol: "NOTHEL",
 				Index:  100,
 				Name:   "Not Hello Stock",
@@ -184,6 +190,9 @@ func (suite *DatabaseTestSuite) TestGetStockAtTick() {
 	for _, test := range testGetStocksAtTickData {
 		err := suite.dbService.DB.Create(&test.stock).Error
 		assert.Equal(suite.T(), nil, err)
+		test.stock.Tick++
+		err = suite.dbService.DB.Create(&test.stock).Error
+		assert.Equal(suite.T(), nil, err)
 		result, err := suite.dbService.GetStocksAtTick(test.tick)
 		assert.Equal(suite.T(), nil, err)
 
@@ -193,6 +202,77 @@ func (suite *DatabaseTestSuite) TestGetStockAtTick() {
 			assert.Equal(suite.T(), test.expectation[j].Index, result[j].Index)
 			assert.Equal(suite.T(), test.expectation[j].Name, result[j].Name)
 			assert.Equal(suite.T(), test.expectation[j].Tick, result[j].Tick)
+		}
+	}
+	suite.dbService.DB.Close()
+}
+
+type GetStockMapAtTickTestData struct {
+	tick        int64
+	stock       models.Stock
+	expectation map[string]models.Stock
+}
+
+var testGetStockMapAtTickData = []GetStockMapAtTickTestData{
+	{
+		tick: 1,
+		stock: models.Stock{
+			Symbol: "HELLO",
+			Index:  100,
+			Name:   "Hello Stock",
+			Tick:   1,
+		},
+		expectation: map[string]models.Stock{
+			"HELLO": {
+				Symbol: "HELLO",
+				Index:  100,
+				Name:   "Hello Stock",
+				Tick:   1,
+			},
+		},
+	},
+	{
+		tick: 2,
+		stock: models.Stock{
+			Symbol: "NOTHEL",
+			Index:  100,
+			Name:   "Not Hello Stock",
+			Tick:   2,
+		},
+		expectation: map[string]models.Stock{
+			"HELLO": {
+				Symbol: "HELLO",
+				Index:  100,
+				Name:   "Hello Stock",
+				Tick:   2,
+			},
+			"NOTHEL": {
+				Symbol: "NOTHEL",
+				Index:  100,
+				Name:   "Not Hello Stock",
+				Tick:   2,
+			},
+		},
+	},
+	{},
+}
+
+func (suite *DatabaseTestSuite) TestGetStockMapAtTick() {
+	for _, test := range testGetStockMapAtTickData {
+		err := suite.dbService.DB.Create(&test.stock).Error
+		assert.Equal(suite.T(), nil, err)
+		test.stock.Tick++
+		err = suite.dbService.DB.Create(&test.stock).Error
+		assert.Equal(suite.T(), nil, err)
+		result, err := suite.dbService.GetStockMapAtTick(test.tick)
+		assert.Equal(suite.T(), nil, err)
+
+		for j := 0; j < len(test.expectation); j++ {
+			//I hate my life - cant tests equals because of UUID and other stuff
+			assert.Equal(suite.T(), test.expectation[test.stock.Symbol].Symbol, result[test.stock.Symbol].Symbol)
+			assert.Equal(suite.T(), test.expectation[test.stock.Symbol].Index, result[test.stock.Symbol].Index)
+			assert.Equal(suite.T(), test.expectation[test.stock.Symbol].Name, result[test.stock.Symbol].Name)
+			assert.Equal(suite.T(), test.expectation[test.stock.Symbol].Tick, result[test.stock.Symbol].Tick)
 		}
 	}
 	suite.dbService.DB.Close()
