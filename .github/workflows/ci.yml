@@ -8,9 +8,6 @@ jobs:
     steps:
     - name: Checkout Files
       uses: actions/checkout@v2
-    
-    - name: Unshallow
-      run: git fetch --prune --unshallow
 
     - name: Setup Go
       uses: actions/setup-go@v2-beta
@@ -20,8 +17,14 @@ jobs:
     - name: Install Taskfile
       uses: Arduino/actions/setup-taskfile@master
     
-    - name: Run Tests
+    - name: Run CI Scripts
       run: task ci
+
+    - name: Check Test-Coverage
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.out
 
     - name: Build Binary
       run: task build

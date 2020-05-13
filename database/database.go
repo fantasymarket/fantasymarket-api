@@ -26,6 +26,18 @@ func Connect(config *config.Config) (*Service, error) {
 		return nil, err
 	}
 
+	AutoMigrate(db)
+
+	log.Info().Msg("successfully connected to the database")
+
+	return &Service{
+		DB:     db,
+		Config: config,
+	}, nil
+}
+
+// AutoMigrate migrates the database tables
+func AutoMigrate(db *gorm.DB) {
 	db.AutoMigrate(
 		&models.Stock{},
 		&models.Event{},
@@ -34,11 +46,4 @@ func Connect(config *config.Config) (*Service, error) {
 		&models.Portfolio{},
 		&models.PortfolioItem{},
 	)
-
-	log.Info().Msg("successfully connected to the database")
-
-	return &Service{
-		DB:     db,
-		Config: config,
-	}, nil
 }

@@ -13,10 +13,21 @@ tasks:
     cmds:
       - go test ./...
 
+  test-coverage:
+    desc: "run all tests"
+    cmds:
+      - go test -coverprofile coverage.out ./...
+
   lint:
     desc: "lint all files"
     cmds:
       - $(go env GOPATH)/bin/revive -formatter stylish -config .revive.toml -exclude=./vendor/... ./...
+
+  install-deps:
+    desc: "install all dependencies"
+    cmds:
+      - task: install-linter
+      - task: insall-bindata
 
   install-linter:
     desc: "install the revive linter"
@@ -25,13 +36,20 @@ tasks:
     cmds:
       - go get -u github.com/mgechev/revive
 
+  insall-bindata:
+    desc: "install go-bindata"
+    env:
+      GO111MODULES: off
+    cmds:
+      - go get -u github.com/go-bindata/go-bindata/...
+
   ci:
     desc: "run ci scripts (should only be run in ci environments)"
     cmds:
       - go mod download
-      - task install-linter
-      - task lint
-      - task test
+      - task: install-deps
+      - task: lint
+      - task: test-coverage
 
   build:
     env:

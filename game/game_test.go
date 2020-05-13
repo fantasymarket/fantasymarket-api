@@ -144,7 +144,7 @@ var testActiveTagsData = activeEventsTestData{
 		},
 	},
 	expectation: []details.TagOptions{
-		details.TagOptions{
+		{
 			AffectsTags: []string{"some-type-only-event1-affects"},
 		},
 		{
@@ -184,4 +184,79 @@ func TestGetActiveEventTags(t *testing.T) {
 
 	result := s.GetActiveEventTags(events)
 	assert.Equal(t, testActiveTagsData.expectation, result)
+}
+
+type getRandomEventEffectTestData struct {
+	EventID      string
+	eventDetails map[string]details.EventDetails
+	expectation  string
+}
+
+var getRandomEventEffectData = []getRandomEventEffectTestData{
+	{
+		EventID:     "testEvent1",
+		expectation: "newEvent1",
+		eventDetails: map[string]details.EventDetails{
+			"testEvent1": {
+				Effects: []details.EventEffect{
+					{
+						Chance:  0.2,
+						EventID: "newEvent1",
+					},
+					{
+						Chance:  0.9,
+						EventID: "newEvent2",
+					},
+					{
+						Chance:  1,
+						EventID: "newEvent3",
+					},
+				},
+			},
+		},
+	},
+	{
+		EventID:     "testEvent2",
+		expectation: "newEvent1",
+		eventDetails: map[string]details.EventDetails{
+			"testEvent2": {
+				Effects: []details.EventEffect{
+					{
+						Chance:  0.001,
+						EventID: "newEvent1",
+					},
+					{
+						Chance:  0.002,
+						EventID: "newEvent2",
+					},
+					{
+						Chance:  1,
+						EventID: "newEvent3",
+					},
+				},
+			},
+		},
+	},
+	{
+		EventID:     "testEvent3",
+		expectation: "",
+		eventDetails: map[string]details.EventDetails{
+			"testEvent2": {},
+		},
+	},
+}
+
+func TestGetRandomEventEffect(t *testing.T) {
+	s := Service{
+		TicksSinceStart: 100,
+		EventDetails:    map[string]details.EventDetails{},
+	}
+
+	for _, test := range getRandomEventEffectData {
+		s.EventDetails = test.eventDetails
+		result, err := s.GetRandomEventEffect(test.EventID)
+		if assert.NoError(t, err) {
+			assert.Equal(t, test.expectation, result)
+		}
+	}
 }
