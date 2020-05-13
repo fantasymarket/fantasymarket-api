@@ -20,7 +20,7 @@ type APIHandler struct {
 // Errors for the HTTP Handler
 var (
 	fetchingError = errors.New("error fetching data")
-	orderUpdateError = errors.New("error updating error")
+	orderUpdateError = errors.New("error updating order")
 	decodingError = errors.New("data could not be decoded")
 	orderDeletionError = errors.New("order could not be deleted")
 	userNotFoundError = errors.New("could not find user")
