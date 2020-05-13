@@ -1,12 +1,13 @@
 package v1
 
 import (
+	"errors"
 	"fantasymarket/database"
 	"fantasymarket/game"
 	"fantasymarket/utils/config"
 	"fantasymarket/utils/http/middleware/jwt"
 	"net/http"
-	"errors"
+
 	"github.com/go-chi/chi"
 )
 
@@ -19,16 +20,16 @@ type APIHandler struct {
 
 // Errors for the HTTP Handler
 var (
-	fetchingError = errors.New("error fetching data")
-	orderUpdateError = errors.New("error updating order")
-	decodingError = errors.New("data could not be decoded")
+	fetchingError      = errors.New("error fetching data")
+	orderUpdateError   = errors.New("error updating order")
+	decodingError      = errors.New("data could not be decoded")
 	orderDeletionError = errors.New("order could not be deleted")
-	userNotFoundError = errors.New("could not find user")
-	passwordError = errors.New("could not parse password")
-	usernameError = errors.New("could not parse username")
-	tokenError = errors.New("could not generate token")
-	accountError = errors.New("error creating new user account")
-	loginError = errors.New("could not login user")
+	userNotFoundError  = errors.New("could not find user")
+	passwordError      = errors.New("could not parse password")
+	usernameError      = errors.New("could not parse username")
+	tokenError         = errors.New("could not generate token")
+	accountError       = errors.New("error creating new user account")
+	loginError         = errors.New("could not login user")
 )
 
 // NewAPIRouter creates a new API HTTP handler
@@ -43,9 +44,7 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 	r.Get("/events", api.getEvents)
 
-
 	r.Get("/time", api.getTime)
-
 
 	r.Route("/stocks", func(r chi.Router) {
 

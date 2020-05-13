@@ -5,9 +5,10 @@ import (
 	"fantasymarket/database/models"
 	"fantasymarket/utils/http/middleware/jwt"
 	"fantasymarket/utils/http/responses"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"net/http"
+
+	"gopkg.in/yaml.v3"
 )
 
 type customOrder struct {

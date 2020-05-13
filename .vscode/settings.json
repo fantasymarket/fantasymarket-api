@@ -1,20 +1,32 @@
 {
     "go.lintTool": "revive",
-    "go.lintFlags": ["-exclude=vendor/...", "-config=${workspaceFolder}/.revive.toml"],
+    "go.lintFlags": [
+        "-config=${workspaceFolder}/.revive.toml"
+    ],
+    "go.buildOnSave": "package",
+    "go.lintOnSave": "package",
+    "go.vetOnSave": "package",
+    "go.testOnSave": false,
+    "go.useLanguageServer": true,
     "[go]": {
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
             "source.organizeImports": true,
         },
-        "editor.snippetSuggestions": "inline",
+        // Optional: Disable snippets, as they conflict with completion ranking.
+        "editor.snippetSuggestions": "none",
     },
-    "go.useLanguageServer": false,
-    "go.formatTool": "goimports",
-    "go.liveErrors": {
-        "enabled": true,
-         "delay": 500
+    "[go.mod]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true,
+        },
     },
-    "go.useCodeSnippetsOnFunctionSuggest": true,
-    "go.useCodeSnippetsOnFunctionSuggestWithoutType": true,
-    "liveshare.languages.allowGuestCommandControl": true,
+    "gopls": {
+        // Add parameter placeholders when completing a function.
+        "usePlaceholders": true,
+        // If true, enable additional analyses with staticcheck.
+        // Warning: This will significantly increase memory usage.
+        "staticcheck": false,
+    }
 }
