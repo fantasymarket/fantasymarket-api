@@ -197,7 +197,6 @@ func (suite *DatabaseTestSuite) TestGetStockAtTick() {
 		assert.Equal(suite.T(), nil, err)
 
 		for j := 0; j < len(test.expectation); j++ {
-			//I hate my life - cant tests equals because of UUID and other stuff
 			assert.Equal(suite.T(), test.expectation[j].Symbol, result[j].Symbol)
 			assert.Equal(suite.T(), test.expectation[j].Index, result[j].Index)
 			assert.Equal(suite.T(), test.expectation[j].Name, result[j].Name)
@@ -268,7 +267,6 @@ func (suite *DatabaseTestSuite) TestGetStockMapAtTick() {
 		assert.Equal(suite.T(), nil, err)
 
 		for j := 0; j < len(test.expectation); j++ {
-			//I hate my life - cant tests equals because of UUID and other stuff
 			assert.Equal(suite.T(), test.expectation[test.stock.Symbol].Symbol, result[test.stock.Symbol].Symbol)
 			assert.Equal(suite.T(), test.expectation[test.stock.Symbol].Index, result[test.stock.Symbol].Index)
 			assert.Equal(suite.T(), test.expectation[test.stock.Symbol].Name, result[test.stock.Symbol].Name)
