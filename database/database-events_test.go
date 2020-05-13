@@ -50,7 +50,6 @@ func (suite *DatabaseTestSuite) TestGetEvents() {
 			newEvent, err := suite.dbService.GetEvents(parseTime("2020-12-30T15:00:05Z"))
 			assert.Equal(suite.T(), nil, err)
 
-			// I hate my life
 			// Cos newEvent is an array, I need to get correct model for each test case with the index
 			assert.EqualValues(suite.T(), event.expectation.EventID, newEvent[i].EventID)
 			assert.EqualValues(suite.T(), event.expectation.Title, newEvent[i].Title)
