@@ -13,6 +13,11 @@ tasks:
     cmds:
       - go test ./...
 
+  test-coverage:
+    desc: "run all tests"
+    cmds:
+      - go test -coverprofile coverage.out ./...
+
   lint:
     desc: "lint all files"
     cmds:
@@ -44,7 +49,7 @@ tasks:
       - go mod download
       - task: install-deps
       - task: lint
-      - task: test
+      - task: test-coverage
 
   build:
     env:

@@ -15,7 +15,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-const addr = "localhost:42069"
+const addr = "localhost:5000"
 
 // Start starts a new instance of our REST API
 func Start(db *database.Service, game *game.Service, config *config.Config) {

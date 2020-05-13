@@ -36,7 +36,7 @@ func Connect(config *config.Config) (*Service, error) {
 	}, nil
 }
 
-// AutoMigrate creates each Database tables
+// AutoMigrate migrates the database tables
 func AutoMigrate(db *gorm.DB) {
 	db.AutoMigrate(
 		&models.Stock{},
