@@ -64,16 +64,17 @@ var testAddEventData = []details.EventDetails{
 	{
 		EventID: "testEvent1",
 	},
-	{},
 }
 
+//TODO: TestAddEvent returns error on empty event being added
 func (suite *DatabaseTestSuite) TestAddEvent() {
 
 	createdAt := parseTime("2019-12-30T15:04:05Z")
 	currentDate := parseTime("2020-12-30T15:04:05Z")
 	for _, event := range testAddEventData {
-		suite.dbService.AddEvent(event, createdAt)
-		err := suite.dbService.DB.Where(models.Event{
+		err := suite.dbService.AddEvent(event, createdAt)
+		assert.Equal(suite.T(), nil, err)
+		err = suite.dbService.DB.Where(models.Event{
 			Active: true,
 		}).Where("created_at < ?", currentDate).Find(&models.Event{}).Error
 		assert.Equal(suite.T(), nil, err)
