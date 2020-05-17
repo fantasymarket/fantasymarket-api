@@ -556,7 +556,7 @@
   maxDuration: P10Y #todo
 
   tags:
-  - affectsTags: ["airplane"]
+  - affectsTags: ["aviation"]
     trend: -1.4
     affectsStockIDs: ["BA"]
     offset: P3DT22M14S
@@ -1045,6 +1045,113 @@
     affectsStockIDs: ["AAPL"]
     offset: P4MT58M24S
     duration: P1M
+
+- eventID: "flood-hits-new-york"
+  title: "Too much rain in the last couple of days has led to big floods in New York"
+  description: >-
+    "Due to the mass in rain, the city has flooded with millions of property damage.
+    Many of New Yorks most prestigious buildings and firms are affected and have claimed to suffer damages in the high millions"
+
+  Type: "random"
+  randomChancePerDay: 0.009
+
+  duration: P1W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["financial"]
+      minTrend: -1.6
+      maxTrend: -1
+      affectsStockIDs: ["JPM","AXP", "GS"]
+
+
+- eventID: "hurricane-hits-caribbean"
+  title: "big-hurricane-in-the-caribbean-holds-health-services-in-check"
+  description: >-
+    "A big hurricane that originated south-east of the Florida peninsula, has been going on a rampage through many islands in the Caribbean.
+    The health organisations are struggling to keep supply flowing to those in need"
+
+  Type: "random"
+  randomChancePerDay: 0.009
+
+  duration: P3W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["health"]
+      minTrend: -1.6
+      maxTrend: -1
+      affectsStockIDs: ["DVA","IDEXX","ANTM"]
+
+
+- eventID: "low-oil-levels"
+  title: "new-research-suggests-that-we-are-running-out-of-oil"
+  description: >-
+    "New Research from Harvard University who partnered with Yale University has concluded that we will run out of oil sooner, rather than later."
+
+  Type: "random"
+  randomChancePerDay: 0.009
+
+  duration: P1W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["energy"]
+      minTrend: -1.4
+      maxTrend: -0.6
+      affectsStockIDs: ["RDS-A"]
+    - affectsTags: ["energy"]
+      minTrend: 0.9
+      maxTrend: 2.1
+      affectsStockIDs: ["NEP", "FSLR"]
+
+
+
+- eventID: "SpaceX-new-breakthrough"
+  title: "SpaceX-has-announced-a-huge-breakthrough-in-their-earth-to-earth-rocket-travel-technology"
+  description: >-
+    "After a lot of testing, SpaceX has claimed it has reached a safety level 100 times greater than that of modern day airplanes"
+
+  Type: "random"
+  randomChancePerDay: 0.009
+
+  duration: P1D
+
+  dependencies: []
+  effects: []
+
+  tags:
+    -	affectsTags: ["aviation"]
+      minTrend: -0.7
+      maxTrend: -0.1
+      affectsStockIDs: ["BA"]
+
+
+- eventID: "fbi-uncovers-corruption-in-high-banking-positions"
+  title: "FBI uncovers corruption scandal in high banking positions"
+  description: >-
+    "Yesterday evening the FBI released reports showing corruption in high banking positions.
+    “Many banking CEOs have taken more than they should have”, claims the FBI representative"
+
+  Type: "random"
+  randomChancePerDay: 0.006
+
+  duration: P4W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["financial"]
+      minTrend: -2
+      maxTrend: -1.5
+      affectsStockIDs: ["JPM","AXP", "GS"]
 
 
 
