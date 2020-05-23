@@ -40,13 +40,14 @@ func (suite *DatabaseTestSuite) TestGetEvents() {
 	for i, event := range testGetEventData {
 		if event.eventID != "" {
 			createdAt = createdAt.Add(time.Minute)
-			suite.dbService.DB.Create(&models.Event{
+			err := suite.dbService.DB.Create(&models.Event{
 				EventID:   event.eventID,
 				Title:     event.eventID + event.eventID,
 				Text:      "",
 				Active:    true,
 				CreatedAt: createdAt,
-			})
+			}).Error
+			assert.Equal(suite.T(), nil, err)
 			newEvent, err := suite.dbService.GetEvents(parseTime("2020-12-30T15:00:05Z"))
 			assert.Equal(suite.T(), nil, err)
 
