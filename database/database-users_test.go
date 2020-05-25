@@ -22,6 +22,7 @@ func (suite *DatabaseTestSuite) TestCreateGuest() {
 
 		assert.Equal(suite.T(), user.Username, testUser.Username)
 	}
+	suite.dbService.DB.Close()
 }
 
 type ChangePasswordTestData struct {
@@ -127,19 +128,30 @@ func (suite *DatabaseTestSuite) TestRenameUserNoNewUsername() {
 	suite.dbService.DB.Close()
 }
 
-// func (suite *DatabaseTestSuite) TestRenameUserUsernameExists() {
-// 	expectErr := "username alreay exists"
-// 	id := uuid.NewV4()
-// 	err := suite.dbService.DB.Create(&models.User{
-// 		Username: "Admin1",
-// 	}).Error
-// 	assert.Equal(suite.T(), nil, err)
-// 	err = suite.dbService.DB.Create(&models.User{
-// 		UserID:   id,
-// 		Username: "Admin2",
-// 	}).Error
-// 	assert.Equal(suite.T(), nil, err)
-// 	fmt.Println(id)
-// 	newErr := suite.dbService.RenameUser(id, "Admin2", "Admin1")
-// 	assert.Equal(suite.T(), expectErr, newErr.Error())
-// }
+var testUsernameExitsData = map[string]models.User{
+	"Admin1": {
+		UserID:   uuid.UUID{},
+		Username: "Admin1",
+	},
+	"AdminAdmin2": {
+		UserID:   uuid.UUID{},
+		Username: "AdminAdmin2",
+	},
+}
+
+func (suite *DatabaseTestSuite) TestRenameUserUsernameExists() {
+	expectErr := "username alreay exists"
+
+	for _, user := range testUsernameExitsData {
+		user.UserID = uuid.NewV4()
+		err := suite.dbService.DB.Create(&user).Error
+		assert.Equal(suite.T(), nil, err)
+	}
+
+	err := suite.dbService.RenameUser(testUsernameExitsData["AdminAdmin2"].UserID,
+		testUsernameExitsData["AdminAdmin2"].Username,
+		testUsernameExitsData["Admin1"].Username)
+	assert.Equal(suite.T(), expectErr, err.Error())
+
+	suite.dbService.DB.Close()
+}

@@ -35,5 +35,6 @@
             "dialect": "SQLite",
             "name": "FantasyDatabase"
         }
-    ]
+    ],
+    "sqltools.useNodeRuntime": true
 }

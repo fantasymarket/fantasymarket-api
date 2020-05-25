@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fantasymarket/database/models"
 	"fantasymarket/utils/hash"
-	"fmt"
 
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
@@ -78,8 +77,6 @@ func (s *Service) ChangePassword(username, currentPassword, newPassword string) 
 // RenameUser renames a user account
 // NOTE: this should only be able to be called on your current username
 func (s *Service) RenameUser(userID uuid.UUID, username, newUsername string) error {
-	fmt.Println(userID)
-	fmt.Println(username)
 	if newUsername == "" {
 		return errors.New("cannot change username to blank")
 	}
@@ -95,7 +92,7 @@ func (s *Service) RenameUser(userID uuid.UUID, username, newUsername string) err
 	var newUser models.User
 	if err := s.DB.Where(models.User{
 		Username: newUsername,
-	}).Select("username, password").First(&user).Error; err != nil && !gorm.IsRecordNotFoundError(err) {
+	}).Select("username, password").First(&newUser).Error; err != nil && !gorm.IsRecordNotFoundError(err) {
 		return err
 	}
 
