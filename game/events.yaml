@@ -1153,6 +1153,121 @@
       maxTrend: -1.5
       affectsStockIDs: ["JPM","AXP", "GS"]
 
+- eventID: "Nasa-puts-humans-on-the-moon"
+  title: "Nasa makes an effort to make the moon habitable and puts first colony of humans on the moon"
+  description: >-
+    "Videos from Nasa showing 20 men and women moving into houses on the moon go viral"
+
+  Type: "random"
+  randomChancePerDay: 0.008
+
+  duration: P2W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    -	affectsTags: ["aviation"]
+           minTrend: -0.2
+           maxTrend: -0.5
+           affectsStockIDs: ["BA"]
+
+    -   affectsTags: ["real-estate"]
+          minTrend: -0.1
+          maxTrend: -0.9
+          affectsStockIDs: ["BXP"]
+
+
+- eventID: "high-oil-levels"
+  title: "oil company scientists discover a new way to gain oil"
+  description: >-
+    "A new scientific research found that oil companies do not need to fear running out of oil"
+
+  Type: "random"
+  randomChancePerDay: 0.004
+
+  duration: P2W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["energy"]
+      minTrend: -0.6
+      maxTrend: -1.4
+      affectsStockIDs: ["RDS-A"]
+    - affectsTags: ["energy"]
+      minTrend: 1.9
+      maxTrend: 0.2
+      affectsStockIDs: ["NEP", "FSLR"]
+
+
+- eventID: "cancer-is-cured"
+  title: "Curing cancer is now cheap and easy"
+  description: >-
+    "A young 14 year old latina found a way to cure cancer by merely taking one little pill she created, which was supposed to be one of her school projects"
+
+  Type: "random"
+  randomChancePerDay: 0.008
+
+  duration: P2W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["health"]
+      minTrend: -0.1
+      maxTrend: -3
+      affectsStockIDs: ["DVA","IDEXX","ANTM"]
+
+
+- eventID: "big-toe-problem"
+  title: "A new generation of chinese younglings develop unproportionally big toes"
+  description: >-
+    "Doctors assume that somehow the DNA of a wild animal got mixed with the uterus of pregnant women, resulting in babies with really big toes. A cure is present, but expensive."
+
+  Type: "random"
+  randomChancePerDay: 0.005
+
+  duration: P4W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["health"]
+      minTrend: -0.1
+      maxTrend: -1.4
+      affectsStockIDs: ["DVA","IDEXX"]
+
+
+- eventID: "Apple-Microsoft-Facebook-release-revolutionary-vr-experience"
+  title: "Big Tech in Silicon Valley release revolutionary VR experience as a joint effort"
+  description: >-
+    "The stock market currently sees something that gets called "\The SAO-Effect\", which refers to a japanese anime with VR as its main theme. Billions around the world are interested in this new technology and can't wait to buy the new VR-Suit."
+
+  Type: "random"
+  randomChancePerDay: 0.006
+
+  dependencies: []
+  effects: []
+
+  duration: P5M
+
+  tags:
+    - affectsTags: ["tech"]
+      minTrend: -0.1
+      maxTrend: -3.4
+      affectsStockIDs: ["AAPL", "MSFT", "FB"]
+
+
+
+
+
+
+
+
 
 
       
