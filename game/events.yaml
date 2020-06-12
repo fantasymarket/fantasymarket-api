@@ -1262,6 +1262,106 @@
       affectsStockIDs: ["AAPL", "MSFT", "FB"]
 
 
+- eventID: "World-runs-into-recession-after-intense-gamma-rays-reduce-flights"
+  title: "World hits sudden recession after scientists advise against flying for the next year."
+  description: >-
+    "Scientists notice that a sudden eruption on the surface of the sun altered the gamma rays hitting the earth, which doesn't allow for flights for at least one year."
+
+  Type: "random"
+  randomChancePerDay: 0.005
+
+  duration: P1W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["financial"]
+      minTrend: -2.3
+      maxTrend: -0.3
+      affectsStockIDs: ["JPM","AXP", "GS", "FB", "MSFT", "AAPL", "TSLA", "RDS-A", "NEP", "FSLR", "BXP", "BA"]
+
+- eventID: "Apple-closes-exclusive-deals-for-its-streaming-platform-with-Warner-Bros."
+  title: "Apple TV becomes more interesting for viewers since Apple closed an exclusive deal with Warner Bros."
+  description: >-
+    "Apple had a rather hard time getting a foot in the door of the streaming world, but due to the recently closed deal things might change in their favor."
+
+  Type: "random"
+  randomChancePerDay: 0.009
+
+  dependencies: []
+  effects: []
+
+  duration: P1M
+
+  tags:
+    - affectsTags: ["tech"]
+      minTrend: -0.1
+      maxTrend: -2.1
+      affectsStockIDs: ["AAPL"]
+
+
+- eventID: "Bill-Gates-dies"
+  title: "Bill Gates died in his sleep."
+  description: >-
+    "After Bill Gates death, investors speculate that Microsoft stocks might take a hit after the unfortunate news."
+
+  Type: "random"
+  randomChancePerDay: 0.003
+
+  dependencies: []
+  effects: []
+
+  duration: P1M
+
+  tags:
+    - affectsTags: ["tech"]
+      minTrend: -0.4
+      maxTrend: -0.4
+      affectsStockIDs: ["MSFT"]
+
+
+- eventID: "Mark-Zuckerberg-gets-detained-after-new-privacy-related-violations-come-to-light"
+  title: "Mark Zuckerberg might face jail-time after new severe accusations made against his company's privacy regulations."
+  description: >-
+    "Zuckerberg faces an appointment in court in 2 weeks and potentially gets sentenced to 1-3 years in jail."
+
+  Type: "random"
+  randomChancePerDay: 0.004
+
+  dependencies: []
+  effects: []
+
+  duration: P5M
+
+  tags:
+    - affectsTags: ["tech"]
+      minTrend: -2.5
+      maxTrend: -0.2
+      affectsStockIDs: ["FB"]
+
+
+- eventID: "Europe-forbids-any-non-electric-cars-due-to-massive-pollution"
+  title: "Europe comes to a joint conclusion that any non-electric cars are not allowed to drive on the roads anymore."
+  description: >-
+    "The electric car market has gotten much bigger and improved a lot over the recent years, which led the EU to forbid the use of non-electric cars."
+
+  Type: "random"
+  randomChancePerDay: 0.008
+
+  dependencies: []
+  effects: []
+
+  duration: P2M
+
+  tags:
+    - affectsTags: ["energy"]
+      minTrend: -0.1
+      maxTrend: -3.4
+      affectsStockIDs: ["TSLA"]
+
+
+
 
 
 
