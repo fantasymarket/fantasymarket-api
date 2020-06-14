@@ -19,8 +19,8 @@ require (
 	go.uber.org/multierr v1.5.0 // indirect
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
-	golang.org/x/tools v0.0.0-20200522201501-cb1345f3a375 // indirect
-	gopkg.in/yaml.v2 v2.3.0
-	gopkg.in/yaml.v3 v3.0.0-20200506231410-2ff61e1afc86
-	honnef.co/go/tools v0.0.1-2020.1.3 // indirect
+	golang.org/x/tools v0.0.0-20200428211428-0c9eba77bc32 // indirect
+	golang.org/x/tools/gopls v0.4.0 // indirect
+	gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 )

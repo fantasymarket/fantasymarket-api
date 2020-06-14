@@ -69,7 +69,7 @@ func (s *Service) GetStocksAtTick(lastTick int64) ([]models.Stock, error) {
 
 // GetStockMapAtTick fetches the value of all stocks at a tick as a Map
 func (s *Service) GetStockMapAtTick(lastTick int64) (map[string]models.Stock, error) {
-	stocks, err := s.GetStockMapAtTick(lastTick)
+	stocks, err := s.GetStocksAtTick(lastTick)
 	if err != nil {
 		return nil, err
 	}
