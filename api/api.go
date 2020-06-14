@@ -23,7 +23,7 @@ func Start(db *database.Service, game *game.Service, config *config.Config) {
 	r := chi.NewRouter()
 
 	// CORS Header
-	cors := cors.New(cors.Options{
+	corsConfig := cors.New(cors.Options{
 		AllowedOrigins:     []string{"https://fantasymarket.netlify.com/", "http://localhost:3000"},
 		AllowedMethods:     []string{"GET", "POST", "PUT"},
 		AllowedHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
@@ -35,7 +35,7 @@ func Start(db *database.Service, game *game.Service, config *config.Config) {
 	})
 
 	// Middleware
-	r.Use(middleware.Logger, cors.Handler)
+	r.Use(middleware.Logger, corsConfig.Handler)
 
 	v1Handler := v1.NewAPIRouter(db, game, config)
 

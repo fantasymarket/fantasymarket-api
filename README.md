@@ -35,6 +35,8 @@
 - Linux:
 	- You need to have the [development tools package for your distro](https://github.com/mattn/go-sqlite3#linux) installed
 
+NOTE: Due to some changes in gcc 10, you might see some warnings because of the sqlite bindings we use. This won't cause any issues. 
+
 ### 2. Clone Repo
 
 ```bash

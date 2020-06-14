@@ -3,7 +3,7 @@ module fantasymarket
 go 1.14
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
+	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dustinkirkland/golang-petname v0.0.0-20191129215211-8e5a1ed0cff0
 	github.com/go-chi/chi v4.1.1+incompatible
@@ -17,7 +17,7 @@ require (
 	github.com/stretchr/testify v1.4.0
 	go.uber.org/config v1.4.0
 	go.uber.org/multierr v1.5.0 // indirect
-	golang.org/x/crypto v0.0.0-20200423211502-4bdfaf469ed5
+	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/tools v0.0.0-20200428211428-0c9eba77bc32 // indirect
 	golang.org/x/tools/gopls v0.4.0 // indirect
