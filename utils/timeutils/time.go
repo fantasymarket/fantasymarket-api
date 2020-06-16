@@ -46,3 +46,7 @@ func (t *Time) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 	return t.UnmarshalJSON([]byte(b))
 }
+
+func GetTickAtTime(time string) int {
+
+}
