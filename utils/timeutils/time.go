@@ -1,6 +1,7 @@
 package timeutils
 
 import (
+	"fantasymarket/utils/config"
 	"fmt"
 	"strings"
 	"time"
@@ -47,6 +48,10 @@ func (t *Time) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return t.UnmarshalJSON([]byte(b))
 }
 
-func GetTickAtTime(time string) int {
+func GetTickAtTime(timestamp string) int {
+	startTime, err := time.Parse(time.RFC3339, config.DefaultConfig.Game.StartDate.Time.String())
+	if err != nil {
+		fmt.Println("Could not parse time correctly: ", err)
+	}
 
 }
