@@ -1,12 +1,11 @@
 package v1
 
 import (
-	"errors"
 	"fantasymarket/game/details"
 	"fantasymarket/utils/http/responses"
 	"fantasymarket/utils/timeutils"
+	"fmt"
 	"net/http"
-
 	"github.com/go-chi/chi"
 	"gopkg.in/yaml.v3"
 )
@@ -18,7 +17,7 @@ func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m := []details.StockDetails{}
+	m := make([]details.StockDetails, 20)
 	err = yaml.Unmarshal(allStocks, &m)
 
 	if err != nil {
@@ -35,26 +34,30 @@ func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 
 	yamlData, err := details.StocksYamlBytes()
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "Error getting Stock Details")
+		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
+		return
 	}
 
 	var myStocks []details.StockDetails
-
 	if err := yaml.Unmarshal(yamlData, &myStocks); err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "Error parsing the stock")
+		responses.ErrorResponse(w, http.StatusInternalServerError, decodingError.Error())
+		return
 	}
 
 	stock, err := getStockHelper(myStocks, symbol)
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, "Error getting the Stock Detail")
+		responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
 		return
 	}
 	if time != "" {
 		tick := timeutils.GetTickAtTime(time)
-		// TODO: Implement the GetTickAtTime function and then grab the corresponding
-		// TODO: Stock at that tick from db.GetStockAtTick and then return that stock
-		// TODO: to the client.
-		responses.CustomResponse(w, stockAtTime, http.StatusOK)
+		stockMapAtTick, err := api.DB.GetStockMapAtTick(tick)
+		if err != nil {
+			responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
+			return
+		}
+		desiredStock := stockMapAtTick[stock.Name]
+		responses.CustomResponse(w, desiredStock, http.StatusOK)
 		return
 	}
 

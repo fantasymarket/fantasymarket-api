@@ -48,10 +48,18 @@ func (t *Time) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return t.UnmarshalJSON([]byte(b))
 }
 
-func GetTickAtTime(timestamp string) int {
+func GetTickAtTime(timestamp string) int64 {
 	startTime, err := time.Parse(time.RFC3339, config.DefaultConfig.Game.StartDate.Time.String())
 	if err != nil {
-		fmt.Println("Could not parse time correctly: ", err)
+		fmt.Println("Could not parse startTime correctly: ", err)
 	}
+	currentTime, err := time.Parse(time.RFC3339, timestamp)
+	if err != nil {
+		fmt.Println("Could not parse currentTime correctly: ", err)
+	}
+	difference := int64(currentTime.Sub(startTime).Hours())
+
+	return difference
+
 
 }
