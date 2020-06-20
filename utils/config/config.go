@@ -26,7 +26,7 @@ type GameConfig struct {
 	StartDate       timeutils.Time `yaml:"startDate"`       // The initial ingame time}
 }
 
-var DefaultConfig = Config{
+var defaultConfig = Config{
 	Game: GameConfig{
 		TicksPerSecond:  0.1,
 		StartDate:       timeutils.Time{Time: time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC)},

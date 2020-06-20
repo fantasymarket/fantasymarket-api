@@ -3,11 +3,10 @@ package v1
 import (
 	"fantasymarket/game/details"
 	"fantasymarket/utils/http/responses"
-	"fantasymarket/utils/timeutils"
-	"fmt"
 	"net/http"
 	"github.com/go-chi/chi"
 	"gopkg.in/yaml.v3"
+	"time"
 )
 
 func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +16,7 @@ func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m := make([]details.StockDetails, 20)
+	m := make([]details.StockDetails, 30)
 	err = yaml.Unmarshal(allStocks, &m)
 
 	if err != nil {
@@ -30,46 +29,49 @@ func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 
 func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 	symbol := chi.URLParam(r, "symbol")
-	time := chi.URLParam(r, "time")
+	givenTime := chi.URLParam(r, "time")
 
-	yamlData, err := details.StocksYamlBytes()
-	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
-		return
-	}
-
-	var myStocks []details.StockDetails
-	if err := yaml.Unmarshal(yamlData, &myStocks); err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, decodingError.Error())
-		return
-	}
-
-	stock, err := getStockHelper(myStocks, symbol)
-	if err != nil {
+	stock, ok := api.Game.StockDetails[symbol]
+	if !ok {
 		responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
 		return
 	}
-	if time != "" {
-		tick := timeutils.GetTickAtTime(time)
+	if givenTime != "" {
+		tick, err := api.getTickAtTime(givenTime)
+		if err != nil {
+			responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
+			return
+		}
 		stockMapAtTick, err := api.DB.GetStockMapAtTick(tick)
 		if err != nil {
 			responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
 			return
 		}
-		desiredStock := stockMapAtTick[stock.Name]
+		desiredStock := stockMapAtTick[stock.Symbol]
 		responses.CustomResponse(w, desiredStock, http.StatusOK)
 		return
+	} else {
+		stockMapAtTick, err := api.DB.GetStockMapAtTick(api.Game.TicksSinceStart)
+		if err != nil {
+			responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
+			return
+		}
+		responses.CustomResponse(w, stockMapAtTick, http.StatusOK)
 	}
-
-	responses.CustomResponse(w, stock, http.StatusOK)
 }
 
-func getStockHelper(stocks []details.StockDetails, symbol string) (*details.StockDetails, error){
-	for i := range stocks {
-		if stocks[i].Symbol == symbol {
-			return &stocks[i], nil
-		}
+func (api *APIHandler) getTickAtTime(timestamp string) (int64, error) {
+	startTime, err := time.Parse(time.RFC3339, api.Config.Game.StartDate.String())
+	if err != nil {
+		return 0, err
 	}
+	currentTime, err := time.Parse(time.RFC3339, timestamp)
+	if err != nil {
+		return 0, err
+	}
+	difference := int64(currentTime.Sub(startTime).Hours())
 
-	return nil, stockNotFoundError
+	return difference, nil
+
+
 }
