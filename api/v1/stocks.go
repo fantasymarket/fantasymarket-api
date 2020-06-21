@@ -36,6 +36,7 @@ func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 		responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
 		return
 	}
+
 	if givenTime != "" {
 		tick, err := api.getTickAtTime(givenTime)
 		if err != nil {
@@ -56,7 +57,7 @@ func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 			responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
 			return
 		}
-		responses.CustomResponse(w, stockMapAtTick, http.StatusOK)
+		responses.CustomResponse(w, stockMapAtTick[symbol], http.StatusOK)
 	}
 }
 
@@ -72,6 +73,4 @@ func (api *APIHandler) getTickAtTime(timestamp string) (int64, error) {
 	difference := int64(currentTime.Sub(startTime).Hours())
 
 	return difference, nil
-
-
 }
