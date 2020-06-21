@@ -30,6 +30,7 @@ var (
 	tokenError         = errors.New("could not generate token")
 	accountError       = errors.New("error creating new user account")
 	loginError         = errors.New("could not login user")
+	stockNotFoundError = errors.New("could not find stock")
 )
 
 // NewAPIRouter creates a new API HTTP handler

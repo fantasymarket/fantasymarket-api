@@ -4,9 +4,9 @@ import (
 	"fantasymarket/game/details"
 	"fantasymarket/utils/http/responses"
 	"net/http"
-
 	"github.com/go-chi/chi"
 	"gopkg.in/yaml.v3"
+	"time"
 )
 
 func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
@@ -16,7 +16,7 @@ func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m := []details.StockDetails{}
+	m := make([]details.StockDetails, 30)
 	err = yaml.Unmarshal(allStocks, &m)
 
 	if err != nil {
@@ -29,24 +29,48 @@ func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 
 func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 	symbol := chi.URLParam(r, "symbol")
+	givenTime := chi.URLParam(r, "time")
 
-	yamlData, err := details.StocksYamlBytes()
-	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
+	stock, ok := api.Game.StockDetails[symbol]
+	if !ok {
+		responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
+		return
 	}
 
-	var myStocks []details.StockDetails
-
-	if err := yaml.Unmarshal(yamlData, &myStocks); err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
-	}
-
-	for i := range myStocks {
-		if myStocks[i].Symbol == symbol {
-			responses.CustomResponse(w, myStocks[i], 200)
+	if givenTime != "" {
+		tick, err := api.getTickAtTime(givenTime)
+		if err != nil {
+			responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
 			return
 		}
+		stockMapAtTick, err := api.DB.GetStockMapAtTick(tick)
+		if err != nil {
+			responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
+			return
+		}
+		desiredStock := stockMapAtTick[stock.Symbol]
+		responses.CustomResponse(w, desiredStock, http.StatusOK)
+		return
+	} else {
+		stockMapAtTick, err := api.DB.GetStockMapAtTick(api.Game.TicksSinceStart)
+		if err != nil {
+			responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
+			return
+		}
+		responses.CustomResponse(w, stockMapAtTick[symbol], http.StatusOK)
 	}
+}
 
-	responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
+func (api *APIHandler) getTickAtTime(timestamp string) (int64, error) {
+	startTime, err := time.Parse(time.RFC3339, api.Config.Game.StartDate.String())
+	if err != nil {
+		return 0, err
+	}
+	currentTime, err := time.Parse(time.RFC3339, timestamp)
+	if err != nil {
+		return 0, err
+	}
+	difference := int64(currentTime.Sub(startTime).Hours())
+
+	return difference, nil
 }
