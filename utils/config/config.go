@@ -20,7 +20,7 @@ type Config struct {
 	LogLevel    string         `mapstructure:"logLevel"`
 	Development bool           `mapstructure:"development"`
 	Database    DatabaseConfig `mapstructure:"database"`
-	Port        string         `mapstructure:"listenOn"`
+	Port        string         `mapstructure:"port"`
 }
 
 // DatabaseConfig are specific settings for the database connection
@@ -52,8 +52,9 @@ func Load() (*Config, error) {
 	// config.yaml is only created if the sample config exists in the same dir
 	shouldCreateConfig := exampleErr == nil && os.IsNotExist(configErr)
 	if shouldCreateConfig {
-		if configErr = fileUtils.Copy("config.example.yaml", "config.yaml"); configErr != nil {
-			return nil, configErr
+		if err := fileUtils.Copy("config.example.yaml", "config.yaml"); err != nil {
+			configErr = err
+			return nil, err
 		}
 	}
 
@@ -67,26 +68,29 @@ func Load() (*Config, error) {
 	viper.SetDefault("database.ssl", "")
 
 	viper.SetDefault("game.ticksPerSecond", 0.1)
-	viper.SetDefault("game.timePerTick", time.Hour)
+	viper.SetDefault("game.gameTimePerTick", time.Hour)
 
 	viper.SetDefault("tokenSecret", "secret")
-	viper.SetDefault("logLevel", "info")
+	viper.SetDefault("logLevel", "debug")
 	viper.SetDefault("development", "false")
 	viper.SetDefault("port", "5000")
 
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)
 	viper.AutomaticEnv()
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
 
-	// Find and read the config file
-	err := viper.ReadInConfig()
-	if _, ok := err.(viper.ConfigFileNotFoundError); err != nil && !ok {
-		panic(fmt.Errorf("Fatal error config file: %s", err))
+	if configErr == nil {
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
+		viper.AddConfigPath(".")
+
+		err := viper.ReadInConfig()
+		if _, ok := err.(viper.ConfigFileNotFoundError); err != nil && !ok {
+			panic(fmt.Errorf("Fatal error config file: %s", err))
+		}
 	}
 
+	// Find and read the config file
 	conf := Config{
 		Game: GameConfig{
 			// viper somehow strugles with parsing dates so this is hardcoded
@@ -109,7 +113,7 @@ func Load() (*Config, error) {
 		log.Warn().Msg("tokenSecret should not be kept at the default value in production")
 	}
 
-	return &conf, err
+	return &conf, nil
 }
 
 func getLogLevel(level string) zerolog.Level {

@@ -6,8 +6,10 @@ COPY . .
 RUN curl -sL https://taskfile.dev/install.sh | sh
 RUN ./bin/task install-deps
 RUN ./bin/task build
+RUN ls bin
 
 # STEP 2 build a small image
 FROM scratch
-COPY --from=builder /fantasymarket/bin/fantasymarket /fantasymarket/bin/fantasymarket
-ENTRYPOINT ["/fantasymarket/bin/fantasymarket"]
+WORKDIR /root/
+COPY --from=builder /fantasymarket/bin/fantasymarket .
+ENTRYPOINT ["./fantasymarket"]
