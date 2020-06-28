@@ -4,9 +4,10 @@ import (
 	"fantasymarket/game/details"
 	"fantasymarket/utils/http/responses"
 	"net/http"
+	"time"
+
 	"github.com/go-chi/chi"
 	"gopkg.in/yaml.v3"
-	"time"
 )
 
 func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
@@ -51,14 +52,14 @@ func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 		desiredStock := stockMapAtTick[stock.Symbol]
 		responses.CustomResponse(w, desiredStock, http.StatusOK)
 		return
-	} else {
-		stockMapAtTick, err := api.DB.GetStockMapAtTick(api.Game.TicksSinceStart)
-		if err != nil {
-			responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
-			return
-		}
-		responses.CustomResponse(w, stockMapAtTick[symbol], http.StatusOK)
 	}
+
+	stockMapAtTick, err := api.DB.GetStockMapAtTick(api.Game.TicksSinceStart)
+	if err != nil {
+		responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
+		return
+	}
+	responses.CustomResponse(w, stockMapAtTick[symbol], http.StatusOK)
 }
 
 func (api *APIHandler) getTickAtTime(timestamp string) (int64, error) {
