@@ -26,6 +26,7 @@ type Config struct {
 // DatabaseConfig are specific settings for the database connection
 type DatabaseConfig struct {
 	Type     string `mapstructure:"type"` // sqlite or postgres
+	URL      string `mapstructure:"url"`
 	Host     string `mapstructure:"host"`
 	Port     string `mapstructure:"port"`
 	Username string `mapstructure:"username"`
@@ -57,11 +58,12 @@ func Load() (*Config, error) {
 	}
 
 	viper.SetDefault("database.type", "sqlite")
-	viper.SetDefault("database.host", "localhost")
-	viper.SetDefault("database.port", "5432")
-	viper.SetDefault("database.username", "fantasymarket")
-	viper.SetDefault("database.password", "fantasymarket")
-	viper.SetDefault("database.database", "fantasymarket")
+	viper.SetDefault("database.url", "")
+	viper.SetDefault("database.host", "")
+	viper.SetDefault("database.port", "")
+	viper.SetDefault("database.username", "")
+	viper.SetDefault("database.password", "")
+	viper.SetDefault("database.database", "")
 	viper.SetDefault("database.ssl", "")
 
 	viper.SetDefault("game.ticksPerSecond", 0.1)
