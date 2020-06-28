@@ -57,7 +57,7 @@ tasks:
       GOARCH: amd64
     cmds:
       - go generate ./...
-      - go build -ldflags="-s -w" -o bin/fantasymarket -i main.go
+      - go build -a -tags netgo -ldflags='-s -w -extldflags "-static"' -o bin/fantasymarket -i main.go
 
   deploy-staging:
     cmds:

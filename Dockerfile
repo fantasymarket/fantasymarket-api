@@ -10,6 +10,6 @@ RUN ls bin
 
 # STEP 2 build a small image
 FROM scratch
-WORKDIR /root/
+WORKDIR /
 COPY --from=builder /fantasymarket/bin/fantasymarket .
-ENTRYPOINT ["./fantasymarket"]
+ENTRYPOINT ["/fantasymarket"]
