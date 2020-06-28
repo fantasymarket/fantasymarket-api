@@ -109,8 +109,6 @@ func Load() (*Config, error) {
 		log.Warn().Msg("tokenSecret should not be kept at the default value in production")
 	}
 
-	fmt.Println(conf)
-
 	return &conf, err
 }
 

@@ -11,6 +11,7 @@ import (
 	"github.com/jinzhu/gorm"
 
 	// load sqlite dialect
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
