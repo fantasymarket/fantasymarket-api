@@ -20,7 +20,7 @@ type Config struct {
 	LogLevel    string         `mapstructure:"logLevel"`
 	Development bool           `mapstructure:"development"`
 	Database    DatabaseConfig `mapstructure:"database"`
-	ListenOn    string         `mapstructure:"listenOn"`
+	Port        string         `mapstructure:"listenOn"`
 }
 
 // DatabaseConfig are specific settings for the database connection
@@ -72,7 +72,7 @@ func Load() (*Config, error) {
 	viper.SetDefault("tokenSecret", "secret")
 	viper.SetDefault("logLevel", "info")
 	viper.SetDefault("development", "false")
-	viper.SetDefault("listenOn", ":5000")
+	viper.SetDefault("port", "5000")
 
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)
