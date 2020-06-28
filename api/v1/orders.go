@@ -71,7 +71,7 @@ func (api *APIHandler) addOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	time := api.Config.Game.StartDate
-	err := api.DB.AddOrder(*requestOrder, user.UserID, time.Time)
+	err := api.DB.AddOrder(*requestOrder, user.UserID, time)
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, orderUpdateError.Error())
 	}
@@ -85,7 +85,7 @@ func (api *APIHandler) deleteOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	time := api.Config.Game.StartDate
-	err := api.DB.CancelOrder(requestOrder.OrderID, time.Time)
+	err := api.DB.CancelOrder(requestOrder.OrderID, time)
 	if err != nil {
 		responses.ErrorResponse(w, 500, orderDeletionError.Error())
 		return

@@ -10,12 +10,11 @@ import (
 	"fantasymarket/utils/config"
 
 	"net/http"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 )
-
-const addr = "localhost:5000"
 
 // Start starts a new instance of our REST API
 func Start(db *database.Service, game *game.Service, config *config.Config) {
@@ -42,6 +41,6 @@ func Start(db *database.Service, game *game.Service, config *config.Config) {
 	r.Mount("/v1", v1Handler)
 	r.Mount("/", v1Handler)
 
-	log.Info().Str("address", addr).Msg("successfully started the http server")
-	http.ListenAndServe(addr, r)
+	log.Info().Str("address", config.ListenOn).Msg("successfully started the http server")
+	http.ListenAndServe(config.ListenOn, r)
 }

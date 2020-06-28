@@ -93,7 +93,7 @@ func StocksYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "../stocks.yaml", size: 238, mode: os.FileMode(420), modTime: time.Unix(1586353646, 0)}
+	info := bindataFileInfo{name: "../stocks.yaml", size: 238, mode: os.FileMode(420), modTime: time.Unix(1592586598, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -113,7 +113,7 @@ func EventsYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "../events.yaml", size: 31834, mode: os.FileMode(420), modTime: time.Unix(1588005611, 0)}
+	info := bindataFileInfo{name: "../events.yaml", size: 31834, mode: os.FileMode(420), modTime: time.Unix(1592586598, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
