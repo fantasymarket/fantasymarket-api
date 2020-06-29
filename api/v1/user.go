@@ -115,6 +115,7 @@ func (api *APIHandler) loginUser(w http.ResponseWriter, r *http.Request) {
 	user, err := api.DB.LoginUser(req.username, req.password)
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, loginError.Error())
+		return
 	}
 
 	responses.CustomResponse(w, user, 200)

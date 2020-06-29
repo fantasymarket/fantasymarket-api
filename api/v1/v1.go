@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/rs/cors"
 )
 
 // APIHandler holds the dependencies for http handlers
@@ -43,6 +45,18 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 	r := chi.NewRouter()
 
+	// CORS Header
+	corsConfig := cors.New(cors.Options{
+		AllowedOrigins:   []string{"https://fantasymarket.netlify.app", "https://develop--fantasymarket.netlify.app", "http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "HEAD", "PATCH"},
+		AllowCredentials: true,
+		Debug:            true,
+	})
+
+	// Middleware
+	r.Use(corsConfig.Handler)
+	r.Use(middleware.Logger)
+
 	r.Get("/events", api.getEvents)
 
 	r.Get("/time", api.getTime)
@@ -71,6 +85,7 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 			r.Use(jwt.Middleware(api.Config.TokenSecret, true))
 			r.Get("/{username}", api.getUser)
 			r.Put("/", api.createUser)
+			r.Post("/login", api.loginUser)
 		})
 
 		r.Group(func(r chi.Router) {
