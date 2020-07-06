@@ -85,11 +85,20 @@ func (s *Service) GetStockMapAtTick(lastTick int64) (map[string]models.Stock, er
 }
 
 // GetStockAtTick fetches the value of a specific stock at a specific tick
-func (s *Service) GetStockAtTick(stockID uuid.UUID, lastTick int64) (*models.Stock, error) {
-	var stock models.Stock
-	if err := s.DB.Where(models.Stock{Tick: lastTick, StockID: stockID}).First(&stock).Error; err != nil {
+// `stock` can either be a stock symbol or stockID
+func (s *Service) GetStockAtTick(stock string, lastTick int64) (*models.Stock, error) {
+	query := models.Stock{Tick: lastTick}
+
+	if uuid, err := uuid.FromString(stock); err != nil {
+		query.StockID = uuid
+	} else {
+		query.Symbol = stock
+	}
+
+	var stockData models.Stock
+	if err := s.DB.Where(query).First(&stockData).Error; err != nil {
 		return nil, err
 	}
 
-	return &stock, nil
+	return &stockData, nil
 }
