@@ -10,7 +10,8 @@ func (api *APIHandler) getEvents(w http.ResponseWriter, r *http.Request) {
 	events, err := api.DB.GetEvents(t)
 
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
+		responses.ErrorResponse(w, http.StatusInternalServerError, errFetchingData.Error())
+		return
 	}
 
 	responses.CustomResponse(w, events, 200)

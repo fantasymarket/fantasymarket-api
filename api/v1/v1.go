@@ -22,17 +22,17 @@ type APIHandler struct {
 
 // Errors for the HTTP Handler
 var (
-	fetchingError      = errors.New("error fetching data")
-	orderUpdateError   = errors.New("error updating order")
-	decodingError      = errors.New("data could not be decoded")
-	orderDeletionError = errors.New("order could not be deleted")
-	userNotFoundError  = errors.New("could not find user")
-	passwordError      = errors.New("could not parse password")
-	usernameError      = errors.New("could not parse username")
-	tokenError         = errors.New("could not generate token")
-	accountError       = errors.New("error creating new user account")
-	loginError         = errors.New("could not login user")
-	stockNotFoundError = errors.New("could not find stock")
+	errFetchingData    = errors.New("error fetching data")
+	errUpdatingOrder   = errors.New("error updating order")
+	errDecoding        = errors.New("data could not be decoded")
+	errDeletingOrder   = errors.New("order could not be deleted")
+	errUserNotFound    = errors.New("could not find user")
+	errParsingPassword = errors.New("could not parse password")
+	errParsingUsername = errors.New("could not parse username")
+	errGeneratingToken = errors.New("could not generate token")
+	errCreatingAccount = errors.New("error creating new user account")
+	errInvalidLogin    = errors.New("could not login user")
+	errStockNotFound   = errors.New("could not find stock")
 )
 
 // NewAPIRouter creates a new API HTTP handler
