@@ -11,7 +11,8 @@ func (api *APIHandler) getTime(w http.ResponseWriter, r *http.Request) {
 
 	if !t.IsZero() {
 		responses.CustomResponse(w, t.Format(time.RFC3339), 200)
-	} else {
-		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
+		return
 	}
+
+	responses.ErrorResponse(w, http.StatusInternalServerError, errFetchingData.Error())
 }

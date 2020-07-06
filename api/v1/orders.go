@@ -22,14 +22,14 @@ func (api *APIHandler) ordersForUser(w http.ResponseWriter, r *http.Request) {
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
+		responses.ErrorResponse(w, http.StatusInternalServerError, errFetchingData.Error())
 		return
 	}
 
 	allOrders := &customOrder{Order: models.Order{UserID: user.UserID}}
 	err = yaml.Unmarshal(body, allOrders)
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, decodingError.Error())
+		responses.ErrorResponse(w, http.StatusInternalServerError, errDecoding.Error())
 		return
 	}
 
@@ -39,7 +39,7 @@ func (api *APIHandler) ordersForUser(w http.ResponseWriter, r *http.Request) {
 
 	orders, err := api.DB.GetOrders(allOrders.Order, allOrders.Limit, allOrders.Offset)
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
+		responses.ErrorResponse(w, http.StatusInternalServerError, errFetchingData.Error())
 		return
 	}
 	responses.CustomResponse(w, orders, 200)
@@ -49,13 +49,13 @@ func (api *APIHandler) ordersForUser(w http.ResponseWriter, r *http.Request) {
 func (api *APIHandler) getOrdersID(w http.ResponseWriter, r *http.Request) {
 	var requestOrder models.Order
 	if err := json.NewDecoder(r.Body).Decode(&requestOrder); err != nil {
-		responses.ErrorResponse(w, http.StatusBadRequest, decodingError.Error())
+		responses.ErrorResponse(w, http.StatusBadRequest, errDecoding.Error())
 		return
 	}
 
 	orders, err := api.DB.GetOrderByID(requestOrder.OrderID)
 	if err != nil {
-		responses.ErrorResponse(w, 500, fetchingError.Error())
+		responses.ErrorResponse(w, 500, errFetchingData.Error())
 		return
 	}
 	responses.CustomResponse(w, orders, 200)
@@ -66,28 +66,28 @@ func (api *APIHandler) addOrder(w http.ResponseWriter, r *http.Request) {
 
 	var requestOrder *models.Order
 	if err := json.NewDecoder(r.Body).Decode(&requestOrder); err != nil {
-		responses.ErrorResponse(w, http.StatusBadRequest, decodingError.Error())
+		responses.ErrorResponse(w, http.StatusBadRequest, errDecoding.Error())
 		return
 	}
 
 	time := api.Config.Game.StartDate
 	err := api.DB.AddOrder(*requestOrder, user.UserID, time)
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, orderUpdateError.Error())
+		responses.ErrorResponse(w, http.StatusInternalServerError, errUpdatingOrder.Error())
 	}
 }
 
 func (api *APIHandler) deleteOrder(w http.ResponseWriter, r *http.Request) {
 	var requestOrder *models.Order
 	if err := json.NewDecoder(r.Body).Decode(&requestOrder); err != nil {
-		responses.ErrorResponse(w, http.StatusBadRequest, decodingError.Error())
+		responses.ErrorResponse(w, http.StatusBadRequest, errDecoding.Error())
 		return
 	}
 
 	time := api.Config.Game.StartDate
 	err := api.DB.CancelOrder(requestOrder.OrderID, time)
 	if err != nil {
-		responses.ErrorResponse(w, 500, orderDeletionError.Error())
+		responses.ErrorResponse(w, 500, errDeletingOrder.Error())
 		return
 	}
 

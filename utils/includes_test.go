@@ -54,9 +54,7 @@ var includesData = []includesTestData{
 
 func testSome(t *testing.T) {
 	for _, test := range includesData {
-
 		assert.Equal(t, test.someExpect, utils.Some(test.slice, test.someData))
-
 		assert.Equal(t, test.inclExpect, utils.Includes(test.slice, test.inclData))
 	}
 }

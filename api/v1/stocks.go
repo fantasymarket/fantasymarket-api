@@ -13,7 +13,7 @@ import (
 func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 	allStocks, err := details.StocksYamlBytes()
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
+		responses.ErrorResponse(w, http.StatusInternalServerError, errFetchingData.Error())
 		return
 	}
 
@@ -21,7 +21,7 @@ func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 	err = yaml.Unmarshal(allStocks, &m)
 
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, fetchingError.Error())
+		responses.ErrorResponse(w, http.StatusInternalServerError, errFetchingData.Error())
 		return
 	}
 
@@ -34,19 +34,19 @@ func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 
 	stock, ok := api.Game.StockDetails[symbol]
 	if !ok {
-		responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
+		responses.ErrorResponse(w, http.StatusInternalServerError, errStockNotFound.Error())
 		return
 	}
 
 	if givenTime != "" {
 		tick, err := api.getTickAtTime(givenTime)
 		if err != nil {
-			responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
+			responses.ErrorResponse(w, http.StatusInternalServerError, errStockNotFound.Error())
 			return
 		}
 		stockMapAtTick, err := api.DB.GetStockMapAtTick(tick)
 		if err != nil {
-			responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
+			responses.ErrorResponse(w, http.StatusInternalServerError, errStockNotFound.Error())
 			return
 		}
 		desiredStock := stockMapAtTick[stock.Symbol]
@@ -56,7 +56,7 @@ func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
 
 	stockMapAtTick, err := api.DB.GetStockMapAtTick(api.Game.TicksSinceStart)
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, stockNotFoundError.Error())
+		responses.ErrorResponse(w, http.StatusInternalServerError, errStockNotFound.Error())
 		return
 	}
 	responses.CustomResponse(w, stockMapAtTick[symbol], http.StatusOK)
