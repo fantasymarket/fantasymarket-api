@@ -3,6 +3,8 @@ package database
 import (
 	"fantasymarket/database/models"
 	"fantasymarket/game/details"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 // CreateInitialStocks takes a list of initial stocks and uses them to initialize the database
@@ -80,4 +82,14 @@ func (s *Service) GetStockMapAtTick(lastTick int64) (map[string]models.Stock, er
 	}
 
 	return stockMap, nil
+}
+
+// GetStockAtTick fetches the value of a specific stock at a specific tick
+func (s *Service) GetStockAtTick(stockID uuid.UUID, lastTick int64) (*models.Stock, error) {
+	var stock models.Stock
+	if err := s.DB.Where(models.Stock{Tick: lastTick, StockID: stockID}).First(&stock).Error; err != nil {
+		return nil, err
+	}
+
+	return &stock, nil
 }
