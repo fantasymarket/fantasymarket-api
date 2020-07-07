@@ -13,6 +13,11 @@ tasks:
     cmds:
       - go test ./...
 
+  test-coverage:
+    desc: "run all tests"
+    cmds:
+      - go test -coverprofile coverage.out ./...
+
   lint:
     desc: "lint all files"
     cmds:
@@ -44,7 +49,7 @@ tasks:
       - go mod download
       - task: install-deps
       - task: lint
-      - task: test
+      - task: test-coverage
 
   build:
     env:
@@ -52,7 +57,7 @@ tasks:
       GOARCH: amd64
     cmds:
       - go generate ./...
-      - go build -ldflags="-s -w" -o bin/fantasymarket -i main.go
+      - go build -a -tags netgo -ldflags='-s -w -extldflags "-static"' -o bin/fantasymarket -i main.go
 
   deploy-staging:
     cmds:

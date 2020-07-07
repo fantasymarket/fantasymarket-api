@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"errors"
 	"fantasymarket/database"
 	"fantasymarket/game"
 	"fantasymarket/utils/config"
@@ -8,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/rs/cors"
 )
 
 // APIHandler holds the dependencies for http handlers
@@ -16,6 +19,21 @@ type APIHandler struct {
 	Game   *game.Service
 	Config *config.Config
 }
+
+// Errors for the HTTP Handler
+var (
+	errFetchingData    = errors.New("error fetching data")
+	errUpdatingOrder   = errors.New("error updating order")
+	errDecoding        = errors.New("data could not be decoded")
+	errDeletingOrder   = errors.New("order could not be deleted")
+	errUserNotFound    = errors.New("could not find user")
+	errParsingPassword = errors.New("could not parse password")
+	errParsingUsername = errors.New("could not parse username")
+	errGeneratingToken = errors.New("could not generate token")
+	errCreatingAccount = errors.New("error creating new user account")
+	errInvalidLogin    = errors.New("could not login user")
+	errStockNotFound   = errors.New("could not find stock")
+)
 
 // NewAPIRouter creates a new API HTTP handler
 func NewAPIRouter(db *database.Service, game *game.Service, config *config.Config) http.Handler {
@@ -27,16 +45,22 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 	r := chi.NewRouter()
 
-	// Standalone GET Requests
-	r.Get("/events", api.getEvents) // Allow for query parameters
+	// CORS Header
+	corsConfig := cors.New(cors.Options{
+		AllowedOrigins:   []string{"https://fantasymarket.netlify.app", "https://develop--fantasymarket.netlify.app", "http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "HEAD", "PATCH"},
+		AllowCredentials: true,
+		Debug:            true,
+	})
 
-	//r.Get("/overview", api.getOverview) // Some stats for the dashboard
-	// Top 2 Gainers / Top 2 Losers
-	// Maybe total + of all stock and things like that in the future
+	// Middleware
+	r.Use(corsConfig.Handler)
+	r.Use(middleware.Logger)
 
-	r.Get("/time", api.getTime) // Current time on the server
+	r.Get("/events", api.getEvents)
 
-	// API Routes
+	r.Get("/time", api.getTime)
+
 	r.Route("/stocks", func(r chi.Router) {
 
 		r.Get("/", api.getAllStocks)
@@ -51,7 +75,7 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 		r.Post("/", api.addOrder)
 
-		r.Get("/{orderID}", api.ordersID)
+		r.Get("/{orderID}", api.getOrdersID)
 
 		r.Delete("/{orderID}", api.deleteOrder)
 	})
@@ -61,6 +85,7 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 			r.Use(jwt.Middleware(api.Config.TokenSecret, true))
 			r.Get("/{username}", api.getUser)
 			r.Put("/", api.createUser)
+			r.Post("/login", api.loginUser)
 		})
 
 		r.Group(func(r chi.Router) {

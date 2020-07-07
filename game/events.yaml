@@ -95,7 +95,7 @@
 
 - eventID: "JPM-to-modernize-access-to-data"
   title: "JPM modernizes how customers access their data, effective immediately"
-  description: "Global financial services firm JPMorgan Chase & Co has planned to modernize
+  description: "Global finance services firm JPMorgan Chase & Co has planned to modernize
   how customers access their data. Effective immediately, the bank institute is beginning to block automated access to customer
   accounts after July 30, 2020 (today), requiring any fintech apps or aggregators to instead use an API that exposes limited information
   authorized by the bank customer, which appears to inherently be more secure when accessing data."
@@ -385,7 +385,7 @@
   effects: []
 
   tags:
-  - affectsTags: ["financial", "tech"]
+  - affectsTags: ["finance", "tech"]
     minTrend: -1.4
     maxTrend: -0.5
     affectsStockIDs: ["JPM", "AXP", "FB", "AAPL", "MSFT"]
@@ -571,7 +571,7 @@
     affectsStockIDs: ["IDEXX", "ANTM", "DVA"]
     offset: P3DT22M14S
 
-  - affectsTags: ["financial", "energy"]
+  - affectsTags: ["finance", "energy"]
     trend: -0.8
     affectsStockIDs: ["AXP", "JPM", "GS", "RDS-A", "TSLA", "NEP", "FSLR"]
     offset: P3DT22M14S
@@ -672,31 +672,31 @@
   duration: P18M2DT6H
 
   tags:
-  - affectsTags: ["financial"]
+  - affectsTags: ["finance"]
     trend: 0.8
     affectsStockIDs: ["AXP"]
     offset: PT2H20M49S
     duration: P1M
   
-  - affectsTags: ["financial"]
+  - affectsTags: ["finance"]
     trend: 1.4
     affectsStockIDs: ["AXP"]
     offset: P1MT2H20M49S
     duration: P2M
   
-  - affectsTags: ["financial"]
+  - affectsTags: ["finance"]
     trend: 1.8
     affectsStockIDs: ["AXP"]
     offset: P3MT2H20M49S
     duration: P1M
 
-  - affectsTags: ["financial"]
+  - affectsTags: ["finance"]
     trend: 1.3
     affectsStockIDs: ["AXP"]
     offset: P4MT2H20M49S
     duration: P1M
   
-  - affectsTags: ["financial"]
+  - affectsTags: ["finance"]
     trend: 0.6
     affectsStockIDs: ["AXP"]
     offset: P5MT2H20M49S
@@ -824,7 +824,7 @@
 - eventID: "american-express-to-launch-into-tech"
   title: "American Express plans to jump into tech"
   description: >-
-    Financial and banking company American Express is currently planning to dive into the 
+    finance and banking company American Express is currently planning to dive into the 
     tech industry and is planning to build their first line of laptops at the end of this year or latest Spring 2026.
     These laptops are thought to have implemented Amex apps and technologies to provide support
     for existing credit cards and can even act as a credit card, with the added card chip at the bottom of the laptop. 

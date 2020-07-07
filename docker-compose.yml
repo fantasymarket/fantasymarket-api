@@ -1,0 +1,22 @@
+version: "3"
+services:
+  # POSTGRES
+  postgres:
+    image: postgres:11-alpine
+    ports:
+      - "5432:5432/tcp"
+    environment:
+      POSTGRES_USER: fantasymarket
+      POSTGRES_PASSWORD: fantasymarket
+      PGPASSWORD: fantasymarket
+      POSTGRES_DB: fantasymarket
+
+  # PGADMIN
+  pgadmin:
+    image: chorss/docker-pgadmin4:4.11
+    ports:
+      - "5050:5050/tcp"
+    environment:
+      SERVER_MODE: "false"
+    depends_on:
+      - postgres

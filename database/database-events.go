@@ -1,11 +1,10 @@
 package database
 
 import (
+	"errors"
 	"fantasymarket/database/models"
 	"fantasymarket/game/details"
 	"time"
-
-	uuid "github.com/satori/go.uuid"
 )
 
 // GetEvents fetches all currently active events
@@ -14,7 +13,7 @@ func (s *Service) GetEvents(currentDate time.Time) ([]models.Event, error) {
 
 	if err := s.DB.Where(models.Event{
 		Active: true,
-	}).Where("created_at > ?", currentDate).Find(&events).Error; err != nil {
+	}).Where("created_at < ?", currentDate).Find(&events).Error; err != nil {
 		return nil, err
 	}
 
@@ -23,6 +22,9 @@ func (s *Service) GetEvents(currentDate time.Time) ([]models.Event, error) {
 
 // AddEvent adds an event to the event table
 func (s *Service) AddEvent(event details.EventDetails, createdAt time.Time) error {
+	if event.EventID == "" {
+		return errors.New("error: attempting to add empty event")
+	}
 	return s.DB.Create(&models.Event{
 		EventID:   event.EventID,
 		Title:     event.Title,
@@ -33,8 +35,8 @@ func (s *Service) AddEvent(event details.EventDetails, createdAt time.Time) erro
 }
 
 // RemoveEvent marks an event as inactive so it won't affect stocks in the GameLoop anymore
-func (s *Service) RemoveEvent(uniqueEventID uuid.UUID) error {
-	return s.DB.Where(models.Event{Active: true, ID: uniqueEventID}).Update("active", false).Error
+func (s *Service) RemoveEvent(eventID string) error {
+	return s.DB.Model(&models.Event{}).Where(models.Event{Active: true, EventID: eventID}).Update("active", false).Error
 }
 
 // GetEventHistory returns all the events that ran at some point as a map
