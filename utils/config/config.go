@@ -1,40 +1,45 @@
 package config
 
 import (
-	"fantasymarket/utils/file"
-	"fantasymarket/utils/timeutils"
+	fileUtils "fantasymarket/utils/file"
+	"fmt"
 	"os"
+	"strings"
 	"time"
+
+	"github.com/spf13/viper"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	uberConfig "go.uber.org/config"
 )
 
 // Config is our global configuration file
 type Config struct {
-	Game        GameConfig `yaml:"game"`
-	TokenSecret string     `yaml:"tokenSecret"`
-	LogLevel    string     `yaml:"logLevel"`
-	Development bool       `yaml:"development"`
+	Game        GameConfig     `mapstructure:"game"`
+	TokenSecret string         `mapstructure:"tokenSecret"`
+	LogLevel    string         `mapstructure:"logLevel"`
+	Development bool           `mapstructure:"development"`
+	Database    DatabaseConfig `mapstructure:"database"`
+	Port        string         `mapstructure:"port"`
+}
+
+// DatabaseConfig are specific settings for the database connection
+type DatabaseConfig struct {
+	Type     string `mapstructure:"type"` // sqlite or postgres
+	URL      string `mapstructure:"url"`
+	Host     string `mapstructure:"host"`
+	Port     string `mapstructure:"port"`
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+	Database string `mapstructure:"database"`
+	SSL      string `mapstructure:"ssl"`
 }
 
 // GameConfig are specific settings for the game mechanics
 type GameConfig struct {
-	TicksPerSecond  float64        `yaml:"ticksPerSecond"`  // How many times the game updates per second
-	GameTimePerTick time.Duration  `yaml:"gameTimePerTick"` // How much ingame time passes between updates
-	StartDate       timeutils.Time `yaml:"startDate"`       // The initial ingame time}
-}
-
-var DefaultConfig = Config{
-	Game: GameConfig{
-		TicksPerSecond:  0.1,
-		StartDate:       timeutils.Time{Time: time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC)},
-		GameTimePerTick: time.Hour,
-	},
-	TokenSecret: "secret",
-	LogLevel:    "info",
-	Development: false,
+	TicksPerSecond  float64       `mapstructure:"ticksPerSecond"`  // How many times the game updates per second
+	GameTimePerTick time.Duration `mapstructure:"gameTimePerTick"` // How much ingame time passes between updates
+	StartDate       time.Time     `mapstructure:"startDate"`       // The initial ingame time
 }
 
 // Load loads the global configuration
@@ -47,28 +52,53 @@ func Load() (*Config, error) {
 	// config.yaml is only created if the sample config exists in the same dir
 	shouldCreateConfig := exampleErr == nil && os.IsNotExist(configErr)
 	if shouldCreateConfig {
-		if configErr = file.Copy("config.example.yaml", "config.yaml"); configErr != nil {
-			return nil, configErr
+		if err := fileUtils.Copy("config.example.yaml", "config.yaml"); err != nil {
+			configErr = err
+			return nil, err
 		}
 	}
 
-	// we append all providers one-by-one so they are
-	// loaded in the right order
-	options := []uberConfig.YAMLOption{}
-	options = append(options, uberConfig.Static(defaultConfig))
-	// only load the config file if it actually exists
+	viper.SetDefault("database.type", "sqlite")
+	viper.SetDefault("database.url", "")
+	viper.SetDefault("database.host", "")
+	viper.SetDefault("database.port", "")
+	viper.SetDefault("database.username", "")
+	viper.SetDefault("database.password", "")
+	viper.SetDefault("database.database", "")
+	viper.SetDefault("database.ssl", "")
+
+	viper.SetDefault("game.ticksPerSecond", 0.1)
+	viper.SetDefault("game.gameTimePerTick", time.Hour)
+
+	viper.SetDefault("tokenSecret", "secret")
+	viper.SetDefault("logLevel", "debug")
+	viper.SetDefault("development", "false")
+	viper.SetDefault("port", "5000")
+
+	replacer := strings.NewReplacer(".", "_")
+	viper.SetEnvKeyReplacer(replacer)
+	viper.AutomaticEnv()
+
 	if configErr == nil {
-		options = append(options, uberConfig.File("config.yaml"))
-	}
-	options = append(options, uberConfig.Expand(os.LookupEnv))
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
+		viper.AddConfigPath(".")
 
-	yaml, err := uberConfig.NewYAML(options...)
-	if err != nil {
-		return nil, err
+		err := viper.ReadInConfig()
+		if _, ok := err.(viper.ConfigFileNotFoundError); err != nil && !ok {
+			panic(fmt.Errorf("Fatal error config file: %s", err))
+		}
 	}
 
-	var conf Config
-	if err := yaml.Get(uberConfig.Root).Populate(&conf); err != nil {
+	// Find and read the config file
+	conf := Config{
+		Game: GameConfig{
+			// viper somehow strugles with parsing dates so this is hardcoded
+			StartDate: time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
+		},
+	}
+
+	if err := viper.Unmarshal(&conf); err != nil {
 		return nil, err
 	}
 
@@ -83,7 +113,7 @@ func Load() (*Config, error) {
 		log.Warn().Msg("tokenSecret should not be kept at the default value in production")
 	}
 
-	return &conf, err
+	return &conf, nil
 }
 
 func getLogLevel(level string) zerolog.Level {

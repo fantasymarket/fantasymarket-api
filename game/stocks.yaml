@@ -13,3 +13,43 @@
   tags: ["tech"]
   stability: 1
   trend: 1
+
+- symbol: "AXP"
+  stockCount: 700000000
+  startPrice: 60000
+  name: American Express Company
+  tags: ["finance"]
+  stability: 1
+  trend: 1
+
+- symbol: "JPM"
+  stockCount: 700000000
+  startPrice: 60000
+  name: JPMorgan Case & co
+  tags: ["finance"]
+  stability: 1
+  trend: 1
+
+- symbol: "GS"
+  stockCount: 700000000
+  startPrice: 60000
+  name: Goldman Sachs Group
+  tags: ["finance"]
+  stability: 1.1
+  trend: 1
+
+- symbol: "NFLX"
+  stockCount: 700000000
+  startPrice: 60000
+  name: Netflix Inc
+  tags: ["tech"]
+  stability: 1.1
+  trend: 1
+
+- symbol: "TSLA"
+  stockCount: 700000000
+  startPrice: 60000
+  name: Tesla Inc
+  tags: ["tech"]
+  stability: 1.1
+  trend: 1

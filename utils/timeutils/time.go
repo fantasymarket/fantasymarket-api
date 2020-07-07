@@ -1,7 +1,6 @@
 package timeutils
 
 import (
-	"fantasymarket/utils/config"
 	"fmt"
 	"strings"
 	"time"
@@ -46,15 +45,4 @@ func (t *Time) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 
 	return t.UnmarshalJSON([]byte(b))
-}
-
-func ConvertToTicks(timestamp string) (int, error) {
-	// Vergiss nicht das Defaultconfig in config.go erstmal wieder private zu machen
-	startDate := config.DefaultConfig.Game.StartDate.Time
-	currentDate, err := time.Parse(time.RFC3339, timestamp)
-	if err != nil {
-		return -1, err
-	}
-
-	return int(currentDate.Sub(startDate).Hours()), nil
 }

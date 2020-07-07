@@ -2,7 +2,6 @@
 game:
   ticksPerSecond: 0.1
   gameTimePerTick: 1h0m0s
-  startDate: 2020-01-01T00:00:00Z
 
 # secret used to sign JWT tokens
 tokenSecret: "secret"
