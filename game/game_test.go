@@ -176,7 +176,7 @@ func TestGetActiveEventTags(t *testing.T) {
 	s := Service{
 		Config: &config.Config{
 			Game: config.GameConfig{
-				StartDate: timeutils.Time{Time: startDate},
+				StartDate: startDate,
 			},
 		},
 		EventDetails: eventDetails,

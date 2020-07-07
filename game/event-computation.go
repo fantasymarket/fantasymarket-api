@@ -145,7 +145,9 @@ func (s *Service) eventNeedsToBeRun(event details.EventDetails) bool {
 
 	randomEventShouldRun := currentDate.After(timeStampOfLastEvent.Add(event.MinTimeBetweenEvents))
 
-	return eventHasNeverRun && eventDateInPast || event.Type == "random" && randomEventShouldRun
+	return event.Type == "recurring" && eventDateInPast ||
+		event.Type == "fixed" && eventHasNeverRun && eventDateInPast ||
+		event.Type == "random" && randomEventShouldRun
 }
 
 // ChangeDescriptionPlaceholder fills the templates of a description string

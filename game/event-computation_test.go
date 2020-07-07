@@ -3,7 +3,6 @@ package game_test
 import (
 	"fantasymarket/game"
 	"fantasymarket/utils/config"
-	"fantasymarket/utils/timeutils"
 	"testing"
 	"time"
 
@@ -32,7 +31,7 @@ func TestChangeDescriptionPlaceholder(t *testing.T) {
 	s := game.Service{
 		Config: &config.Config{
 			Game: config.GameConfig{
-				StartDate: timeutils.Time{Time: startDate},
+				StartDate: startDate,
 			},
 		},
 	}
