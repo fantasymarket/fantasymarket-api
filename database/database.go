@@ -1,6 +1,8 @@
 package database
 
 import (
+	"fmt"
+
 	"github.com/rs/zerolog/log"
 
 	"fantasymarket/database/models"
