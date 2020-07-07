@@ -66,7 +66,6 @@ var testAddEventData = []details.EventDetails{
 	},
 }
 
-//TODO: TestAddEvent returns error on empty event being added
 func (suite *DatabaseTestSuite) TestAddEvent() {
 
 	createdAt := parseTime("2019-12-30T15:04:05Z")

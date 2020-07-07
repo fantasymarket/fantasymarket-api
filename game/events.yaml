@@ -1071,7 +1071,7 @@
   title: "big-hurricane-in-the-caribbean-holds-health-services-in-check"
   description: >-
     "A big hurricane that originated south-east of the Florida peninsula, has been going on a rampage through many islands in the Caribbean.
-    The health organisations are struggling to keep supply flowing to those in need"
+    The health organizations are struggling to keep supply flowing to those in need."
 
   Type: "random"
   randomChancePerDay: 0.009
@@ -1091,7 +1091,7 @@
 - eventID: "low-oil-levels"
   title: "new-research-suggests-that-we-are-running-out-of-oil"
   description: >-
-    "New Research from Harvard University who partnered with Yale University has concluded that we will run out of oil sooner, rather than later."
+    "New research from Harvard University who partnered with Yale University has concluded that we will run out of oil sooner, rather than later."
 
   Type: "random"
   randomChancePerDay: 0.009
@@ -1116,7 +1116,7 @@
 - eventID: "SpaceX-new-breakthrough"
   title: "SpaceX-has-announced-a-huge-breakthrough-in-their-earth-to-earth-rocket-travel-technology"
   description: >-
-    "After a lot of testing, SpaceX has claimed it has reached a safety level 100 times greater than that of modern day airplanes"
+    "After a lot of testing, SpaceX has claimed it has reached a safety level 100 times greater than that of modern-day airplanes"
 
   Type: "random"
   randomChancePerDay: 0.009
@@ -1154,7 +1154,7 @@
       affectsStockIDs: ["JPM","AXP", "GS"]
 
 - eventID: "Nasa-puts-humans-on-the-moon"
-  title: "Nasa makes an effort to make the moon habitable and puts first colony of humans on the moon"
+  title: "Nasa makes an effort to make the moon habitable and puts the first colony of humans on the moon."
   description: >-
     "Videos from Nasa showing 20 men and women moving into houses on the moon go viral"
 
@@ -1204,7 +1204,8 @@
 - eventID: "cancer-is-cured"
   title: "Curing cancer is now cheap and easy"
   description: >-
-    "A young 14 year old latina found a way to cure cancer by merely taking one little pill she created, which was supposed to be one of her school projects"
+    "A young 14-year-old Latina found a way to cure cancer by merely taking one little pill she created, which was supposed to be one of her school projects."
+
 
   Type: "random"
   randomChancePerDay: 0.008
