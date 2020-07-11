@@ -1241,7 +1241,6 @@
       maxTrend: -1.4
       affectsStockIDs: ["DVA","IDEXX"]
 
-
 - eventID: "Apple-Microsoft-Facebook-release-revolutionary-vr-experience"
   title: "Big Tech in Silicon Valley release revolutionary VR experience as a joint effort"
   description: >-

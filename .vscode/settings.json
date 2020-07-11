@@ -28,5 +28,13 @@
         // If true, enable additional analyses with staticcheck.
         // Warning: This will significantly increase memory usage.
         "staticcheck": false,
-    }
+    },
+    "sqltools.connections": [
+        {
+            "database": "${workspaceFolder}\\database.db",
+            "dialect": "SQLite",
+            "name": "FantasyDatabase"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
 }

@@ -50,7 +50,7 @@ func (s *Service) CreateGuest() (*models.User, error) {
 // ChangePassword changes the password of an existing or
 // adds a new password to an previously unprotected user account
 // NOTE: this should only be able to be called on your current username
-func (s *Service) ChangePassword(username, currentPassword string, newPassword string) error {
+func (s *Service) ChangePassword(username, currentPassword, newPassword string) error {
 
 	var user models.User
 	if err := s.DB.Where(models.User{
@@ -77,19 +77,22 @@ func (s *Service) ChangePassword(username, currentPassword string, newPassword s
 // RenameUser renames a user account
 // NOTE: this should only be able to be called on your current username
 func (s *Service) RenameUser(userID uuid.UUID, username, newUsername string) error {
+	if newUsername == "" {
+		return errors.New("cannot change username to blank")
+	}
 
 	var user models.User
 	if err := s.DB.Where(models.User{
-		Username: username,
 		UserID:   userID,
-	}).Select("username. password").First(&user).Error; err != nil {
+		Username: username,
+	}).Select("username, password").First(&user).Error; err != nil {
 		return err
 	}
 
 	var newUser models.User
 	if err := s.DB.Where(models.User{
 		Username: newUsername,
-	}).Select("username, password").First(&user).Error; err != nil && !gorm.IsRecordNotFoundError(err) {
+	}).Select("username, password").First(&newUser).Error; err != nil && !gorm.IsRecordNotFoundError(err) {
 		return err
 	}
 
@@ -101,7 +104,7 @@ func (s *Service) RenameUser(userID uuid.UUID, username, newUsername string) err
 		return errors.New("username alreay exists and is protected by a password")
 	}
 
-	return s.DB.Model(&user).Update("username", newUsername).Error
+	return s.DB.Model(&models.User{}).Where(models.User{UserID: userID, Username: username}).Update("username", newUsername).Error
 }
 
 // LoginUser logs into an account
