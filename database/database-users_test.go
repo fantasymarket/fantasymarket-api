@@ -3,8 +3,8 @@ package database_test
 import (
 	"fantasymarket/database/models"
 	"fantasymarket/utils/hash"
-
 	uuid "github.com/satori/go.uuid"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,6 +22,7 @@ func (suite *DatabaseTestSuite) TestCreateGuest() {
 
 		assert.Equal(suite.T(), user.Username, testUser.Username)
 	}
+
 	suite.dbService.DB.Close()
 }
 
