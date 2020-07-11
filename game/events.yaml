@@ -556,7 +556,7 @@
   maxDuration: P10Y #todo
 
   tags:
-  - affectsTags: ["airplane"]
+  - affectsTags: ["aviation"]
     trend: -1.4
     affectsStockIDs: ["BA"]
     offset: P3DT22M14S
@@ -1046,13 +1046,394 @@
     offset: P4MT58M24S
     duration: P1M
 
+- eventID: "flood-hits-new-york"
+  title: "Too much rain in the last couple of days has led to big floods in New York"
+  description: >-
+    "Due to the mass in rain, the city has flooded with millions of property damage.
+    Many of New Yorks most prestigious buildings and firms are affected and have claimed to suffer damages in the high millions"
+
+  Type: "random"
+  randomChancePerDay: 0.009
+
+  duration: P1W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["financial"]
+      minTrend: -1.6
+      maxTrend: -1
+      affectsStockIDs: ["JPM","AXP", "GS"]
 
 
+- eventID: "hurricane-hits-caribbean"
+  title: "big-hurricane-in-the-caribbean-holds-health-services-in-check"
+  description: >-
+    "A big hurricane that originated south-east of the Florida peninsula, has been going on a rampage through many islands in the Caribbean.
+    The health organizations are struggling to keep supply flowing to those in need."
+
+  Type: "random"
+  randomChancePerDay: 0.009
+
+  duration: P3W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["health"]
+      minTrend: -1.6
+      maxTrend: -1
+      affectsStockIDs: ["DVA","IDEXX","ANTM"]
+
+
+- eventID: "low-oil-levels"
+  title: "new-research-suggests-that-we-are-running-out-of-oil"
+  description: >-
+    "New research from Harvard University who partnered with Yale University has concluded that we will run out of oil sooner, rather than later."
+
+  Type: "random"
+  randomChancePerDay: 0.009
+
+  duration: P1W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["energy"]
+      minTrend: -1.4
+      maxTrend: -0.6
+      affectsStockIDs: ["RDS-A"]
+    - affectsTags: ["energy"]
+      minTrend: 0.9
+      maxTrend: 2.1
+      affectsStockIDs: ["NEP", "FSLR"]
+
+
+
+- eventID: "SpaceX-new-breakthrough"
+  title: "SpaceX-has-announced-a-huge-breakthrough-in-their-earth-to-earth-rocket-travel-technology"
+  description: >-
+    "After a lot of testing, SpaceX has claimed it has reached a safety level 100 times greater than that of modern-day airplanes"
+
+  Type: "random"
+  randomChancePerDay: 0.009
+
+  duration: P1D
+
+  dependencies: []
+  effects: []
+
+  tags:
+    -	affectsTags: ["aviation"]
+      minTrend: -0.7
+      maxTrend: -0.1
+      affectsStockIDs: ["BA"]
+
+
+- eventID: "fbi-uncovers-corruption-in-high-banking-positions"
+  title: "FBI uncovers corruption scandal in high banking positions"
+  description: >-
+    "Yesterday evening the FBI released reports showing corruption in high banking positions.
+    “Many banking CEOs have taken more than they should have”, claims the FBI representative"
+
+  Type: "random"
+  randomChancePerDay: 0.006
+
+  duration: P4W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["financial"]
+      minTrend: -2
+      maxTrend: -1.5
+      affectsStockIDs: ["JPM","AXP", "GS"]
+
+- eventID: "Nasa-puts-humans-on-the-moon"
+  title: "Nasa makes an effort to make the moon habitable and puts the first colony of humans on the moon."
+  description: >-
+    "Videos from Nasa showing 20 men and women moving into houses on the moon go viral"
+
+  Type: "random"
+  randomChancePerDay: 0.008
+
+  duration: P2W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    -	affectsTags: ["aviation"]
+           minTrend: -0.2
+           maxTrend: -0.5
+           affectsStockIDs: ["BA"]
+    -   affectsTags: ["real-estate"]
+          minTrend: -0.1
+          maxTrend: -0.9
+          affectsStockIDs: ["BXP"]
+
+
+- eventID: "high-oil-levels"
+  title: "oil company scientists discover a new way to gain oil"
+  description: >-
+    "A new scientific research found that oil companies do not need to fear running out of oil"
+
+  Type: "random"
+  randomChancePerDay: 0.004
+
+  duration: P2W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["energy"]
+      minTrend: -0.6
+      maxTrend: -1.4
+      affectsStockIDs: ["RDS-A"]
+    - affectsTags: ["energy"]
+      minTrend: 1.9
+      maxTrend: 0.2
+      affectsStockIDs: ["NEP", "FSLR"]
+
+
+- eventID: "cancer-is-cured"
+  title: "Curing cancer is now cheap and easy"
+  description: >-
+    "A young 14-year-old Latina found a way to cure cancer by merely taking one little pill she created, which was supposed to be one of her school projects."
+
+
+  Type: "random"
+  randomChancePerDay: 0.008
+
+  duration: P2W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["health"]
+      minTrend: -0.1
+      maxTrend: -3
+      affectsStockIDs: ["DVA","IDEXX","ANTM"]
+
+
+- eventID: "big-toe-problem"
+  title: "A new generation of chinese younglings develop unproportionally big toes"
+  description: >-
+    "Doctors assume that somehow the DNA of a wild animal got mixed with the uterus of pregnant women, resulting in babies with really big toes. A cure is present, but expensive."
+
+  Type: "random"
+  randomChancePerDay: 0.005
+
+  duration: P4W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["health"]
+      minTrend: -0.1
+      maxTrend: -1.4
+      affectsStockIDs: ["DVA","IDEXX"]
+
+
+- eventID: "Apple-Microsoft-Facebook-release-revolutionary-vr-experience"
+  title: "Big Tech in Silicon Valley release revolutionary VR experience as a joint effort"
+  description: >-
+    "The stock market currently sees something that gets called "\The SAO-Effect\", which refers to a japanese anime with VR as its main theme. Billions around the world are interested in this new technology and can't wait to buy the new VR-Suit."
+
+  Type: "random"
+  randomChancePerDay: 0.006
+
+  dependencies: []
+  effects: []
+
+  duration: P5M
+
+  tags:
+    - affectsTags: ["tech"]
+      minTrend: -0.1
+      maxTrend: -3.4
+      affectsStockIDs: ["AAPL", "MSFT", "FB"]
+
+
+- eventID: "World-runs-into-recession-after-intense-gamma-rays-reduce-flights"
+  title: "World hits sudden recession after scientists advise against flying for the next year."
+  description: >-
+    "Scientists notice that a sudden eruption on the surface of the sun altered the gamma rays hitting the earth, which doesn't allow for flights for at least one year."
+
+  Type: "random"
+  randomChancePerDay: 0.005
+
+  duration: P1W
+
+  dependencies: []
+  effects: []
+
+  tags:
+    - affectsTags: ["financial"]
+      minTrend: -2.3
+      maxTrend: -0.3
+      affectsStockIDs: ["JPM","AXP", "GS", "FB", "MSFT", "AAPL", "TSLA", "RDS-A", "NEP", "FSLR", "BXP", "BA"]
+
+- eventID: "Apple-closes-exclusive-deals-for-its-streaming-platform-with-Warner-Bros."
+  title: "Apple TV becomes more interesting for viewers since Apple closed an exclusive deal with Warner Bros."
+  description: >-
+    "Apple had a rather hard time getting a foot in the door of the streaming world, but due to the recently closed deal things might change in their favor."
+
+  Type: "random"
+  randomChancePerDay: 0.009
+
+  dependencies: []
+  effects: []
+
+  duration: P1M
+
+  tags:
+    - affectsTags: ["tech"]
+      minTrend: -0.1
+      maxTrend: -2.1
+      affectsStockIDs: ["AAPL"]
+
+
+- eventID: "Bill-Gates-dies"
+  title: "Bill Gates died in his sleep."
+  description: >-
+    "After Bill Gates death, investors speculate that Microsoft stocks might take a hit after the unfortunate news."
+
+  Type: "random"
+  randomChancePerDay: 0.003
+
+  dependencies: []
+  effects: []
+
+  duration: P1M
+
+  tags:
+    - affectsTags: ["tech"]
+      minTrend: -0.4
+      maxTrend: -0.4
+      affectsStockIDs: ["MSFT"]
+
+
+- eventID: "Mark-Zuckerberg-gets-detained-after-new-privacy-related-violations-come-to-light"
+  title: "Mark Zuckerberg might face jail-time after new severe accusations made against his company's privacy regulations."
+  description: >-
+    "Zuckerberg faces an appointment in court in 2 weeks and potentially gets sentenced to 1-3 years in jail."
+
+  Type: "random"
+  randomChancePerDay: 0.004
+
+  dependencies: []
+  effects: []
+
+  duration: P5M
+
+  tags:
+    - affectsTags: ["tech"]
+      minTrend: -2.5
+      maxTrend: -0.2
+      affectsStockIDs: ["FB"]
+
+
+- eventID: "Europe-forbids-any-non-electric-cars-due-to-massive-pollution"
+  title: "Europe comes to a joint conclusion that any non-electric cars are not allowed to drive on the roads anymore."
+  description: >-
+    "The electric car market has gotten much bigger and improved a lot over the recent years, which led the EU to forbid the use of non-electric cars."
+
+  Type: "random"
+  randomChancePerDay: 0.008
+
+  dependencies: []
+  effects: []
+
+  duration: P2M
+
+  tags:
+    - affectsTags: ["energy"]
+      minTrend: 0.1
+      maxTrend: 3.4
+      affectsStockIDs: ["TSLA"]
+
+- eventID: "pollution-at-all-time-high"
+  title: "Pollution was measured to be at an all time high. World Governments try to find a way to reduce pollution for the next year."
+  description: >-
+    "New all time polution means that all Governments must try to reduce these values to stop global warming. Big transporting companies have claimed to suffer huge losses under the new guidlines"
+
+  Type: "random"
+  randomChancePerDay: 0.007
+
+  dependencies: []
+  effects: []
+
+  duration: P2M
+
+  tags:
+    -	affectsTags: ["aviation"]
+      minTrend: -1.5
+      maxTrend: -0.6
+    - affectsStockIDs: ["TSLA"]
+      minTrend: 1
+      maxTrend: 1.4
+    - affectsStockIDs: ["RDS-A"]
+      minTrend: -1.4
+      maxTrend: -1
       
-    
+- eventID: "china-releases-new-investment-strategy"
+  title: "A business university in china has released a new and impproved investment strategy."
+  description: >-
+    "The business world is facing a new reform. This new investment strategy is said to increase returns by 10%!"
 
+  Type: "random"
+  randomChancePerDay: 0.006
 
+  dependencies: []
+  effects: []
 
+  duration: P2M
 
-  
+  tags:
+    -	affectsTags: ["finance"]
+      minTrend: 1
+      maxTrend: 2
 
+- eventID: "south-africa-calls-for-a-united-states-of-africa"
+  title: "South African President called for a new super country"
+  description: >-
+    "The United States of Africa Idea has been proposed by the current leader of South Africa and has already been signed by the President of Egypt. The trading opportunites could be huge said a spokesman for the Times Newspaper this morning."
+
+  Type: "random"
+  randomChancePerDay: 0.008
+
+  dependencies: []
+  effects: []
+
+  duration: P2M
+
+  tags:
+    -	affectsTags: ["finance"]
+      minTrend: 0.1
+      maxTrend: 1.2
+
+- eventID: "up-and-coming-sports-talent-wins-huge-sponsership-from-goldman-sachs"
+  title: "A new sporting talent has received a huge sponsorship from finance giant Goldman Sachs"
+  description: >-
+    "Goldman Sachs has invested in a new talent who has huge winning chances in their next event."
+
+  Type: "random"
+  randomChancePerDay: 0.004
+
+  dependencies: []
+  effects: []
+
+  duration: P2M
+
+  tags:
+    -	affectsStockIDs: ["GS"]
+      minTrend: 0.1
+      maxTrend: 0.2

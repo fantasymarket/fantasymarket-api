@@ -44,7 +44,7 @@ var testCreateInitialStocksData = []CreateInitialStocksTestData{
 
 func (suite *DatabaseTestSuite) TestCreateInitialStocks() {
 
-	stocks := []models.Stock{}
+	var stocks []models.Stock
 	for i, test := range testCreateInitialStocksData {
 		err := suite.dbService.CreateInitialStocks(test.stock)
 		assert.Equal(suite.T(), nil, err)
