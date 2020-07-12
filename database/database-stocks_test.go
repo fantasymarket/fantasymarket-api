@@ -332,7 +332,7 @@ func (suite *DatabaseTestSuite) TestGetStockAtTick() {
 		}
 
 		result, err := suite.dbService.GetStockAtTick(stockName, test.tick)
-		if test.needsToFail && assert.Error(err, "didnt't return the wrong tick") {
+		if test.needsToFail && assert.Error(err, "returned stock instead of error") {
 			return
 		}
 
