@@ -186,7 +186,7 @@ var testGetStocksAtTickData = []GetStocksAtTickTestData{
 	{},
 }
 
-func (suite *DatabaseTestSuite) TestGetStockAtTick() {
+func (suite *DatabaseTestSuite) TestGetStocksAtTick() {
 	for _, test := range testGetStocksAtTickData {
 		err := suite.dbService.DB.Create(&test.stock).Error
 		assert.Equal(suite.T(), nil, err)
@@ -273,5 +273,79 @@ func (suite *DatabaseTestSuite) TestGetStockMapAtTick() {
 			assert.Equal(suite.T(), test.expectation[test.stock.Symbol].Tick, result[test.stock.Symbol].Tick)
 		}
 	}
+	suite.dbService.DB.Close()
+}
+
+type GetStockAtTickTestData struct {
+	tick        int64
+	stock       models.Stock
+	stockName   string
+	needsToFail bool
+}
+
+var testGetStockAtTickData = []GetStockAtTickTestData{
+	{
+		tick:      1,
+		stockName: "HELLO",
+		stock: models.Stock{
+			Symbol: "HELLO",
+			Index:  100,
+			Name:   "Hello Stock",
+			Tick:   1,
+		},
+	}, {
+		tick:      99999,
+		stockName: "hi",
+		stock: models.Stock{
+			Symbol: "hi",
+			Index:  22,
+			Name:   "Hello Stock",
+			Tick:   0,
+		},
+		needsToFail: true,
+	},
+	{
+		tick:      2,
+		stockName: "insert-uuid",
+		stock: models.Stock{
+			Symbol: "NOTHEL",
+			Index:  100,
+			Name:   "Not Hello Stock",
+			Tick:   2,
+		},
+	},
+}
+
+func (suite *DatabaseTestSuite) TestGetStockAtTick() {
+	assert := suite.Assert()
+
+	for _, test := range testGetStockAtTickData {
+
+		if err := suite.dbService.DB.Create(&test.stock).Error; err != nil {
+			assert.Fail(err.Error())
+			return
+		}
+
+		stockName := test.stockName
+		if stockName == "insert-uuid" {
+			stockName = test.stock.StockID.String()
+		}
+
+		result, err := suite.dbService.GetStockAtTick(stockName, test.tick)
+		if test.needsToFail && assert.Error(err, "didnt't return the wrong tick") {
+			return
+		}
+
+		if err != nil {
+			assert.Fail(err.Error())
+			return
+		}
+
+		assert.Equal(test.stock.Symbol, result.Symbol)
+		assert.Equal(test.stock.Index, result.Index)
+		assert.Equal(test.stock.Name, result.Name)
+		assert.Equal(test.stock.Tick, result.Tick)
+	}
+
 	suite.dbService.DB.Close()
 }

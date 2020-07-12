@@ -89,7 +89,7 @@ func (s *Service) GetStockMapAtTick(lastTick int64) (map[string]models.Stock, er
 func (s *Service) GetStockAtTick(stock string, lastTick int64) (*models.Stock, error) {
 	query := models.Stock{Tick: lastTick}
 
-	if uuid, err := uuid.FromString(stock); err != nil {
+	if uuid, err := uuid.FromString(stock); err == nil {
 		query.StockID = uuid
 	} else {
 		query.Symbol = stock
