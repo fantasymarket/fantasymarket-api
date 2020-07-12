@@ -83,28 +83,6 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 				cancelOrder()
 			}
 
-			// trailing stop for sell: Say Stock A is at $100. A user puts the trailing stop of 10% meaning that the stop value is $90. As long
-			// as CurrentStock.Index is between 90 and 100, the stop value doesn't change. If it goes above $100, the stop value goes up by the percentage.
-			// If the CurrentStock.Index reaches $90 or below, the order gets executed.
-
-			// current price: 100
-			// trailing stop: 10%
-			// starting stop value: 90$
-
-			// scenario 1
-			// stock price changes to 102
-			// -> newPrice 91.8
-			// we update
-
-			// scenario 2
-			// stock price changes to 98
-			// -> newPrice88.2
-			// 88.2 < 90 => we dont updates
-
-			// scanerio 3
-			// stock price changes to <=90
-			// fillOrder() is called
-
 			if order.Side == "sell" {
 				if currentStock.Index <= order.Price {
 					fillOrder()
@@ -123,21 +101,6 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 					Price: newPrice,
 				})
 			}
-
-			// trailing stop for buy: Say Stock A is priced at $110. Trailing percentage is 5%, starting stop value : $115.50
-
-			// scenario 1:
-			// stock prices fall to 100
-			//	-> newPrice: 5% higher than lowest price (100), becomes $105
-			//	we update
-
-			// scenario 2:
-			// stock prices rise to 113
-			//	->newPrice : 105.65, greater than 105, don't update
-
-			// scenario 3:
-			// stock prices rise to >= 115.50
-			// fillOrder() is called
 
 			if order.Side == "buy" {
 				if currentStock.Index >= order.Price {
