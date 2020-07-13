@@ -8,7 +8,6 @@ import (
 )
 
 type AddOrderTestData struct {
-	userID uuid.UUID
 	input  models.Order
 	expect models.Order
 }
@@ -17,53 +16,52 @@ var testAddOrderData = []AddOrderTestData{
 	{
 		input: models.Order{
 			Type:   "stock",
-			Symbol: "GOOG",
+			Symbol: "HALLO",
+			Status: "waiting",
 		},
 		expect: models.Order{
 			Type:   "stock",
 			Symbol: "HALLO",
+			Status: "waiting",
 		},
 	},
 	{
 		input: models.Order{
 			Type:   "stock",
 			Symbol: "GOOG",
+			Side:   "buy",
 		},
 		expect: models.Order{
 			Type:   "stock",
 			Symbol: "GOOG",
+			Side:   "buy",
 		},
 	},
 	{},
 }
 
-func (suite *DatabaseTestSuite) TestAddOrderAndGetOrder() {
+//write test for GetOrder(), FillOrder(), CancelOrder(), UPdate order and FillOrder()
 
-	result := *models.Order{}
+func (suite *DatabaseTestSuite) TestAddOrder() {
+	userID := uuid.NewV4()
 	currentDate := parseTime("2019-12-30T15:00:05Z")
-	for order := range testAddOrderData {
-		err := suite.dbService.AddOrder(order, userID, currentDate)
-		assert.Equal(suite.T(), nil, err)
-		err = s.DB.Where(models.Order{UserID: order.UserID, Type: order.Type, Symbol: order.Symbol}).Limit(1).First(&result).Offset(-1).Error
+	for _, test := range testAddOrderData {
+		result := models.Order{}
+		test.input.UserID = userID
+		test.input.CreatedAt = currentDate
+		err := suite.dbService.AddOrder(test.input, test.input.UserID, currentDate)
 		assert.Equal(suite.T(), nil, err)
 
-		assert.Equal(suite.T(), order.expect, result)
+		err = suite.dbService.DB.Where(test.input).First(&result).Error
+		assert.Equal(suite.T(), nil, err)
+
+		assert.Equal(suite.T(), test.expect.Type, result.Type)
+		assert.Equal(suite.T(), test.expect.Symbol, result.Symbol)
+		assert.Equal(suite.T(), test.expect.Side, result.Side)
 	}
 
 	suite.dbService.DB.Close()
 }
-
-// // AddOrder adds an Order to the database
-// func (s *Service) AddOrder(order models.Order, userID uuid.UUID, currentDate time.Time) error {
-// 	return s.DB.Create(&models.Order{
-// 		UserID:    userID,
-// 		CreatedAt: currentDate,
-// 		Type:      order.Type,
-// 		Side:      order.Side,
-// 		Symbol:    order.Symbol,
-// 		Status:    order.Status,
-// 	}).Error
-// }
 
 // // GetOrders gets all orders based on the parameters of orderDetails where Symbol, Type and userID can be set.
 // // Limit is how many items. Offset is from where to where the data is used
@@ -74,5 +72,4 @@ func (suite *DatabaseTestSuite) TestAddOrderAndGetOrder() {
 // 	}
 
 // 	return orders, nil
-// }
 // }
