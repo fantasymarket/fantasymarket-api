@@ -52,6 +52,9 @@ func (suite *DatabaseTestSuite) TestAddOrder() {
 		err := suite.dbService.AddOrder(test.input, test.input.UserID, currentDate)
 		assert.Equal(suite.T(), nil, err)
 
+		suite.T().Log(test)
+		suite.T().Log("ok") //Dont delete this line. The tests literally fail if you do
+
 		err = suite.dbService.DB.Where(test.input).First(&result).Error
 		assert.Equal(suite.T(), nil, err)
 
@@ -63,6 +66,38 @@ func (suite *DatabaseTestSuite) TestAddOrder() {
 	suite.dbService.DB.Close()
 }
 
+type GetOrderTestData struct {
+	orderDetails models.Order
+	expect       models.Order
+}
+
+var testGetOrderData = []GetOrderTestData{
+	{
+		orderDetails: models.Order{
+			Type:   "stock",
+			Symbol: "KMS",
+		},
+		expect: models.Order{
+			Type:   "stock",
+			Symbol: "KMS",
+		},
+	},
+	{
+		orderDetails: models.Order{
+			Type:   "stock",
+			Symbol: "KYS",
+		},
+		expect: models.Order{
+			Type:   "stock",
+			Symbol: "KYS",
+		},
+	},
+}
+
+//func (suite *DatabaseTestSuite) TestGetOrder() {
+//	userID := uuid.NewV4()
+//	for _, test := range
+//}
 // // GetOrders gets all orders based on the parameters of orderDetails where Symbol, Type and userID can be set.
 // // Limit is how many items. Offset is from where to where the data is used
 // func (s *Service) GetOrders(orderDetails models.Order, limit int, offset int) (*[]models.Order, error) {
