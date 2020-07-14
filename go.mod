@@ -18,6 +18,7 @@ require (
 	github.com/rs/zerolog v1.18.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/senseyeio/duration v0.0.0-20180430131211-7c2a214ada46
+	github.com/shopspring/decimal v1.2.0
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.0

@@ -20,13 +20,17 @@ var (
 	ErrInvalidType = errors.New("404 type not found")
 	// ErrCantSellMoreThanYouHave meansyou can't sell more than
 	ErrCantSellMoreThanYouHave = errors.New("cant sell more than you have")
-
+	// ErrOrderCantBeNil is if the user wants to add an order that is empty
+	ErrOrderCantBeNil = errors.New("you cant add an empty order")
 	// ListOFValidTypes is the list of types accepted for trading
-	ListOFValidTypes = [3]string{"stock", "crypto", "earth"}
+	ListOFValidTypes = [3]string{"stock", "crypto", "commodities"}
 )
 
 // AddOrder adds an Order to the database
 func (s *Service) AddOrder(order models.Order, userID uuid.UUID, currentDate time.Time) error {
+	if order.OrderID == uuid.Nil {
+		return ErrOrderCantBeNil
+	}
 	return s.DB.Create(&models.Order{
 		UserID:    userID,
 		CreatedAt: currentDate,
@@ -41,7 +45,7 @@ func (s *Service) AddOrder(order models.Order, userID uuid.UUID, currentDate tim
 // Limit is how many items. Offset is from where to where the data is used
 func (s *Service) GetOrders(orderDetails models.Order, limit int, offset int) (*[]models.Order, error) {
 	var orders *[]models.Order
-	if err := s.DB.Where(models.Order{UserID: orderDetails.UserID, Type: orderDetails.Type, Symbol: orderDetails.Symbol}).Limit(limit).Offset(offset).Error; err != nil {
+	if err := s.DB.Where(models.Order{UserID: orderDetails.UserID, Type: orderDetails.Type, Symbol: orderDetails.Symbol}).Limit(limit).Offset(offset).Find(&orders).Error; err != nil {
 		return nil, err
 	}
 
@@ -72,6 +76,11 @@ func (s *Service) CancelOrder(orderID uuid.UUID, currentDate time.Time) error {
 	}
 
 	return ErrOrderFilledOrCancelled
+}
+
+// UpdateOrder updates a order
+func (s *Service) UpdateOrder(orderID uuid.UUID, update models.Order) error {
+	return s.DB.Table("orders").Where(models.Order{OrderID: orderID}).Updates(&update).Error
 }
 
 // FillOrder "completes" the order

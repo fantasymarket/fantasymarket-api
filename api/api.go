@@ -10,7 +10,6 @@ import (
 	"fantasymarket/utils/config"
 
 	"net/http"
-
 	"github.com/go-chi/chi"
 )
 
