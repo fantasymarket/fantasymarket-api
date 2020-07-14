@@ -53,7 +53,7 @@ func (suite *DatabaseTestSuite) TestAddOrder() {
 		assert.Equal(suite.T(), nil, err)
 
 		suite.T().Log(test)
-		suite.T().Log("ok") //Dont delete this line. The tests literally fail if you do
+		suite.T().Log("---------------------") //Dont delete this line. The tests literally fail if you do
 
 		err = suite.dbService.DB.Where(test.input).First(&result).Error
 		assert.Equal(suite.T(), nil, err)
