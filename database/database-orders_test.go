@@ -1,6 +1,7 @@
 package database_test
 
 import (
+	"errors"
 	"fantasymarket/database/models"
 
 	uuid "github.com/satori/go.uuid"
@@ -50,17 +51,18 @@ func (suite *DatabaseTestSuite) TestAddOrder() {
 		test.input.UserID = userID
 		test.input.CreatedAt = currentDate
 		err := suite.dbService.AddOrder(test.input, test.input.UserID, currentDate)
-		assert.Equal(suite.T(), nil, err)
+		if test.input.OrderID == uuid.Nil {
+			assert.Equal(suite.T(), errors.New("you cant add an empty order"), err)
+		} else {
+			assert.Equal(suite.T(), nil, err)
 
-		suite.T().Log(test)
-		suite.T().Log("---------------------") //Dont delete this line. The tests literally fail if you do
+			err = suite.dbService.DB.Where(test.input).First(&result).Error
+			assert.Equal(suite.T(), nil, err)
 
-		err = suite.dbService.DB.Where(test.input).First(&result).Error
-		assert.Equal(suite.T(), nil, err)
-
-		assert.Equal(suite.T(), test.expect.Type, result.Type)
-		assert.Equal(suite.T(), test.expect.Symbol, result.Symbol)
-		assert.Equal(suite.T(), test.expect.Side, result.Side)
+			assert.Equal(suite.T(), test.expect.Type, result.Type)
+			assert.Equal(suite.T(), test.expect.Symbol, result.Symbol)
+			assert.Equal(suite.T(), test.expect.Side, result.Side)
+		}
 	}
 
 	suite.dbService.DB.Close()

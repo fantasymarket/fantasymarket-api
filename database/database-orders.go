@@ -20,12 +20,17 @@ var (
 	ErrInvalidType = errors.New("404 type not found")
 	// ErrCantSellMoreThanYouHave meansyou can't sell more than
 	ErrCantSellMoreThanYouHave = errors.New("cant sell more than you have")
+	// ErrOrderCantBeNil is if the user wants to add an order that is empty
+	ErrOrderCantBeNil = errors.New("you cant add an empty order")
 	// ListOFValidTypes is the list of types accepted for trading
 	ListOFValidTypes = [3]string{"stock", "crypto", "commodities"}
 )
 
 // AddOrder adds an Order to the database
 func (s *Service) AddOrder(order models.Order, userID uuid.UUID, currentDate time.Time) error {
+	if order.OrderID == uuid.Nil {
+		return ErrOrderCantBeNil
+	}
 	return s.DB.Create(&models.Order{
 		UserID:    userID,
 		CreatedAt: currentDate,
