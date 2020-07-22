@@ -3,7 +3,7 @@
   #   title: "Quantum Breakthrough"
   #   description: "We did it reddit!"
 
-  #   # Type says when the event is run
+  #   # type says when the event is run
   #   # can be:
   #   #	- recurring		- events like ellections that happen every x years
   #   # - fixed				- events that happen on a fixed date
@@ -1052,7 +1052,7 @@
     "Due to the mass in rain, the city has flooded with millions of property damage.
     Many of New Yorks most prestigious buildings and firms are affected and have claimed to suffer damages in the high millions"
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.009
 
   duration: P1W
@@ -1073,7 +1073,7 @@
     "A big hurricane that originated south-east of the Florida peninsula, has been going on a rampage through many islands in the Caribbean.
     The health organizations are struggling to keep supply flowing to those in need."
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.009
 
   duration: P3W
@@ -1093,7 +1093,7 @@
   description: >-
     "New research from Harvard University who partnered with Yale University has concluded that we will run out of oil sooner, rather than later."
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.009
 
   duration: P1W
@@ -1118,20 +1118,17 @@
   description: >-
     "After a lot of testing, SpaceX has claimed it has reached a safety level 100 times greater than that of modern-day airplanes"
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.009
 
   duration: P1D
 
   dependencies: []
   effects: []
-
   tags:
-    -	affectsTags: ["aviation"]
+    - affectsTags: ["aviation"]
       minTrend: -0.7
       maxTrend: -0.1
-      affectsStockIDs: ["BA"]
-
 
 - eventID: "fbi-uncovers-corruption-in-high-banking-positions"
   title: "FBI uncovers corruption scandal in high banking positions"
@@ -1139,7 +1136,7 @@
     "Yesterday evening the FBI released reports showing corruption in high banking positions.
     “Many banking CEOs have taken more than they should have”, claims the FBI representative"
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.006
 
   duration: P4W
@@ -1158,7 +1155,7 @@
   description: >-
     "Videos from Nasa showing 20 men and women moving into houses on the moon go viral"
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.008
 
   duration: P2W
@@ -1167,14 +1164,14 @@
   effects: []
 
   tags:
-    -	affectsTags: ["aviation"]
-           minTrend: -0.2
-           maxTrend: -0.5
-           affectsStockIDs: ["BA"]
-    -   affectsTags: ["real-estate"]
-          minTrend: -0.1
-          maxTrend: -0.9
-          affectsStockIDs: ["BXP"]
+    - affectsTags: ["aviation"]
+      minTrend: -0.2
+      maxTrend: -0.5
+      affectsStockIDs: ["BA"]
+    - affectsTags: ["real-estate"]
+      minTrend: -0.1
+      maxTrend: -0.9
+      affectsStockIDs: ["BXP"]
 
 
 - eventID: "high-oil-levels"
@@ -1182,7 +1179,7 @@
   description: >-
     "A new scientific research found that oil companies do not need to fear running out of oil"
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.004
 
   duration: P2W
@@ -1207,7 +1204,7 @@
     "A young 14-year-old Latina found a way to cure cancer by merely taking one little pill she created, which was supposed to be one of her school projects."
 
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.008
 
   duration: P2W
@@ -1227,7 +1224,7 @@
   description: >-
     "Doctors assume that somehow the DNA of a wild animal got mixed with the uterus of pregnant women, resulting in babies with really big toes. A cure is present, but expensive."
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.005
 
   duration: P4W
@@ -1246,7 +1243,7 @@
   description: >-
     "The stock market currently sees something that gets called "\The SAO-Effect\", which refers to a japanese anime with VR as its main theme. Billions around the world are interested in this new technology and can't wait to buy the new VR-Suit."
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.006
 
   dependencies: []
@@ -1266,7 +1263,7 @@
   description: >-
     "Scientists notice that a sudden eruption on the surface of the sun altered the gamma rays hitting the earth, which doesn't allow for flights for at least one year."
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.005
 
   duration: P1W
@@ -1285,7 +1282,7 @@
   description: >-
     "Apple had a rather hard time getting a foot in the door of the streaming world, but due to the recently closed deal things might change in their favor."
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.009
 
   dependencies: []
@@ -1305,7 +1302,7 @@
   description: >-
     "After Bill Gates death, investors speculate that Microsoft stocks might take a hit after the unfortunate news."
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.003
 
   dependencies: []
@@ -1325,7 +1322,7 @@
   description: >-
     "Zuckerberg faces an appointment in court in 2 weeks and potentially gets sentenced to 1-3 years in jail."
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.004
 
   dependencies: []
@@ -1345,7 +1342,7 @@
   description: >-
     "The electric car market has gotten much bigger and improved a lot over the recent years, which led the EU to forbid the use of non-electric cars."
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.008
 
   dependencies: []
@@ -1364,7 +1361,7 @@
   description: >-
     "New all time polution means that all Governments must try to reduce these values to stop global warming. Big transporting companies have claimed to suffer huge losses under the new guidlines"
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.007
 
   dependencies: []
@@ -1373,7 +1370,7 @@
   duration: P2M
 
   tags:
-    -	affectsTags: ["aviation"]
+    - affectsTags: ["aviation"]
       minTrend: -1.5
       maxTrend: -0.6
     - affectsStockIDs: ["TSLA"]
@@ -1388,7 +1385,7 @@
   description: >-
     "The business world is facing a new reform. This new investment strategy is said to increase returns by 10%!"
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.006
 
   dependencies: []
@@ -1397,7 +1394,7 @@
   duration: P2M
 
   tags:
-    -	affectsTags: ["finance"]
+    - affectsTags: ["finance"]
       minTrend: 1
       maxTrend: 2
 
@@ -1406,7 +1403,7 @@
   description: >-
     "The United States of Africa Idea has been proposed by the current leader of South Africa and has already been signed by the President of Egypt. The trading opportunites could be huge said a spokesman for the Times Newspaper this morning."
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.008
 
   dependencies: []
@@ -1415,7 +1412,7 @@
   duration: P2M
 
   tags:
-    -	affectsTags: ["finance"]
+    - affectsTags: ["finance"]
       minTrend: 0.1
       maxTrend: 1.2
 
@@ -1424,7 +1421,7 @@
   description: >-
     "Goldman Sachs has invested in a new talent who has huge winning chances in their next event."
 
-  Type: "random"
+  type: "random"
   randomChancePerDay: 0.004
 
   dependencies: []
@@ -1433,6 +1430,6 @@
   duration: P2M
 
   tags:
-    -	affectsStockIDs: ["GS"]
+    - affectsStockIDs: ["GS"]
       minTrend: 0.1
       maxTrend: 0.2
