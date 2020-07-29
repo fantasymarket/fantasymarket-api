@@ -69,6 +69,7 @@ func Load() (*Config, error) {
 
 	viper.SetDefault("game.ticksPerSecond", 0.1)
 	viper.SetDefault("game.gameTimePerTick", time.Hour)
+	viper.SetDefault("game.startDate", time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC))
 
 	viper.SetDefault("tokenSecret", "secret")
 	viper.SetDefault("logLevel", "debug")

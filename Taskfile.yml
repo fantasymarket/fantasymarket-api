@@ -6,6 +6,7 @@ tasks:
       development: false
     desc: "run fantasymarket"
     cmds:
+      - go generate ./...
       - go run main.go
 
   test:
