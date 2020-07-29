@@ -67,7 +67,7 @@ func (s *Service) startEvents() error {
 			createdAt.Add(offset)
 		}
 
-		if s.eventNeedsToBeRun(event) {
+		if s.EventNeedsToBeRun(event) {
 			if err := s.addEventToRun(event, createdAt); err != nil {
 				return fmt.Errorf("event-computation: failed to start event: %w", err)
 			}
@@ -128,7 +128,8 @@ func calculateRandomOffset(randomOffset timeutils.Duration, seed string) time.Du
 	return time.Duration(offset)
 }
 
-func (s *Service) eventNeedsToBeRun(event details.EventDetails) bool {
+// EventNeedsToBeRun checks if an even fullfills the requirements to run
+func (s *Service) EventNeedsToBeRun(event details.EventDetails) bool {
 	currentDate := s.GetCurrentDate()
 
 	lengthOfEventHistorySlice := len(s.EventHistory[event.EventID])
