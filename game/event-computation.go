@@ -132,14 +132,13 @@ func calculateRandomOffset(randomOffset timeutils.Duration, seed string) time.Du
 func (s *Service) EventNeedsToBeRun(event details.EventDetails) bool {
 	currentDate := s.GetCurrentDate()
 
-	lengthOfEventHistorySlice := len(s.EventHistory[event.EventID])
+	eventHistory, ok := s.EventHistory[event.EventID]
+	lengthOfEventHistorySlice := len(eventHistory)
 
 	timeStampOfLastEvent := time.Time{}
 	if lengthOfEventHistorySlice != 0 {
 		timeStampOfLastEvent = s.EventHistory[event.EventID][lengthOfEventHistorySlice-1]
 	}
-
-	_, ok := s.EventHistory[event.EventID]
 
 	eventHasNeverRun := !ok || lengthOfEventHistorySlice == 0
 	eventDateInPast := currentDate.After(event.FixedDate.Time)
