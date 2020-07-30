@@ -139,9 +139,9 @@ func (s *Service) EventNeedsToBeRun(event details.EventDetails) bool {
 		timeStampOfLastEvent = s.EventHistory[event.EventID][lengthOfEventHistorySlice-1]
 	}
 
-	eventHistory, ok := s.EventHistory[event.EventID]
+	_, ok := s.EventHistory[event.EventID]
 
-	eventHasNeverRun := !ok || len(eventHistory) == 0
+	eventHasNeverRun := !ok || lengthOfEventHistorySlice == 0
 	eventDateInPast := currentDate.After(event.FixedDate.Time)
 
 	randomEventShouldRun := currentDate.After(timeStampOfLastEvent.Add(event.MinTimeBetweenEvents))
