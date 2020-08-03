@@ -54,12 +54,12 @@ func (s *Service) GetOrders(orderDetails models.Order, limit int, offset int) (*
 
 // GetOrderByID gets an order by the orderID
 func (s *Service) GetOrderByID(orderID uuid.UUID) (models.Order, error) {
-	var order []models.Order
+	var order models.Order
 	if err := s.DB.Where(models.Order{OrderID: orderID}).First(&order).Error; err != nil {
 		return models.Order{}, err
 	}
 
-	return order[0], nil
+	return order, nil
 }
 
 // CancelOrder cancels an order in the database
