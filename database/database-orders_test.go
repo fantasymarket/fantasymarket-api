@@ -77,23 +77,71 @@ var testGetOrderData = []GetOrderTestData{
 	{
 		orderDetails: models.Order{
 			Type:   "stock",
-			Symbol: "KMS",
+			Symbol: "ASD",
 		},
 		expect: models.Order{
 			Type:   "stock",
-			Symbol: "KMS",
+			Symbol: "ASD",
 		},
 	},
 	{
 		orderDetails: models.Order{
 			Type:   "stock",
-			Symbol: "KYS",
+			Symbol: "ASD",
 		},
 		expect: models.Order{
 			Type:   "stock",
-			Symbol: "KYS",
+			Symbol: "ASD",
 		},
 	},
+}
+
+type GetOrderByIDTestData struct {
+	input  models.Order
+	expect models.Order
+}
+
+var testGetOrderByIDData = []GetOrderByIDTestData{
+	{
+		input: models.Order{
+			Type:   "stock",
+			Symbol: "AMZN",
+			Price:  5000,
+		},
+		expect: models.Order{
+			Type:   "stock",
+			Symbol: "AMZN",
+			Price:  5000,
+		},
+	},
+	{
+		input: models.Order{
+			Type:   "commodities",
+			Symbol: "GOLD",
+			Price:  100,
+		},
+		expect: models.Order{
+			Type:   "commodities",
+			Symbol: "GOLD",
+			Price:  100,
+		},
+	},
+}
+
+func (suite *DatabaseTestSuite) TestGetorderByID() {
+	for _, test := range testGetOrderByIDData {
+		err := suite.dbService.DB.Create(&test.input).Error
+		assert.Equal(suite.T(), nil, err)
+
+		result, err := suite.dbService.GetOrderByID(test.input.OrderID)
+		assert.Equal(suite.T(), nil, err)
+
+		assert.Equal(suite.T(), test.expect.Type, result.Type)
+		assert.Equal(suite.T(), test.expect.Symbol, result.Symbol)
+		assert.Equal(suite.T(), test.expect.Price, result.Price)
+	}
+
+	suite.dbService.DB.Close()
 }
 
 //func (suite *DatabaseTestSuite) TestGetOrder() {
