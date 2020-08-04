@@ -17,12 +17,12 @@ var testAddOrderData = []AddOrderTestData{
 	{
 		input: models.Order{
 			Type:   "stock",
-			Symbol: "HALLO",
+			Symbol: "APPL",
 			Status: "waiting",
 		},
 		expect: models.Order{
 			Type:   "stock",
-			Symbol: "HALLO",
+			Symbol: "APPL",
 			Status: "waiting",
 		},
 	},
@@ -40,8 +40,6 @@ var testAddOrderData = []AddOrderTestData{
 	},
 	{},
 }
-
-//write test for GetOrder(), FillOrder(), CancelOrder(), UPdate order and FillOrder()
 
 func (suite *DatabaseTestSuite) TestAddOrder() {
 	userID := uuid.NewV4()
@@ -70,30 +68,160 @@ func (suite *DatabaseTestSuite) TestAddOrder() {
 
 type GetOrderTestData struct {
 	orderDetails models.Order
-	expect       models.Order
+	expect       []models.Order
+	limit        int
+	offset       int
 }
 
 var testGetOrderData = []GetOrderTestData{
 	{
 		orderDetails: models.Order{
 			Type:   "stock",
-			Symbol: "ASD",
+			Symbol: "GOOG",
 		},
-		expect: models.Order{
-			Type:   "stock",
-			Symbol: "ASD",
+		expect: []models.Order{
+			{
+				Type:   "stock",
+				Symbol: "GOOG",
+				Price:  100,
+			},
 		},
+		limit:  1,
+		offset: -1,
 	},
 	{
 		orderDetails: models.Order{
-			Type:   "stock",
-			Symbol: "ASD",
+			Type: "stock",
 		},
-		expect: models.Order{
-			Type:   "stock",
-			Symbol: "ASD",
+		expect: []models.Order{
+			{
+				Type:   "stock",
+				Symbol: "GOOG",
+				Price:  100,
+			},
+			{
+				Type:   "stock",
+				Symbol: "APPL",
+				Price:  50,
+			},
 		},
+		limit:  2,
+		offset: -1,
 	},
+	{
+		orderDetails: models.Order{
+			Symbol: "GOOG",
+		},
+		expect: []models.Order{
+			{
+				Type:   "stock",
+				Symbol: "GOOG",
+				Price:  100,
+			},
+			{
+				Type:   "stock",
+				Symbol: "GOOG",
+				Price:  200,
+			},
+		},
+		limit:  -1,
+		offset: -1,
+	},
+	{
+		orderDetails: models.Order{
+			Type: "stock",
+		},
+		expect: []models.Order{
+			{
+				Type:   "stock",
+				Symbol: "AMZN",
+				Price:  5000,
+			},
+			{
+				Type:   "stock",
+				Symbol: "GOOG",
+				Price:  200,
+			},
+		},
+		limit:  2,
+		offset: 2,
+	},
+	{
+		orderDetails: models.Order{
+			Type: "commoditites",
+		},
+		expect: []models.Order{
+			{
+				Type:   "commoditites",
+				Symbol: "GOLD",
+				Price:  100,
+			},
+		},
+		limit:  1,
+		offset: -1,
+	},
+}
+var initialOrdersInDB = []models.Order{
+	{
+		Type:   "stock",
+		Symbol: "GOOG",
+		Price:  100,
+	},
+	{
+		Type:   "commoditites",
+		Symbol: "GOLD",
+		Price:  100,
+	},
+	{
+		Type:   "stock",
+		Symbol: "APPL",
+		Price:  50,
+	},
+	{
+		Type:   "commoditites",
+		Symbol: "SILV",
+		Price:  1,
+	},
+	{
+		Type:   "stock",
+		Symbol: "AMZN",
+		Price:  5000,
+	},
+	{
+		Type:   "stock",
+		Symbol: "GOOG",
+		Price:  200,
+	},
+}
+
+func (suite *DatabaseTestSuite) TestGetOrder() {
+	userID := uuid.NewV4()
+	for i, loadDB := range initialOrdersInDB {
+		if i%2 == 0 {
+			loadDB.UserID = userID
+		}
+		err := suite.dbService.DB.Create(&loadDB).Error
+		assert.Equal(suite.T(), nil, err)
+	}
+	index := 0
+	for _, test := range testGetOrderData {
+		if index == 5 {
+			test.orderDetails.UserID = userID
+		}
+		result, err := suite.dbService.GetOrders(test.orderDetails, test.limit, test.offset)
+		assert.Equal(suite.T(), nil, err)
+
+		for i, r := range result {
+			assert.Equal(suite.T(), test.expect[i].Type, r.Type)
+			assert.Equal(suite.T(), test.expect[i].Symbol, r.Symbol)
+			if index == 5 {
+				assert.Equal(suite.T(), test.expect[i].UserID, r.UserID)
+			}
+		}
+		index++
+	}
+
+	suite.dbService.DB.Close()
 }
 
 type GetOrderByIDTestData struct {
@@ -136,25 +264,8 @@ func (suite *DatabaseTestSuite) TestGetorderByID() {
 		result, err := suite.dbService.GetOrderByID(test.input.OrderID)
 		assert.Equal(suite.T(), nil, err)
 
-		assert.Equal(suite.T(), test.expect.Type, result.Type)
-		assert.Equal(suite.T(), test.expect.Symbol, result.Symbol)
-		assert.Equal(suite.T(), test.expect.Price, result.Price)
+		assert.Equal(suite.T(), test.input.OrderID, result.OrderID)
 	}
 
 	suite.dbService.DB.Close()
 }
-
-//func (suite *DatabaseTestSuite) TestGetOrder() {
-//	userID := uuid.NewV4()
-//	for _, test := range
-//}
-// // GetOrders gets all orders based on the parameters of orderDetails where Symbol, Type and userID can be set.
-// // Limit is how many items. Offset is from where to where the data is used
-// func (s *Service) GetOrders(orderDetails models.Order, limit int, offset int) (*[]models.Order, error) {
-// 	var orders *[]models.Order
-// 	if err := s.DB.Where(models.Order{UserID: orderDetails.UserID, Type: orderDetails.Type, Symbol: orderDetails.Symbol}).Limit(limit).Offset(offset).Error; err != nil {
-// 		return nil, err
-// 	}
-
-// 	return orders, nil
-// }

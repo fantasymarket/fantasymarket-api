@@ -43,8 +43,8 @@ func (s *Service) AddOrder(order models.Order, userID uuid.UUID, currentDate tim
 
 // GetOrders gets all orders based on the parameters of orderDetails where Symbol, Type and userID can be set.
 // Limit is how many items. Offset is from where to where the data is used
-func (s *Service) GetOrders(orderDetails models.Order, limit int, offset int) (*[]models.Order, error) {
-	var orders *[]models.Order
+func (s *Service) GetOrders(orderDetails models.Order, limit int, offset int) ([]models.Order, error) {
+	var orders []models.Order
 	if err := s.DB.Where(models.Order{UserID: orderDetails.UserID, Type: orderDetails.Type, Symbol: orderDetails.Symbol}).Limit(limit).Offset(offset).Find(&orders).Error; err != nil {
 		return nil, err
 	}
