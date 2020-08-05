@@ -196,15 +196,14 @@ var initialOrdersInDB = []models.Order{
 
 func (suite *DatabaseTestSuite) TestGetOrder() {
 	userID := uuid.NewV4()
-	for i, loadDB := range initialOrdersInDB {
+	for i, order := range initialOrdersInDB {
 		if i%2 == 0 {
-			loadDB.UserID = userID
+			order.UserID = userID
 		}
-		err := suite.dbService.DB.Create(&loadDB).Error
+		err := suite.dbService.DB.Create(&order).Error
 		assert.Equal(suite.T(), nil, err)
 	}
-	index := 0
-	for _, test := range testGetOrderData {
+	for index, test := range testGetOrderData {
 		if index == 5 {
 			test.orderDetails.UserID = userID
 		}
@@ -218,7 +217,6 @@ func (suite *DatabaseTestSuite) TestGetOrder() {
 				assert.Equal(suite.T(), test.expect[i].UserID, r.UserID)
 			}
 		}
-		index++
 	}
 
 	suite.dbService.DB.Close()
@@ -265,6 +263,65 @@ func (suite *DatabaseTestSuite) TestGetorderByID() {
 		assert.Equal(suite.T(), nil, err)
 
 		assert.Equal(suite.T(), test.input.OrderID, result.OrderID)
+	}
+
+	suite.dbService.DB.Close()
+}
+
+type CancelOrderTestData struct {
+	input  models.Order
+	expect string
+}
+
+var testCancelOrderData = []CancelOrderTestData{
+	{
+		input: models.Order{
+			Symbol: "ASDF",
+			Status: "waiting",
+		},
+		expect: "cancelled",
+	},
+	{
+		input: models.Order{
+			Symbol: "YES",
+			Status: "waiting",
+		},
+		expect: "cancelled",
+	},
+	{
+		input: models.Order{
+			Symbol: "KMS",
+			Status: "filled",
+		},
+		expect: "cancelled",
+	},
+	{
+		input: models.Order{
+			Symbol: "WHAT",
+			Status: "filled",
+		},
+		expect: "cancelled",
+	},
+}
+
+func (suite *DatabaseTestSuite) TestCancelOrder() {
+	var ErrOrderFilledOrCancelled = errors.New("can't cancel order, as its already filled or cancelled")
+	currentDate := parseTime("2020-08-05T10:58:00Z")
+	for _, test := range testCancelOrderData {
+		err := suite.dbService.DB.Create(&test.input).Error
+		assert.Equal(suite.T(), nil, err)
+
+		err = suite.dbService.CancelOrder(test.input.OrderID, currentDate)
+
+		if test.input.Status == "filled" || test.input.Status == "cancelled" {
+			assert.Equal(suite.T(), ErrOrderFilledOrCancelled, err)
+		} else {
+			assert.Equal(suite.T(), nil, err)
+			err = suite.dbService.DB.Where(models.Order{OrderID: test.input.OrderID}).First(&test.input).Error
+			assert.Equal(suite.T(), nil, err)
+
+			assert.Equal(suite.T(), test.expect, test.input.Status)
+		}
 	}
 
 	suite.dbService.DB.Close()
