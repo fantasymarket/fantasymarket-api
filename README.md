@@ -3,13 +3,19 @@
 
 ## Table of Contents
 
+- [Introduction](#introduction)
 - [Project Structure](#structure)
 - [Installation](#installation)
 - [Development](#development)
   - [Recommended Tools](#recommended-tools)
   - [Testing](#testing)
-  - [Running](#running-beta)
+  - [Beta impressions](#beta-impressions)
+  - [Running beta](#running-beta)
 - [Our Current Situation](#our-current-situation)
+
+# Introduction
+
+We are creating a working stock market simulation, where the user can invest in-game currency in a simulated market completely separated from the real world. By providing custom events that pop up randomly and alter the course of our stocks, coupled with a market that never sleeps, we are presenting a fun and fast-paced introduction into the stock market. Our beta is currently in its final phase and we plan to release it fully by the end of august.
 
 ## Structure
 
@@ -64,6 +70,12 @@ Alternative:
 $ go test ./...
 ```
 
+## Beta impressions
+
+| Landing Page      | Chart View      | Trading View |
+|------------|-------------|-------------|
+| <img src=https://i.imgur.com/lK5VEYK.jpg> | <img src=https://i.imgur.com/duyFyZS.jpg> | <img src=https://i.imgur.com/AncR4ah.png> |
+
 ### Running Beta:
 
 After installing all the requirements, start the program by running `$ go run main.go`.\
@@ -92,5 +104,4 @@ DBG updated stock index=60024 name=APPL
 
 Currently, the project needs some final refactoring, some last bits of database logic and ultimately testing. 
 Even though some tests are already completed, more are needed to ensure a well tested project.
-Finally, we have also started to link the frontend to the backend so we can complete our MVP. 
-If all goes smoothly, we will be able to release the project fully by the end of summer.
+Finally, we have also started to link the frontend to the backend. If all goes smoothly, we will be able to release the project fully by the end of august.
