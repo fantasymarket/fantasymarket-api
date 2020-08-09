@@ -86,8 +86,8 @@ func (s *Service) GetStockMapAtTick(lastTick int64) (map[string]models.Stock, er
 
 // GetStockAtTick fetches the value of a specific stock at a specific tick
 // `stock` can either be a stock symbol or stockID
-func (s *Service) GetStockAtTick(stock string, lastTick int64) (*models.Stock, error) {
-	query := models.Stock{Tick: lastTick}
+func (s *Service) GetStockAtTick(stock string, tick int64) (*models.Stock, error) {
+	query := models.Stock{Tick: tick}
 
 	if uuid, err := uuid.FromString(stock); err == nil {
 		query.StockID = uuid
@@ -101,4 +101,26 @@ func (s *Service) GetStockAtTick(stock string, lastTick int64) (*models.Stock, e
 	}
 
 	return &stockData, nil
+}
+
+// GetStockData fetches all ticks between two ticks
+func (s *Service) GetStockData(stock string, from int64, to int64) (*[]models.Stock, error) {
+	query := models.Stock{}
+
+	if uuid, err := uuid.FromString(stock); err == nil {
+		query.StockID = uuid
+	} else {
+		query.Symbol = stock
+	}
+
+	stocks := []models.Stock{}
+	if err := s.DB.Where(query).Where(
+		"tick BETWEEN ? AND ?",
+		from,
+		to,
+	).Find(&stocks).Error; err != nil {
+		return nil, err
+	}
+
+	return &stocks, nil
 }
