@@ -4,6 +4,7 @@ import (
 	"fantasymarket/game/details"
 	"fantasymarket/utils/http/responses"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -26,6 +27,22 @@ func (api *APIHandler) getAllAssets(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responses.CustomResponse(w, m, 200)
+}
+
+type assetResponse struct {
+	Symbol      string              `json:"symbol"`
+	Type        string              `json:"type"`
+	Name        string              `json:"name,omitempty"`
+	Description string              `json:"description,omitempty"`
+	Tick        string              `json:"tick,omitempty"`
+	Date        string              `json:"date,omitempty"`
+	Price       string              `json:"price,omitempty"`
+	Price24h    string              `json:"price24h,omitempty"`
+	Volume      string              `json:"volume,omitempty"`
+	Volume24h   string              `json:"volume24h,omitempty"`
+	From        string              `json:"from,omitempty"`
+	To          string              `json:"to,omitempty"`
+	Prices      []map[string]string `json:"prices,omitempty"`
 }
 
 func (api *APIHandler) getAsset(w http.ResponseWriter, r *http.Request) {
@@ -55,18 +72,21 @@ func (api *APIHandler) getAsset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responses.CustomResponse(w, map[string]interface{}{
-		"symbol":      asset.Symbol,
-		"type":        asset.Type,
-		"name":        asset.Name,
-		"description": asset.Description,
-		"tick":        tick,
-		"date":        api.Game.TickToTime(tick),
-		"price":       assetData.Index,
-		"price24h":    0,
-		"volume":      0,
-		"volume24h":   0,
-	}, http.StatusOK)
+	responses.CustomResponse(w,
+		assetResponse{
+			Symbol:      asset.Symbol,
+			Type:        asset.Type,
+			Name:        asset.Name,
+			Description: asset.Description,
+			Tick:        strconv.FormatInt(tick, 10),
+			Date:        api.Game.TickToTime(tick).Format(time.RFC3339),
+			Price:       strconv.FormatInt(assetData.Index, 10),
+			Price24h:    "",
+			Volume:      "",
+			Volume24h:   "",
+		},
+		http.StatusOK,
+	)
 }
 
 func (api *APIHandler) getAssetHistory(w http.ResponseWriter, r *http.Request) {
@@ -92,13 +112,38 @@ func (api *APIHandler) getAssetHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	asset, err := api.DB.GetAssetData(symbol, from, to)
+	assetData, err := api.DB.GetAssetData(symbol, from, to)
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, errAssetNotFound.Error())
 		return
 	}
 
-	responses.CustomResponse(w, asset, http.StatusOK)
+	prices := []map[string]string{}
+	for _, a := range *assetData {
+		prices = append(prices, map[string]string{
+			"date":  api.Game.TickToTime(a.Tick).Format(time.RFC3339),
+			"index": strconv.FormatInt(a.Index, 10),
+		})
+	}
+
+	asset, ok := api.Game.AssetDetails[symbol]
+	if !ok {
+		responses.ErrorResponse(w, http.StatusInternalServerError, errAssetNotFound.Error())
+		return
+	}
+
+	responses.CustomResponse(w,
+		assetResponse{
+			Symbol:      asset.Symbol,
+			Type:        asset.Type,
+			Name:        asset.Name,
+			Description: asset.Description,
+			From:        api.Game.TickToTime(from).Format(time.RFC3339),
+			To:          api.Game.TickToTime(to).Format(time.RFC3339),
+			Prices:      prices,
+		},
+		http.StatusOK,
+	)
 }
 
 func (api *APIHandler) getTickAtTime(timestamp string) (int64, error) {
