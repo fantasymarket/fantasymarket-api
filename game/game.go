@@ -214,9 +214,9 @@ func (s Service) ComputeAssetNumbers(assets []models.Asset, events []models.Even
 
 	// This computes the random and own asset, not taking into account other peoples selling
 	// As a asset drops to a % of its value, theres gonna be more buyers or more sellers
-	for _, asset := range assets {
+	for i, asset := range assets {
 		affectedness := affectedness[asset.Symbol]
-		asset.Index += s.GetTendency(asset, affectedness)
+		assets[i].Index += s.GetTendency(asset, affectedness)
 
 		log.Debug().Str("name", asset.Symbol).Int64("index", asset.Index).Msg("updated asset")
 	}
