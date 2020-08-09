@@ -32,7 +32,7 @@ var (
 	errGeneratingToken   = errors.New("could not generate token")
 	errCreatingAccount   = errors.New("error creating new user account")
 	errInvalidLogin      = errors.New("could not login user")
-	errStockNotFound     = errors.New("could not find stock")
+	errAssetNotFound     = errors.New("could not find asset")
 	errInvalidParameters = errors.New("invalid parameters")
 )
 
@@ -62,15 +62,13 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 	r.Get("/time", api.getTime)
 
-	r.Route("/stocks", func(r chi.Router) {
+	r.Route("/assets", func(r chi.Router) {
 
-		r.Get("/", api.getAllStocks)
+		r.Get("/", api.getAllAssets)
 
-		r.Get("/{symbol}", api.getStockDetails)
+		r.Get("/{symbol}", api.getAsset)
 
-		r.Get("/{symbol}/value", api.getStockValue)
-
-		r.Get("/{symbol}/history", api.getStockHistory)
+		r.Get("/{symbol}/history", api.getAssetHistory)
 	})
 
 	r.Route("/orders", func(r chi.Router) {

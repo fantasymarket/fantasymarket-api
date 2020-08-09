@@ -10,15 +10,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
-	allStocks, err := details.StocksYamlBytes()
+func (api *APIHandler) getAllAssets(w http.ResponseWriter, r *http.Request) {
+	allAssets, err := details.AssetsYamlBytes()
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, errFetchingData.Error())
 		return
 	}
 
-	m := make([]details.StockDetails, 30)
-	err = yaml.Unmarshal(allStocks, &m)
+	m := make([]details.AssetDetails, 30)
+	err = yaml.Unmarshal(allAssets, &m)
 
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, errFetchingData.Error())
@@ -28,7 +28,7 @@ func (api *APIHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
 	responses.CustomResponse(w, m, 200)
 }
 
-func (api *APIHandler) getStockValue(w http.ResponseWriter, r *http.Request) {
+func (api *APIHandler) getAsset(w http.ResponseWriter, r *http.Request) {
 	symbol := chi.URLParam(r, "symbol")
 	givenTime := chi.URLParam(r, "time")
 
@@ -38,21 +38,38 @@ func (api *APIHandler) getStockValue(w http.ResponseWriter, r *http.Request) {
 		var err error
 		tick, err = api.getTickAtTime(givenTime)
 		if err != nil {
-			responses.ErrorResponse(w, http.StatusInternalServerError, errStockNotFound.Error())
+			responses.ErrorResponse(w, http.StatusInternalServerError, errAssetNotFound.Error())
 			return
 		}
 	}
 
-	stock, err := api.DB.GetStockAtTick(symbol, tick)
+	assetData, err := api.DB.GetAssetAtTick(symbol, tick)
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, errStockNotFound.Error())
+		responses.ErrorResponse(w, http.StatusInternalServerError, errAssetNotFound.Error())
 		return
 	}
 
-	responses.CustomResponse(w, stock, http.StatusOK)
+	asset, ok := api.Game.AssetDetails[symbol]
+	if !ok {
+		responses.ErrorResponse(w, http.StatusInternalServerError, errAssetNotFound.Error())
+		return
+	}
+
+	responses.CustomResponse(w, map[string]interface{}{
+		"symbol":      asset.Symbol,
+		"type":        asset.Type,
+		"name":        asset.Name,
+		"description": asset.Description,
+		"tick":        tick,
+		"date":        api.Game.TickToTime(tick),
+		"price":       assetData.Index,
+		"price24h":    0,
+		"volume":      0,
+		"volume24h":   0,
+	}, http.StatusOK)
 }
 
-func (api *APIHandler) getStockHistory(w http.ResponseWriter, r *http.Request) {
+func (api *APIHandler) getAssetHistory(w http.ResponseWriter, r *http.Request) {
 	symbol := chi.URLParam(r, "symbol")
 
 	fromTime := chi.URLParam(r, "from")
@@ -75,25 +92,13 @@ func (api *APIHandler) getStockHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stock, err := api.DB.GetStockData(symbol, from, to)
+	asset, err := api.DB.GetAssetData(symbol, from, to)
 	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, errStockNotFound.Error())
+		responses.ErrorResponse(w, http.StatusInternalServerError, errAssetNotFound.Error())
 		return
 	}
 
-	responses.CustomResponse(w, stock, http.StatusOK)
-}
-
-func (api *APIHandler) getStockDetails(w http.ResponseWriter, r *http.Request) {
-	symbol := chi.URLParam(r, "symbol")
-
-	stock, ok := api.Game.StockDetails[symbol]
-	if !ok {
-		responses.ErrorResponse(w, http.StatusInternalServerError, errStockNotFound.Error())
-		return
-	}
-
-	responses.CustomResponse(w, stock, http.StatusOK)
+	responses.CustomResponse(w, asset, http.StatusOK)
 }
 
 func (api *APIHandler) getTickAtTime(timestamp string) (int64, error) {
