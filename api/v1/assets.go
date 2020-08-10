@@ -1,32 +1,60 @@
 package v1
 
 import (
-	"fantasymarket/game/details"
 	"fantasymarket/utils/http/responses"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/go-chi/chi"
-	"gopkg.in/yaml.v3"
 )
 
 func (api *APIHandler) getAllAssets(w http.ResponseWriter, r *http.Request) {
-	allAssets, err := details.AssetsYamlBytes()
+
+	givenTime := r.URL.Query().Get("time")
+	tick := api.Game.TicksSinceStart
+
+	fmt.Println(givenTime)
+	fmt.Println(givenTime)
+	fmt.Println(givenTime)
+	fmt.Println(givenTime)
+	fmt.Println(givenTime)
+	fmt.Println(givenTime)
+
+	if givenTime != "" {
+		var err error
+		tick, err = api.Game.TimeStringToTick(givenTime)
+
+		if err != nil {
+			responses.ErrorResponse(w, http.StatusInternalServerError, errAssetNotFound.Error())
+			return
+		}
+	}
+
+	assetData, err := api.DB.GetAssetsAtTick(tick)
 	if err != nil {
 		responses.ErrorResponse(w, http.StatusInternalServerError, errFetchingData.Error())
 		return
 	}
 
-	m := make([]details.AssetDetails, 30)
-	err = yaml.Unmarshal(allAssets, &m)
+	var assets []assetResponse
+	for _, asset := range assetData {
+		assetDetails := api.Game.AssetDetails[asset.Symbol]
 
-	if err != nil {
-		responses.ErrorResponse(w, http.StatusInternalServerError, errFetchingData.Error())
-		return
+		assets = append(assets, assetResponse{
+			Symbol:      asset.Symbol,
+			Type:        assetDetails.Type,
+			Name:        assetDetails.Name,
+			Description: assetDetails.Description,
+			Tick:        strconv.FormatInt(tick, 10),
+			Date:        api.Game.TickToTime(tick).Format(time.RFC3339),
+			Price:       strconv.FormatInt(asset.Index, 10),
+			Volume:      "",
+		})
 	}
 
-	responses.CustomResponse(w, m, 200)
+	responses.CustomResponse(w, assets, 200)
 }
 
 type assetResponse struct {
@@ -37,9 +65,7 @@ type assetResponse struct {
 	Tick        string              `json:"tick,omitempty"`
 	Date        string              `json:"date,omitempty"`
 	Price       string              `json:"price,omitempty"`
-	Price24h    string              `json:"price24h,omitempty"`
 	Volume      string              `json:"volume,omitempty"`
-	Volume24h   string              `json:"volume24h,omitempty"`
 	From        string              `json:"from,omitempty"`
 	To          string              `json:"to,omitempty"`
 	Prices      []map[string]string `json:"prices,omitempty"`
@@ -47,13 +73,13 @@ type assetResponse struct {
 
 func (api *APIHandler) getAsset(w http.ResponseWriter, r *http.Request) {
 	symbol := chi.URLParam(r, "symbol")
-	givenTime := chi.URLParam(r, "time")
+	givenTime := r.URL.Query().Get("time")
 
 	tick := api.Game.TicksSinceStart
 
 	if givenTime != "" {
 		var err error
-		tick, err = api.getTickAtTime(givenTime)
+		tick, err = api.Game.TimeStringToTick(givenTime)
 		if err != nil {
 			responses.ErrorResponse(w, http.StatusInternalServerError, errAssetNotFound.Error())
 			return
@@ -81,9 +107,7 @@ func (api *APIHandler) getAsset(w http.ResponseWriter, r *http.Request) {
 			Tick:        strconv.FormatInt(tick, 10),
 			Date:        api.Game.TickToTime(tick).Format(time.RFC3339),
 			Price:       strconv.FormatInt(assetData.Index, 10),
-			Price24h:    "",
 			Volume:      "",
-			Volume24h:   "",
 		},
 		http.StatusOK,
 	)
@@ -92,19 +116,19 @@ func (api *APIHandler) getAsset(w http.ResponseWriter, r *http.Request) {
 func (api *APIHandler) getAssetHistory(w http.ResponseWriter, r *http.Request) {
 	symbol := chi.URLParam(r, "symbol")
 
-	fromTime := chi.URLParam(r, "from")
-	toTime := chi.URLParam(r, "to")
+	fromTime := r.URL.Query().Get("from")
+	toTime := r.URL.Query().Get("to")
 
 	from := int64(0)
 	to := api.Game.TicksSinceStart
 
 	var err error
 	if fromTime != "" {
-		from, err = api.getTickAtTime(fromTime)
+		from, err = api.Game.TimeStringToTick(fromTime)
 	}
 
 	if toTime != "" {
-		to, err = api.getTickAtTime(toTime)
+		to, err = api.Game.TimeStringToTick(toTime)
 	}
 
 	if err != nil {
@@ -144,18 +168,4 @@ func (api *APIHandler) getAssetHistory(w http.ResponseWriter, r *http.Request) {
 		},
 		http.StatusOK,
 	)
-}
-
-func (api *APIHandler) getTickAtTime(timestamp string) (int64, error) {
-	startTime, err := time.Parse(time.RFC3339, api.Config.Game.StartDate.String())
-	if err != nil {
-		return 0, err
-	}
-	currentTime, err := time.Parse(time.RFC3339, timestamp)
-	if err != nil {
-		return 0, err
-	}
-	difference := int64(currentTime.Sub(startTime).Hours())
-
-	return difference, nil
 }

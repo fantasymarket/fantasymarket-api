@@ -40,6 +40,25 @@ func (s *Service) TickToTime(ticks int64) time.Time {
 	return s.Config.Game.StartDate.Add(timeSinceStart)
 }
 
+// TimeStringToTick converts a timestamp to a tick
+func (s *Service) TimeStringToTick(time string) (int64, error) {
+	t, err := timeutils.ParseTime(time)
+	return s.TimeToTick(t), err
+}
+
+// TimeToTick converts a timestamp to a tick
+func (s *Service) TimeToTick(time time.Time) int64 {
+
+	diff := time.Sub(s.Config.Game.StartDate)
+	ticks := diff / s.Config.Game.GameTimePerTick
+
+	if ticks < 0 {
+		return 0
+	}
+
+	return int64(ticks)
+}
+
 // Start starts the game loop
 func Start(db *database.Service, config *config.Config) (*Service, error) {
 
