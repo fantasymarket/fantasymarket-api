@@ -2,7 +2,6 @@ package v1
 
 import (
 	"fantasymarket/utils/http/responses"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -13,14 +12,18 @@ import (
 func (api *APIHandler) getAllAssets(w http.ResponseWriter, r *http.Request) {
 
 	givenTime := r.URL.Query().Get("time")
+	tickStr := r.URL.Query().Get("tick")
+
 	tick := api.Game.TicksSinceStart
 
-	fmt.Println(givenTime)
-	fmt.Println(givenTime)
-	fmt.Println(givenTime)
-	fmt.Println(givenTime)
-	fmt.Println(givenTime)
-	fmt.Println(givenTime)
+	if tickStr != "" {
+		var err error
+		tick, err = strconv.ParseInt(tickStr, 10, 63)
+		if err != nil || tick < 0 {
+			responses.ErrorResponse(w, http.StatusInternalServerError, errFetchingData.Error())
+			return
+		}
+	}
 
 	if givenTime != "" {
 		var err error
@@ -51,6 +54,7 @@ func (api *APIHandler) getAllAssets(w http.ResponseWriter, r *http.Request) {
 			Date:        api.Game.TickToTime(tick).Format(time.RFC3339),
 			Price:       strconv.FormatInt(asset.Index, 10),
 			Volume:      "",
+			Count:       strconv.FormatInt(assetDetails.Shares, 10),
 		})
 	}
 
@@ -69,13 +73,24 @@ type assetResponse struct {
 	From        string              `json:"from,omitempty"`
 	To          string              `json:"to,omitempty"`
 	Prices      []map[string]string `json:"prices,omitempty"`
+	Count       string              `json:"count,omitempty"`
 }
 
 func (api *APIHandler) getAsset(w http.ResponseWriter, r *http.Request) {
 	symbol := chi.URLParam(r, "symbol")
-	givenTime := r.URL.Query().Get("time")
 
+	givenTime := r.URL.Query().Get("time")
+	tickStr := r.URL.Query().Get("tick")
 	tick := api.Game.TicksSinceStart
+
+	if tickStr != "" {
+		var err error
+		tick, err = strconv.ParseInt(tickStr, 10, 63)
+		if err != nil || tick < 0 {
+			responses.ErrorResponse(w, http.StatusInternalServerError, errFetchingData.Error())
+			return
+		}
+	}
 
 	if givenTime != "" {
 		var err error
@@ -108,21 +123,34 @@ func (api *APIHandler) getAsset(w http.ResponseWriter, r *http.Request) {
 			Date:        api.Game.TickToTime(tick).Format(time.RFC3339),
 			Price:       strconv.FormatInt(assetData.Index, 10),
 			Volume:      "",
+			Count:       strconv.FormatInt(asset.Shares, 10),
 		},
 		http.StatusOK,
 	)
 }
 
 func (api *APIHandler) getAssetHistory(w http.ResponseWriter, r *http.Request) {
+
 	symbol := chi.URLParam(r, "symbol")
 
 	fromTime := r.URL.Query().Get("from")
 	toTime := r.URL.Query().Get("to")
 
+	fromTick := r.URL.Query().Get("fromTick")
+	toTick := r.URL.Query().Get("toTick")
+
 	from := int64(0)
 	to := api.Game.TicksSinceStart
 
 	var err error
+	if fromTick != "" {
+		from, err = strconv.ParseInt(fromTick, 10, 63)
+	}
+
+	if toTick != "" {
+		to, err = strconv.ParseInt(toTick, 10, 63)
+	}
+
 	if fromTime != "" {
 		from, err = api.Game.TimeStringToTick(fromTime)
 	}
@@ -131,7 +159,7 @@ func (api *APIHandler) getAssetHistory(w http.ResponseWriter, r *http.Request) {
 		to, err = api.Game.TimeStringToTick(toTime)
 	}
 
-	if err != nil {
+	if err != nil || from < 0 || to < 0 {
 		responses.ErrorResponse(w, http.StatusInternalServerError, errInvalidParameters.Error())
 		return
 	}
@@ -146,7 +174,7 @@ func (api *APIHandler) getAssetHistory(w http.ResponseWriter, r *http.Request) {
 	for _, a := range *assetData {
 		prices = append(prices, map[string]string{
 			"date":  api.Game.TickToTime(a.Tick).Format(time.RFC3339),
-			"index": strconv.FormatInt(a.Index, 10),
+			"price": strconv.FormatInt(a.Index, 10),
 		})
 	}
 
@@ -165,6 +193,7 @@ func (api *APIHandler) getAssetHistory(w http.ResponseWriter, r *http.Request) {
 			From:        api.Game.TickToTime(from).Format(time.RFC3339),
 			To:          api.Game.TickToTime(to).Format(time.RFC3339),
 			Prices:      prices,
+			Count:       strconv.FormatInt(asset.Shares, 10),
 		},
 		http.StatusOK,
 	)

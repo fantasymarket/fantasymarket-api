@@ -256,10 +256,11 @@ func (s Service) GetTendency(asset models.Asset, eventAffectedness float64) int6
 
 	// randomModifier needs a random value in a range multiplied by a variable (depending on the asset) to create spikes in the asset chart
 	randomModifier := hash.Int64HashRange(-rangeValue, rangeValue, seed)
+
 	// assetTrend and eventTrend are the inputs to calculate the asset graph trends
 	assetTrend := weightOfTrends * assetSettings.Trend
 	eventTrend := weightOfTrends * eventAffectedness
-	tendency := float64(randomModifier)*assetSettings.Stability + assetTrend + eventTrend
+	tendency := float64(randomModifier)*10*assetSettings.Stability + assetTrend + eventTrend
 
 	return int64(tendency)
 }
