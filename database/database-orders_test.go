@@ -326,3 +326,39 @@ func (suite *DatabaseTestSuite) TestCancelOrder() {
 
 	suite.dbService.DB.Close()
 }
+
+type UpdateOrderTestData struct {
+	input   models.Order
+	updated models.Order
+}
+
+var testUpdateOrderData = []UpdateOrderTestData{
+	{
+		input: models.Order{
+			Symbol: "TSLA",
+			Status: "waiting",
+		},
+		updated: models.Order{
+			Symbol: "TSLA",
+			Status: "filled",
+		},
+	},
+}
+
+func (suite *DatabaseTestSuite) TestUpdateOrder() {
+
+	for _, test := range testUpdateOrderData {
+		var result models.Order
+		err := suite.dbService.DB.Create(&test.input).Error
+		assert.Equal(suite.T(), nil, err)
+
+		err = suite.dbService.UpdateOrder(test.input.OrderID, test.updated)
+		assert.Equal(suite.T(), nil, err)
+
+		err = suite.dbService.DB.Where(models.Order{OrderID: test.input.OrderID}).First(&result).Error
+		assert.Equal(suite.T(), nil, err)
+
+		assert.Equal(suite.T(), test.updated.Symbol, result.Symbol)
+		assert.Equal(suite.T(), test.updated.Status, result.Status)
+	}
+}

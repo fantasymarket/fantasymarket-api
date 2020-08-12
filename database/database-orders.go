@@ -62,7 +62,7 @@ func (s *Service) GetOrderByID(orderID uuid.UUID) (models.Order, error) {
 	return order, nil
 }
 
-// CancelOrder cancels an order in the database
+// CancelOrder cancels an order and returns the status as "cancelled"
 func (s *Service) CancelOrder(orderID uuid.UUID, currentDate time.Time) error {
 
 	var order models.Order
@@ -78,7 +78,7 @@ func (s *Service) CancelOrder(orderID uuid.UUID, currentDate time.Time) error {
 	return ErrOrderFilledOrCancelled
 }
 
-// UpdateOrder updates a order
+// UpdateOrder updates the status of an order
 func (s *Service) UpdateOrder(orderID uuid.UUID, update models.Order) error {
 	return s.DB.Table("orders").Where(models.Order{OrderID: orderID}).Updates(&update).Error
 }
