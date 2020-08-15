@@ -23,7 +23,7 @@ var (
 	// ErrOrderCantBeNil is if the user wants to add an order that is empty
 	ErrOrderCantBeNil = errors.New("you cant add an empty order")
 	// ListOFValidTypes is the list of types accepted for trading
-	ListOFValidTypes = [3]string{"stock", "crypto", "commodities"}
+	ListOFValidTypes = []string{"stock", "crypto", "commodities"}
 )
 
 // AddOrder adds an Order to the database
@@ -62,7 +62,7 @@ func (s *Service) GetOrderByID(orderID uuid.UUID) (models.Order, error) {
 	return order, nil
 }
 
-// CancelOrder cancels an order and returns the status as "cancelled"
+// CancelOrder changes the status of the order as "cancelled"
 func (s *Service) CancelOrder(orderID uuid.UUID, currentDate time.Time) error {
 
 	var order models.Order
@@ -92,23 +92,25 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentIndex in
 	var order models.Order
 	var user models.User
 
+	//have in the DB query status = "waiting"
+
 	if err := s.DB.Where(models.Order{
 		OrderID: orderID,
 	}).Find(&order).Error; err != nil {
-		return err
+		return errors.New("Order not found")
 	}
 
 	if err := s.DB.Where(models.User{
 		UserID: userID,
 	}).Preload("Portfolio").Find(&user).Error; err != nil {
-		return err
+		return errors.New("User not found")
 	}
 
 	if order.Amount < 0 {
 		return ErrInvalidAmount
 	}
 
-	if !utils.Includes(ListOFValidTypes[:], order.Type) {
+	if !utils.Includes(ListOFValidTypes, order.Type) {
 		return ErrInvalidType
 	}
 

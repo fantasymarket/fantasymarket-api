@@ -362,3 +362,118 @@ func (suite *DatabaseTestSuite) TestUpdateOrder() {
 		assert.Equal(suite.T(), test.updated.Status, result.Status)
 	}
 }
+
+type FillOrderTestData struct {
+	input  models.Order
+	expect models.Order
+}
+
+var testFillOrderData = []FillOrderTestData{
+	{
+		input: models.Order{
+			Symbol: "TSLA",
+			Price:  100,
+			Amount: 5,
+			Side:   "buy",
+			Type:   "stock",
+			Status: "waiting",
+		},
+		expect: models.Order{
+			Status:   "filled",
+			FilledAt: parseTime("2020-08-14T10:32:00Z"),
+		},
+	},
+	{
+		input: models.Order{
+			Symbol: "GOOG",
+			Price:  100,
+			Amount: -1,
+			Side:   "buy",
+			Type:   "stock",
+			Status: "waiting",
+		},
+		expect: models.Order{
+			Status:     "canceled",
+			CanceledAt: parseTime("2020-08-14T10:32:00Z"),
+		},
+	},
+	{
+		input: models.Order{
+			Symbol: "AAPL",
+			Price:  100,
+			Amount: 10,
+			Side:   "buy",
+			Type:   "not stock",
+			Status: "waiting",
+		},
+		expect: models.Order{
+			Status: "waiting",
+		},
+	},
+	{
+		input: models.Order{
+			Symbol: "NO",
+			Price:  100,
+			Amount: 2,
+			Side:   "buy",
+			Type:   "stock",
+			Status: "cancelled",
+		},
+		expect: models.Order{
+			Status:     "canceled",
+			CanceledAt: parseTime("2020-08-14T10:32:00Z"),
+		},
+	},
+	{
+		input: models.Order{
+			Symbol: "PLS",
+			Price:  100,
+			Amount: 4,
+			Side:   "sell",
+			Type:   "stock",
+			Status: "cancelled",
+		},
+		expect: models.Order{
+			Status:     "canceled",
+			CanceledAt: parseTime("2020-08-14T10:32:00Z"),
+		},
+	},
+}
+
+func (suite *DatabaseTestSuite) TestFillOrder() {
+	currentDate := parseTime("2020-08-14T10:32:00Z")
+	user := models.User{UserID: uuid.NewV4(), Portfolio: models.Portfolio{PortfolioID: uuid.NewV4()}}
+	err := suite.dbService.DB.Create(&user).Error
+	assert.Equal(suite.T(), nil, err)
+
+	//ListOFValidTypes := []string{"stock", "crypto", "commodities"}
+	for _, test := range testFillOrderData {
+		test.input.CreatedAt = currentDate
+
+		err := suite.dbService.DB.Create(&test.input).Error
+		assert.Equal(suite.T(), nil, err)
+
+		err = suite.dbService.FillOrder(test.input.OrderID, user.UserID, 100, test.input.CreatedAt)
+		portfolioItem := models.PortfolioItem{PortfolioID: user.Portfolio.PortfolioID, Symbol: test.input.Symbol}
+		err = suite.dbService.DB.Attrs(&portfolioItem).Error
+		assert.Equal(suite.T(), nil, err)
+
+		for i := 0; i < len(testFillOrderData); i++ {
+			if testFillOrderData[i].input.Amount < 0 {
+				assert.Equal(suite.T(), err, errors.New("amount cannot be less than 0"))
+				break
+			} else if testFillOrderData[i].input.Type != "stock" {
+				assert.Equal(suite.T(), err, errors.New("404 type not found"))
+				break
+			} else if testFillOrderData[i].input.Status != "waiting" {
+				assert.Equal(suite.T(), err, errors.New("can't cancel order, as its already filled or cancelled"))
+				break
+			} else {
+				assert.Equal(suite.T(), nil, err)
+				break
+			}
+		}
+
+	}
+	suite.dbService.DB.Close()
+}
