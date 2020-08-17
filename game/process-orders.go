@@ -38,7 +38,6 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 	for _, order := range orders {
 
 		currentStock := currentStocks[order.Symbol]
-
 		processOrder := ProcessOrder{order: order, service: *s, currentStock: currentStock}
 
 		// Decimalizes the prices of the stock and the trailing percentage for the stop-loss order to improve precision
@@ -47,9 +46,7 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 
 		switch order.Type {
 		case "market":
-
 			processOrder.fillOrder()
-
 		case "stop":
 			if order.Side == "sell" && currentStock.Index <= order.Price {
 				processOrder.fillOrder()
@@ -68,7 +65,6 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 			}
 
 		case "trailing-stop":
-
 			if order.TrailingPercentage < 0 || order.TrailingPercentage > 1 {
 				processOrder.cancelOrder()
 			}
