@@ -15,11 +15,12 @@ type Order struct {
 	User      User `gorm:"ForeignKey:UserID;AssociationForeignKey:UserID"`
 	CreatedAt time.Time
 
-	Type   string // the type of the asset (so only stock for now)
-	Symbol string // the symbol of the stock
-	Side   string // buy or sell
-	Status string // filled, waiting or cancelled
-	Amount int64  // amount of stocks in the order
+	AssetType string // the type of the asset (so only stock for now)
+	Type      string // the type of the order (market, limit, stop)
+	Symbol    string // the symbol of the stock
+	Side      string // buy or sell
+	Status    string // filled, waiting or cancelled
+	Amount    int64  // amount of stocks in the order
 
 	Price         int64
 	StopLossPrice int64

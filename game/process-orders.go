@@ -47,35 +47,24 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 
 		switch order.Type {
 		case "market":
-			// the order will sell at the next best available price.
+
 			processOrder.fillOrder()
 
 		case "stop":
-			if order.Side == "sell" {
-				if currentStock.Index <= order.Price {
-					processOrder.fillOrder()
-				}
+			if order.Side == "sell" && currentStock.Index <= order.Price {
+				processOrder.fillOrder()
 			}
-			//Buy stop order: set a stop price above the current price of the stock. If stock rises to stop price buy stop order becomes buy market order.
-			if order.Side == "buy" {
-				if currentStock.Index >= order.Price {
-					processOrder.fillOrder()
-				}
+			if order.Side == "buy" && currentStock.Index >= order.Price {
+				processOrder.fillOrder()
 			}
 
 		case "limit":
-			// Limit orders specify the minimum amount you are willing to receive when selling a stock.
-			if order.Side == "sell" {
-				if currentStock.Index >= order.Price {
-					processOrder.fillOrder()
-				}
+			if order.Side == "sell" && currentStock.Index >= order.Price {
+				processOrder.fillOrder()
 			}
 
-			// Limit orders specify the maximum amount you are willing to pay for a stock.
-			if order.Side == "buy" {
-				if currentStock.Index <= order.Price {
-					processOrder.fillOrder()
-				}
+			if order.Side == "buy" && currentStock.Index <= order.Price {
+				processOrder.fillOrder()
 			}
 
 		case "trailing-stop":
@@ -84,23 +73,19 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 				processOrder.cancelOrder()
 			}
 
+			var newPrice int64
+
 			if order.Side == "sell" {
 				if currentStock.Index <= order.Price {
 					processOrder.fillOrder()
 					break
 				}
 
-				newPrice := currentStockIndex.Sub(currentStockIndex.Mul(trailingPercentage)).Round(0).IntPart()
+				newPrice = currentStockIndex.Sub(currentStockIndex.Mul(trailingPercentage)).Round(0).IntPart()
 
-				// If the newPrice stays between the stop value
-				// the limit can never go down
 				if newPrice <= order.Price {
 					break
 				}
-
-				processOrder.updateOrder(models.Order{
-					Price: newPrice,
-				})
 			}
 
 			if order.Side == "buy" {
@@ -109,16 +94,16 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 					break
 				}
 
-				newPrice := currentStockIndex.Add(currentStockIndex.Mul(trailingPercentage)).Round(0).IntPart()
+				newPrice = currentStockIndex.Add(currentStockIndex.Mul(trailingPercentage)).Round(0).IntPart()
 
 				if newPrice >= order.Price {
 					break
 				}
-
-				processOrder.updateOrder(models.Order{
-					Price: newPrice,
-				})
 			}
+
+			processOrder.updateOrder(models.Order{
+				Price: newPrice,
+			})
 		}
 	}
 

@@ -35,6 +35,7 @@ func (s *Service) AddOrder(order models.Order, userID uuid.UUID, currentDate tim
 	return s.DB.Create(&models.Order{
 		UserID:    userID,
 		CreatedAt: currentDate,
+		AssetType: order.AssetType,
 		Type:      order.Type,
 		Side:      order.Side,
 		Symbol:    order.Symbol,
@@ -130,7 +131,7 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentIndex in
 	}).Attrs(models.PortfolioItem{
 		PortfolioID: user.Portfolio.PortfolioID,
 		Symbol:      order.Symbol,
-		Type:        order.Type,
+		Type:        order.AssetType,
 		Amount:      0,
 	}).FirstOrCreate(&affectedPortfolioItem).Error; err != nil {
 		s.CancelOrder(order.OrderID, currentDate)
