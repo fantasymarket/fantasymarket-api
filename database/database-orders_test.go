@@ -2,6 +2,7 @@ package database_test
 
 import (
 	"errors"
+	"fantasymarket/database"
 	"fantasymarket/database/models"
 
 	uuid "github.com/satori/go.uuid"
@@ -364,8 +365,9 @@ func (suite *DatabaseTestSuite) TestUpdateOrder() {
 }
 
 type FillOrderTestData struct {
-	input  models.Order
-	expect models.Order
+	input       models.Order
+	expect      models.Order
+	expectError error
 }
 
 var testFillOrderData = []FillOrderTestData{
@@ -393,9 +395,10 @@ var testFillOrderData = []FillOrderTestData{
 			Status: "waiting",
 		},
 		expect: models.Order{
-			Status:     "canceled",
-			CanceledAt: parseTime("2020-08-14T10:32:00Z"),
+			Status:      "cancelled",
+			CancelledAt: parseTime("2020-08-14T10:32:00Z"),
 		},
+		expectError: database.ErrInvalidAmount,
 	},
 	{
 		input: models.Order{
@@ -409,6 +412,7 @@ var testFillOrderData = []FillOrderTestData{
 		expect: models.Order{
 			Status: "waiting",
 		},
+		expectError: database.ErrInvalidType,
 	},
 	{
 		input: models.Order{
@@ -420,9 +424,10 @@ var testFillOrderData = []FillOrderTestData{
 			Status: "cancelled",
 		},
 		expect: models.Order{
-			Status:     "canceled",
-			CanceledAt: parseTime("2020-08-14T10:32:00Z"),
+			Status:      "cancelled",
+			CancelledAt: parseTime("2020-08-14T10:32:00Z"),
 		},
+		expectError: database.ErrInvalidStatus,
 	},
 	{
 		input: models.Order{
@@ -434,9 +439,10 @@ var testFillOrderData = []FillOrderTestData{
 			Status: "cancelled",
 		},
 		expect: models.Order{
-			Status:     "canceled",
-			CanceledAt: parseTime("2020-08-14T10:32:00Z"),
+			Status:      "cancelled",
+			CancelledAt: parseTime("2020-08-14T10:32:00Z"),
 		},
+		expectError: database.ErrNotEnoughMoney,
 	},
 }
 
@@ -454,25 +460,16 @@ func (suite *DatabaseTestSuite) TestFillOrder() {
 		assert.Equal(suite.T(), nil, err)
 
 		err = suite.dbService.FillOrder(test.input.OrderID, user.UserID, 100, test.input.CreatedAt)
+		if test.expectError != nil {
+			assert.Equal(suite.T(), errors.Is(err, test.expectError), true)
+			return
+		}
+
+		assert.Equal(suite.T(), nil, err)
+
 		portfolioItem := models.PortfolioItem{PortfolioID: user.Portfolio.PortfolioID, Symbol: test.input.Symbol}
 		err = suite.dbService.DB.Attrs(&portfolioItem).Error
 		assert.Equal(suite.T(), nil, err)
-
-		for i := 0; i < len(testFillOrderData); i++ {
-			if testFillOrderData[i].input.Amount < 0 {
-				assert.Equal(suite.T(), err, errors.New("amount cannot be less than 0"))
-				break
-			} else if testFillOrderData[i].input.Type != "stock" {
-				assert.Equal(suite.T(), err, errors.New("404 type not found"))
-				break
-			} else if testFillOrderData[i].input.Status != "waiting" {
-				assert.Equal(suite.T(), err, errors.New("can't cancel order, as its already filled or cancelled"))
-				break
-			} else {
-				assert.Equal(suite.T(), nil, err)
-				break
-			}
-		}
 
 	}
 	suite.dbService.DB.Close()

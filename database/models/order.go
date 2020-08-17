@@ -18,7 +18,7 @@ type Order struct {
 	Type   string // the type of the asset (so only stock for now)
 	Symbol string // the symbol of the stock
 	Side   string // buy or sell
-	Status string // filled, waiting or canceled
+	Status string // filled, waiting or cancelled
 	Amount int64  // amount of stocks in the order
 
 	Price         int64
@@ -26,8 +26,8 @@ type Order struct {
 
 	TrailingPercentage int64
 
-	CanceledAt time.Time
-	FilledAt   time.Time
+	CancelledAt time.Time
+	FilledAt    time.Time
 }
 
 // BeforeCreate runs before a order is created in the database

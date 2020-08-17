@@ -3,7 +3,6 @@ package database
 import (
 	"errors"
 	"fantasymarket/database/models"
-	"fantasymarket/utils"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -22,8 +21,10 @@ var (
 	ErrCantSellMoreThanYouHave = errors.New("cant sell more than you have")
 	// ErrOrderCantBeNil is if the user wants to add an order that is empty
 	ErrOrderCantBeNil = errors.New("you cant add an empty order")
+	//ErrInvalidStatus is when the order isn't waiting (works for fillorders)
+	ErrInvalidStatus = errors.New("status isn't waiting")
 	// ListOFValidTypes is the list of types accepted for trading
-	ListOFValidTypes = []string{"stock", "crypto", "commodities"}
+	ListOFValidTypes = map[string]bool{"stock": true, "crypto": true, "commodities": true}
 )
 
 // AddOrder adds an Order to the database
@@ -110,7 +111,11 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentIndex in
 		return ErrInvalidAmount
 	}
 
-	if !utils.Includes(ListOFValidTypes, order.Type) {
+	if order.Status != "waiting" {
+		return ErrInvalidStatus
+	}
+
+	if _, ok := ListOFValidTypes[order.Type]; !ok {
 		return ErrInvalidType
 	}
 
@@ -150,7 +155,7 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentIndex in
 		return err
 	}
 
-	return s.DB.Where(models.Order{OrderID: orderID}).Updates(models.Order{Status: "filled", FilledAt: currentDate}).Error
+	return s.DB.Table("orders").Where(models.Order{OrderID: orderID}).Updates(models.Order{Status: "filled", FilledAt: currentDate}).Error
 }
 
 func (s *Service) updatePortfolioItem(portfolioID uuid.UUID, itemID uuid.UUID, newAmount int64, newBalance int64) error {
@@ -159,7 +164,7 @@ func (s *Service) updatePortfolioItem(portfolioID uuid.UUID, itemID uuid.UUID, n
 	// the portfolioItem's amount
 	tx := s.DB.Begin()
 
-	if err := tx.Where(&models.PortfolioItem{
+	if err := tx.Table("portfolio_items").Where(&models.PortfolioItem{
 		PortfolioItemID: itemID,
 	}).Updates(models.PortfolioItem{
 		Amount: newAmount,
@@ -168,7 +173,7 @@ func (s *Service) updatePortfolioItem(portfolioID uuid.UUID, itemID uuid.UUID, n
 		return err
 	}
 
-	if err := tx.Where(&models.Portfolio{
+	if err := tx.Table("portfolios").Where(&models.Portfolio{
 		PortfolioID: portfolioID,
 	}).Updates(models.Portfolio{
 		Balance: newBalance,
