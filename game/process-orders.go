@@ -3,14 +3,32 @@ package game
 import (
 	"fantasymarket/database/models"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 )
 
+//ProcessOrder is an instant of an order that needs to be processed
+type ProcessOrder struct {
+	order        models.Order
+	currentStock models.Stock
+	service      Service
+}
+
+func (p ProcessOrder) cancelOrder() {
+	p.service.DB.CancelOrder(p.order.OrderID, p.service.GetCurrentDate())
+}
+func (p ProcessOrder) fillOrder() {
+	if err := p.service.DB.FillOrder(p.order.OrderID, p.order.UserID, p.currentStock.Index, p.service.GetCurrentDate()); err != nil {
+		p.cancelOrder()
+	}
+}
+func (p ProcessOrder) updateOrder(update models.Order) {
+	if err := p.service.DB.UpdateOrder(p.order.OrderID, update); err != nil {
+		p.cancelOrder()
+	}
+}
+
 //ProcessOrders processes the order if it matches any of the order types.
 func (s *Service) ProcessOrders(orders []models.Order) error {
-
-	currentDate := s.GetCurrentDate()
 
 	currentStocks, err := s.DB.GetStockMapAtTick(s.TicksSinceStart)
 	if err != nil {
@@ -21,44 +39,27 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 
 		currentStock := currentStocks[order.Symbol]
 
+		processOrder := ProcessOrder{order: order, service: *s, currentStock: currentStock}
+
 		// Decimalizes the prices of the stock and the trailing percentage for the stop-loss order to improve precision
 		currentStockIndex := decimal.NewFromInt(currentStock.Index)
 		trailingPercentage := decimal.NewFromInt(order.TrailingPercentage).Div(decimal.NewFromInt(100))
 
-		cancelOrder := func() {
-			log.Error().Err(err).Str("orderID", order.OrderID.String()).Msg("error filling order")
-			s.DB.CancelOrder(order.OrderID, currentDate)
-		}
-
-		fillOrder := func() {
-			if err := s.DB.FillOrder(order.OrderID, order.UserID, currentStock.Index, currentDate); err != nil {
-				cancelOrder()
-				log.Error().Err(err).Str("orderID", order.OrderID.String()).Msg("failed to execute order")
-			}
-		}
-
-		updateOrder := func(update models.Order) {
-			if err := s.DB.UpdateOrder(order.OrderID, update); err != nil {
-				cancelOrder()
-				log.Error().Err(err).Str("orderID", order.OrderID.String()).Msg("failed to update order")
-			}
-		}
-
 		switch order.Type {
 		case "market":
 			// the order will sell at the next best available price.
-			fillOrder()
+			processOrder.fillOrder()
 
 		case "stop":
 			if order.Side == "sell" {
 				if currentStock.Index <= order.Price {
-					fillOrder()
+					processOrder.fillOrder()
 				}
 			}
 			//Buy stop order: set a stop price above the current price of the stock. If stock rises to stop price buy stop order becomes buy market order.
 			if order.Side == "buy" {
 				if currentStock.Index >= order.Price {
-					fillOrder()
+					processOrder.fillOrder()
 				}
 			}
 
@@ -66,26 +67,26 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 			// Limit orders specify the minimum amount you are willing to receive when selling a stock.
 			if order.Side == "sell" {
 				if currentStock.Index >= order.Price {
-					fillOrder()
+					processOrder.fillOrder()
 				}
 			}
 
 			// Limit orders specify the maximum amount you are willing to pay for a stock.
 			if order.Side == "buy" {
 				if currentStock.Index <= order.Price {
-					fillOrder()
+					processOrder.fillOrder()
 				}
 			}
 
 		case "trailing-stop":
 
 			if order.TrailingPercentage < 0 || order.TrailingPercentage > 1 {
-				cancelOrder()
+				processOrder.cancelOrder()
 			}
 
 			if order.Side == "sell" {
 				if currentStock.Index <= order.Price {
-					fillOrder()
+					processOrder.fillOrder()
 					break
 				}
 
@@ -97,14 +98,14 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 					break
 				}
 
-				updateOrder(models.Order{
+				processOrder.updateOrder(models.Order{
 					Price: newPrice,
 				})
 			}
 
 			if order.Side == "buy" {
 				if currentStock.Index >= order.Price {
-					fillOrder()
+					processOrder.fillOrder()
 					break
 				}
 
@@ -114,7 +115,7 @@ func (s *Service) ProcessOrders(orders []models.Order) error {
 					break
 				}
 
-				updateOrder(models.Order{
+				processOrder.updateOrder(models.Order{
 					Price: newPrice,
 				})
 			}

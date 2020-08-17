@@ -93,17 +93,11 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentIndex in
 	var order models.Order
 	var user models.User
 
-	//have in the DB query status = "waiting"
-
-	if err := s.DB.Where(models.Order{
-		OrderID: orderID,
-	}).Find(&order).Error; err != nil {
+	if err := s.DB.Where(models.Order{OrderID: orderID}).Find(&order).Error; err != nil {
 		return errors.New("Order not found")
 	}
 
-	if err := s.DB.Where(models.User{
-		UserID: userID,
-	}).Preload("Portfolio").Find(&user).Error; err != nil {
+	if err := s.DB.Where(models.User{UserID: userID}).Preload("Portfolio").Find(&user).Error; err != nil {
 		return errors.New("User not found")
 	}
 
@@ -154,7 +148,6 @@ func (s *Service) FillOrder(orderID uuid.UUID, userID uuid.UUID, currentIndex in
 		s.CancelOrder(order.OrderID, currentDate)
 		return err
 	}
-
 	return s.DB.Table("orders").Where(models.Order{OrderID: orderID}).Updates(models.Order{Status: "filled", FilledAt: currentDate}).Error
 }
 
