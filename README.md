@@ -9,12 +9,12 @@
 - [Development](#development)
   - [Recommended Tools](#recommended-tools)
   - [Testing](#testing)
-  - [Beta impressions](#beta-impressions)
-  - [Running beta](#running-beta)
+  - [Impressions](#beta-impressions)
+  - [Running the app](#running-beta)
 
 # Introduction
 
-We are creating a working stock market simulation, where the user can invest in-game currency in a simulated market completely separated from the real world. By providing custom events that pop up randomly and alter the course of our stocks, coupled with a market that never sleeps, we are presenting a fun and fast-paced introduction into the stock market. Our beta is currently in its final phase and we plan to release it fully by the end of august.
+We are creating a working stock market simulation, where the user can invest in-game currency in a simulated market completely separated from the real world. By providing custom events that pop up randomly and alter the course of our stocks, coupled with a market that never sleeps, we are presenting a fun and fast-paced introduction into the stock market.
 
 ## Structure
 
@@ -69,13 +69,13 @@ Alternative:
 $ go test ./...
 ```
 
-## Beta impressions
+## Impressions
 
 | Landing Page      | Chart View      | Trading View |
 |------------|-------------|-------------|
 | <img src=https://i.imgur.com/lK5VEYK.jpg> | <img src=https://i.imgur.com/duyFyZS.jpg> | <img src=https://i.imgur.com/AncR4ah.png> |
 
-### Running Beta:
+### Running the app:
 
 After installing all the requirements, start the program by running `$ go run main.go`.\
 The console should output information about the status of the program:
