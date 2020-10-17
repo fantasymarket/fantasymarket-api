@@ -11,7 +11,6 @@
   - [Testing](#testing)
   - [Beta impressions](#beta-impressions)
   - [Running beta](#running-beta)
-- [Our Current Situation](#our-current-situation)
 
 # Introduction
 
