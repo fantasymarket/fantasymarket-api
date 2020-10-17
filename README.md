@@ -100,8 +100,3 @@ This is done every 10 seconds, like this:
 DBG updated stock index=60032 name=GOOG
 DBG updated stock index=60024 name=APPL
 ```
-## Our Current Situation
-
-Currently, the project needs some final refactoring, some last bits of database logic and ultimately testing. 
-Even though some tests are already completed, more are needed to ensure a well tested project.
-Finally, we have also started to link the frontend to the backend. If all goes smoothly, we will be able to release the project fully by the end of october.
