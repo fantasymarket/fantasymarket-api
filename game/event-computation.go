@@ -67,7 +67,7 @@ func (s *Service) startEvents() error {
 			createdAt.Add(offset)
 		}
 
-		if s.eventNeedsToBeRun(event) {
+		if s.EventNeedsToBeRun(event) {
 			if err := s.addEventToRun(event, createdAt); err != nil {
 				return fmt.Errorf("event-computation: failed to start event: %w", err)
 			}
@@ -128,19 +128,19 @@ func calculateRandomOffset(randomOffset timeutils.Duration, seed string) time.Du
 	return time.Duration(offset)
 }
 
-func (s *Service) eventNeedsToBeRun(event details.EventDetails) bool {
+// EventNeedsToBeRun checks if an even fullfills the requirements to run
+func (s *Service) EventNeedsToBeRun(event details.EventDetails) bool {
 	currentDate := s.GetCurrentDate()
 
-	lengthOfEventHistorySlice := len(s.EventHistory[event.EventID])
+	eventHistory, ok := s.EventHistory[event.EventID]
+	lengthOfEventHistorySlice := len(eventHistory)
 
 	timeStampOfLastEvent := time.Time{}
 	if lengthOfEventHistorySlice != 0 {
 		timeStampOfLastEvent = s.EventHistory[event.EventID][lengthOfEventHistorySlice-1]
 	}
 
-	eventHistory, ok := s.EventHistory[event.EventID]
-
-	eventHasNeverRun := !ok || len(eventHistory) == 0
+	eventHasNeverRun := !ok || lengthOfEventHistorySlice == 0
 	eventDateInPast := currentDate.After(event.FixedDate.Time)
 
 	randomEventShouldRun := currentDate.After(timeStampOfLastEvent.Add(event.MinTimeBetweenEvents))
