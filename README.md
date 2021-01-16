@@ -73,7 +73,7 @@ $ go test ./...
 
 | Landing Page      | Chart View      | Trading View |
 |------------|-------------|-------------|
-| <img src=https://imgur.com/DNQ0Xw8> | <img src=https://imgur.com/a/EHCSOCZ> | <img src=https://imgur.com/a/ULpHPim> |
+| <img src=https://i.imgur.com/DNQ0Xw8.jpg> | <img src=https://i.imgur.com/w5ikPh4.jpg> | <img src=https://i.imgur.com/A6Ga5k0.jpg> |
 
 ### Running the app:
 
