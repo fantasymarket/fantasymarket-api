@@ -69,13 +69,7 @@ Alternative:
 $ go test ./...
 ```
 
-## Impressions
-
-| Landing Page      | Chart View      | Trading View |
-|------------|-------------|-------------|
-| <img src=https://i.imgur.com/DNQ0Xw8.jpg> | <img src=https://i.imgur.com/w5ikPh4.jpg> | <img src=https://i.imgur.com/A6Ga5k0.jpg> |
-
-# Impressssions
+# Impressions
 ## Landing Page
 ![Landing Page](https://i.imgur.com/DNQ0Xw8.jpg)
 
