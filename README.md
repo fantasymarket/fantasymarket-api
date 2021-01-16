@@ -75,6 +75,16 @@ $ go test ./...
 |------------|-------------|-------------|
 | <img src=https://i.imgur.com/DNQ0Xw8.jpg> | <img src=https://i.imgur.com/w5ikPh4.jpg> | <img src=https://i.imgur.com/A6Ga5k0.jpg> |
 
+# Impressssions
+## Landing Page
+![Landing Page](https://i.imgur.com/DNQ0Xw8.jpg)
+
+## Chart View
+![Chart View](https://i.imgur.com/w5ikPh4.jpg)
+
+## Trading View
+![Trading View](https://i.imgur.com/A6Ga5k0.jpg)
+
 ### Running the app:
 
 After installing all the requirements, start the program by running `$ go run main.go`.\
