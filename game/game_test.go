@@ -15,55 +15,55 @@ import (
 )
 
 type TestGetTendencyData struct {
-	stock        models.Stock
+	asset        models.Asset
 	affectedness float64
 	expectation  map[string]int64
 }
 
 var GetTendencyData = []TestGetTendencyData{
 	{
-		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
+		asset:        models.Asset{Index: 10000, Symbol: "TEST"},
 		affectedness: -1,
 		expectation: map[string]int64{
-			"TEST0": 1,
-			"TEST1": 5,
-			"TEST2": 21,
+			"TEST0": 10,
+			"TEST1": 50,
+			"TEST2": 30,
 			"TEST3": -5,
 		},
 	},
 	{
-		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
+		asset:        models.Asset{Index: 10000, Symbol: "TEST"},
 		affectedness: -100,
 		expectation: map[string]int64{
-			"TEST0": -494,
-			"TEST1": -490,
-			"TEST2": -474,
+			"TEST0": -485,
+			"TEST1": -445,
+			"TEST2": -465,
 			"TEST3": -500,
 		},
 	},
 	{
-		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
+		asset:        models.Asset{Index: 10000, Symbol: "TEST"},
 		affectedness: 100,
 		expectation: map[string]int64{
-			"TEST0": 506,
-			"TEST1": 510,
-			"TEST2": 526,
+			"TEST0": 515,
+			"TEST1": 555,
+			"TEST2": 535,
 			"TEST3": 500,
 		},
 	},
 	{
-		stock:        models.Stock{Index: 10000, Symbol: "TEST"},
+		asset:        models.Asset{Index: 10000, Symbol: "TEST"},
 		affectedness: 0,
 		expectation: map[string]int64{
-			"TEST0": 6,
-			"TEST1": 10,
-			"TEST2": 26,
+			"TEST0": 15,
+			"TEST1": 55,
+			"TEST2": 35,
 			"TEST3": 0,
 		},
 	},
 }
 
-var stockDetails = map[string]details.StockDetails{
+var assetDetails = map[string]details.AssetDetails{
 	"TEST0": {Stability: 1, Trend: 1},
 	"TEST1": {Stability: 5, Trend: 1},
 	"TEST2": {Stability: 1, Trend: 5},
@@ -72,14 +72,14 @@ var stockDetails = map[string]details.StockDetails{
 
 func TestGetTendency(t *testing.T) {
 	s := Service{
-		StockDetails: stockDetails,
+		AssetDetails: assetDetails,
 	}
 
 	for _, test := range GetTendencyData {
-		for i := range stockDetails {
-			test.stock.Symbol = string(i)
+		for i := range assetDetails {
+			test.asset.Symbol = string(i)
 
-			result := s.GetTendency(test.stock, test.affectedness)
+			result := s.GetTendency(test.asset, test.affectedness)
 			assert.Equal(t, test.expectation[i], result)
 		}
 	}
@@ -125,7 +125,7 @@ var testActiveTagsData = activeEventsTestData{
 			CreatedAt: parseTime("2019-01-02T15:04:05Z"),
 			Tags: []details.TagOptions{
 				{
-					AffectsStocks: []string{"IDEXX", "ANTM"},
+					AffectsAssets: []string{"IDEXX", "ANTM"},
 					Offset:        parseDuration("P1D"),
 					Duration:      parseDuration("P2M"),
 				},
@@ -136,7 +136,7 @@ var testActiveTagsData = activeEventsTestData{
 			CreatedAt: parseTime("2019-01-02T15:04:05Z"),
 			Tags: []details.TagOptions{
 				{
-					AffectsStocks: []string{"GOOG", "APPL"},
+					AffectsAssets: []string{"GOOG", "APPL"},
 					Offset:        parseDuration("P1D"),
 					Duration:      parseDuration("P12M"),
 				},
@@ -148,7 +148,7 @@ var testActiveTagsData = activeEventsTestData{
 			AffectsTags: []string{"some-type-only-event1-affects"},
 		},
 		{
-			AffectsStocks: []string{"GOOG", "APPL"},
+			AffectsAssets: []string{"GOOG", "APPL"},
 		},
 	},
 }

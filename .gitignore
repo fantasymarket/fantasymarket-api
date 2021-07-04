@@ -15,7 +15,8 @@
 # vendor/
 
 coverage.out
-database.db
+*.db
+*.db-journal
 .vs
 .DS_Store
 .idea
