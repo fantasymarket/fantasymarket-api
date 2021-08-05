@@ -14,7 +14,7 @@
 
 # Introduction
 
-We are creating a working stock market simulation, where the user can invest in-game currency in a simulated market completely separated from the real world. By providing custom events that pop up randomly and alter the course of our stocks, coupled with a market that never sleeps, we are presenting a fun and fast-paced introduction into the stock market. This is the repository for the backend, the corresponding frontend can be found [here](https://github.com/fantasymarket/fantasymarket-app).
+We are creating a stock market simulation, where the user can invest in-game currency in a simulated market completely separated from the real world. By providing custom events that pop up randomly and alter the course of our stocks, coupled with a market that never sleeps, we are presenting a fun and fast-paced introduction into the stock market. This is the repository for the backend, the corresponding frontend can be found [here](https://github.com/fantasymarket/fantasymarket-app).
 
 ## Structure
 
