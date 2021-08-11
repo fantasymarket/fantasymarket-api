@@ -1,6 +1,3 @@
-# fantasymarket-api ![CI](https://github.com/fantasymarket/fantasymarket-api/workflows/CI/badge.svg) [![Maintainability](https://api.codeclimate.com/v1/badges/0702b9a5e11f3a0b7629/maintainability)](https://codeclimate.com/github/fantasymarket/fantasymarket-api/maintainability) [![codecov](https://codecov.io/gh/fantasymarket/fantasymarket-api/branch/develop/graph/badge.svg)](https://codecov.io/gh/fantasymarket/fantasymarket-api)
-
-
 ## Table of Contents
 
 - [Introduction](#introduction)
