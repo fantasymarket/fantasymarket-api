@@ -34,7 +34,7 @@ func (s *Service) AddEvent(event details.EventDetails, createdAt time.Time) erro
 	}).Error
 }
 
-// RemoveEvent marks an event as inactive so it won't affect stocks in the GameLoop anymore
+// RemoveEvent marks an event as inactive so it won't affect assets in the GameLoop anymore
 func (s *Service) RemoveEvent(eventID string) error {
 	return s.DB.Model(&models.Event{}).Where(models.Event{Active: true, EventID: eventID}).Update("active", false).Error
 }

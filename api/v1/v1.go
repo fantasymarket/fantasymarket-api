@@ -22,17 +22,18 @@ type APIHandler struct {
 
 // Errors for the HTTP Handler
 var (
-	errFetchingData    = errors.New("error fetching data")
-	errUpdatingOrder   = errors.New("error updating order")
-	errDecoding        = errors.New("data could not be decoded")
-	errDeletingOrder   = errors.New("order could not be deleted")
-	errUserNotFound    = errors.New("could not find user")
-	errParsingPassword = errors.New("could not parse password")
-	errParsingUsername = errors.New("could not parse username")
-	errGeneratingToken = errors.New("could not generate token")
-	errCreatingAccount = errors.New("error creating new user account")
-	errInvalidLogin    = errors.New("could not login user")
-	errStockNotFound   = errors.New("could not find stock")
+	errFetchingData      = errors.New("error fetching data")
+	errUpdatingOrder     = errors.New("error updating order")
+	errDecoding          = errors.New("data could not be decoded")
+	errDeletingOrder     = errors.New("order could not be deleted")
+	errUserNotFound      = errors.New("could not find user")
+	errParsingPassword   = errors.New("could not parse password")
+	errParsingUsername   = errors.New("could not parse username")
+	errGeneratingToken   = errors.New("could not generate token")
+	errCreatingAccount   = errors.New("error creating new user account")
+	errInvalidLogin      = errors.New("could not login user")
+	errAssetNotFound     = errors.New("could not find asset")
+	errInvalidParameters = errors.New("invalid parameters")
 )
 
 // NewAPIRouter creates a new API HTTP handler
@@ -61,12 +62,13 @@ func NewAPIRouter(db *database.Service, game *game.Service, config *config.Confi
 
 	r.Get("/time", api.getTime)
 
-	r.Route("/stocks", func(r chi.Router) {
+	r.Route("/assets", func(r chi.Router) {
 
-		r.Get("/", api.getAllStocks)
+		r.Get("/", api.getAllAssets)
 
-		r.Get("/{symbol}", api.getStockDetails)
+		r.Get("/{symbol}", api.getAsset)
 
+		r.Get("/{symbol}/history", api.getAssetHistory)
 	})
 
 	r.Route("/orders", func(r chi.Router) {

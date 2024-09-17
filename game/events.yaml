@@ -28,7 +28,7 @@
   #   tags:
   #     - affectsTags: ["all", "!tech"]
   #       trend: 0.02
-  #     - affectsStocks: ["all", "!GOOG"]
+  #     - affectsAssets: ["all", "!GOOG"]
   #       trend: 0.01
   #       offset: P1W # 1 Week
   #       duration: P2W # 2 Weeks
@@ -89,9 +89,9 @@
 
   tags:
   - trend: 1.3
-    affectsStockIDs: ["IDEXX, ANTM"] #If the affectsStockIDs is the same as the StockID, the stock IS affected by the number given by the trend -If affectsStockIDs is empty, ignore it
+    affectsAssetIDs: ["IDEXX, ANTM"] #If the affectsAssetIDs is the same as the AssetID, the stock IS affected by the number given by the trend -If affectsAssetIDs is empty, ignore it
   - trend: 1.1
-    affectsStockIDs: ["DVA"]
+    affectsAssetIDs: ["DVA"]
 
 - eventID: "JPM-to-modernize-access-to-data"
   title: "JPM modernizes how customers access their data, effective immediately"
@@ -110,23 +110,23 @@
 
   tags:
   - trend: 0.2 
-    affectsStockIDs: ["JPM"]
+    affectsAssetIDs: ["JPM"]
     offset: PT39M22S
     duration: P7D 
   - trend: 0.8 
-    affectsStockIDs: ["JPM"]
+    affectsAssetIDs: ["JPM"]
     offset: P7DT39M22S
     duration: P7D 
   - trend: 1.2  
-    affectsStockIDs: ["JPM"]
+    affectsAssetIDs: ["JPM"]
     offset: P14DT39M22S
     duration: P7D 
   - trend: 0.4
-    affectsStockIDs: ["JPM"]
+    affectsAssetIDs: ["JPM"]
     offset: P21DT39M22S
     duration: P7D 
   - trend: 0.5
-    affectsStockIDs: ["JPM"]
+    affectsAssetIDs: ["JPM"]
     offset: P28DT39M22S
     duration: P16D
 
@@ -146,19 +146,19 @@
 
   tags:
   - trend: -0.6 
-    affectsStockIDs: ["IDEXX, ANTM, DVA"]
+    affectsAssetIDs: ["IDEXX, ANTM, DVA"]
     offset: PT2H1M55S
     duration: P7D 
   - trend: -1.4
-    affectsStockIDs: ["IDEXX, ANTM, DVA"]
+    affectsAssetIDs: ["IDEXX, ANTM, DVA"]
     offset: P7DT2H1M55S
     duration: P7D 
   - trend: -0.5
-    affectsStockIDs: ["IDEXX, ANTM, DVA"]
+    affectsAssetIDs: ["IDEXX, ANTM, DVA"]
     offset: P14DT2H1M55S
     duration: P7D 
   - trend: 0.2
-    affectsStockIDs: ["IDEXX, ANTM, DVA"]
+    affectsAssetIDs: ["IDEXX, ANTM, DVA"]
     offset: P21DT2H1M55S
     duration: P7D 
  
@@ -182,7 +182,7 @@
   - affectsTags: ["all"]
     minTrend: -2  #todo
     maxTrend: 2   #todo
-    affectsStockIDs: ["all"]
+    affectsAssetIDs: ["all"]
 
 - eventID: "presidential-election-us-potential-republicans-win"
   type: "custom"
@@ -235,7 +235,7 @@
   - affectsTags: ["all"]
     minTrend: -2  #todo
     maxTrend: 2
-    affectsStockIDs: ["all"]
+    affectsAssetIDs: ["all"]
     offset: PT1H2M55S
     duration: P7D
 
@@ -251,7 +251,7 @@
   - affectsTags: ["all"]
     minTrend: -2  #todo
     maxTrend: 2
-    affectsStockIDs: ["all"]
+    affectsAssetIDs: ["all"]
     offset: PT1H2M55S
     duration: P7D
 
@@ -267,7 +267,7 @@
   - affectsTags: ["all"]
     minTrend: -2  
     maxTrend: 2
-    affectsStockIDs: ["all"]
+    affectsAssetIDs: ["all"]
     offset: PT1H2M55S
     duration: P7D
 
@@ -286,7 +286,7 @@
   tags:
   - minTrend: -0.9   
     maxTrend: -0.2  
-    affectsStockIDs: ["GS"]
+    affectsAssetIDs: ["GS"]
     offset: PT4H44M18S
     duration: P3M
 
@@ -306,22 +306,22 @@
 
   tags:
   - trend: -0.9
-    affectsStockIDs: ["GS"]
+    affectsAssetIDs: ["GS"]
     offset: P2DT33M24S
     duration: P7D
 
   - trend: -0.1
-    affectsStockIDs: ["AXP, JPM"]
+    affectsAssetIDs: ["AXP, JPM"]
     offset: P2DT33M24S
     duration: P7D
 
   - trend: -0.4
-    affectsStockIDs: ["GS"]
+    affectsAssetIDs: ["GS"]
     offset: P9DT33M24S
     duration: P8D
 
   - trend: -0.6
-    affectsStockIDs: ["AXP, JPM"]
+    affectsAssetIDs: ["AXP, JPM"]
     offset: P9DT33M24S
     duration: P8D
     
@@ -330,7 +330,7 @@
   description: >-
     "With a value of less than 5 USD per share, banking company Deutsche Bank is unable to retain position to attract investors
     and is suffering from 265B EUR of debt. Capital Group uses their last strand of effort to help Deutsche Bank but is unable to succeed.
-    Following a few months, Deutsche Bank received a final value per share of 7.22 USD but was unable to maintain its value. Stock closes." 
+    Following a few months, Deutsche Bank received a final value per share of 7.22 USD but was unable to maintain its value. Asset closes." 
 
   type: "fixed"
   fixedDate: 2021-09-22 16:02:58
@@ -342,17 +342,17 @@
 
   tags:
   - trend: -1.2
-    affectsStockIDs: ["DB"]
+    affectsAssetIDs: ["DB"]
     offset: PT43M40S
     duration: P30D
 
   - trend: 0.8
-    affectsStockIDs: ["DB"]
+    affectsAssetIDs: ["DB"]
     offset: P30DT43M40S
     duration: P60D
   
   - trend: -1.8
-    affectsStockIDs: ["DB"]
+    affectsAssetIDs: ["DB"]
     offset: P90DT43M40S
     duration: P28D
 
@@ -373,7 +373,7 @@
   ]
 
 - eventID: "hacker-caused-stocks-to-tumble"
-  title: "Stocks see huge tumbling due to recent event"
+  title: "Assets see huge tumbling due to recent event"
   description: >-
     "With the recent event of injecting false price quotes into stock data feeds by an anonymous hacker, stocks have seen huge drops today as investors are wary of the 
     effect it brings to others. Huge sell-offs and major quick sells are happening and are destroying the stock markets today."
@@ -388,7 +388,7 @@
   - affectsTags: ["finance", "tech"]
     minTrend: -1.4
     maxTrend: -0.5
-    affectsStockIDs: ["JPM", "AXP", "FB", "AAPL", "MSFT"]
+    affectsAssetIDs: ["JPM", "AXP", "FB", "AAPL", "MSFT"]
     offset: PT1H24M43S
     duration: P1W
 
@@ -410,13 +410,13 @@
   tags:
   - affectsTags: ["energy"]
     trend: 1.5
-    affectsStockIDs: ["TSLA"]
+    affectsAssetIDs: ["TSLA"]
     offset: PT1H22M04S
     duration: P1M
 
   - affectsTags: ["energy"]
     trend: 0.8
-    affectsStockIDs: ["TSLA"]
+    affectsAssetIDs: ["TSLA"]
     offset: P1MT1H22M04S
     duration: P27D
 
@@ -425,7 +425,7 @@
   description: >-
     Earlier this week Microsoft declared a so-called 'technological-innovation' war against their long-time rival Apple. Into the details of the 
     fun-inducing war: Winner is declared by best innovation of new technology, revenue values, stock increases, overall expenditure. As silly as it sounds, Apple CEO 
-    Tim Cook agrees and their war begins. Investors and entrepreneurs are keen to see who wins. Stock values are expected to fluctuate in an upward manner.
+    Tim Cook agrees and their war begins. Investors and entrepreneurs are keen to see who wins. Asset values are expected to fluctuate in an upward manner.
   
   type: "fixed"
   fixedDate: 2023-03-01 14:42:26
@@ -443,7 +443,7 @@
   - affectsTags: ["tech"]
     minTrend: 0.2
     maxTrend: 1.1
-    affectsStockIDs: ["MSFT, AAPL"]
+    affectsAssetIDs: ["MSFT, AAPL"]
     offset: PT14H22M09S
     duration: P11M27D
 
@@ -462,32 +462,32 @@
 
   tags:
   - trend: 1.7
-    affectsStockIDs: ["MSFT"]
+    affectsAssetIDs: ["MSFT"]
     offset: P1DT32M44S
     duration: P1M
 
   - trend: -0.2
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: P1DT32M44S
     duration: P1M
 
   - trend: 0.4
-    affectsStockIDs: ["MSFT"]
+    affectsAssetIDs: ["MSFT"]
     offset: P1M1DT32M44S
     duration: P1M
 
   - trend: -0.6
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: P1M1DT32M44S
     duration: P1M
 
   - trend: -0.1
-    affectsStockIDs: ["MSFT"]
+    affectsAssetIDs: ["MSFT"]
     offset: P2M1DT32M44S
     duration: P1M
 
   - trend: 0.2
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: P2M1DT32M44S
     duration: P1M
 
@@ -518,25 +518,25 @@
   tags: 
   - affectsTags: ["aviation"]
     trend: -1.8
-    affectsStockIDs: ["BA"]
+    affectsAssetIDs: ["BA"]
     offset: PT2H19M40S
     duration: P1M
 
   - affectsTags: ["aviation"]
     trend: -1.5
-    affectsStockIDs: ["BA"]
+    affectsAssetIDs: ["BA"]
     offset: P1MT2H19M40S
     duration: P1M
   
   - affectsTags: ["aviation"]
     trend: -1.1
-    affectsStockIDs: ["BA"]
+    affectsAssetIDs: ["BA"]
     offset: P2MT2H19M40S
     duration: P1M
 
   - affectsTags: ["aviation"]
     trend: -0.2
-    affectsStockIDs: ["BA"]
+    affectsAssetIDs: ["BA"]
     offset: P3MT2H19M40S
     duration: P1M
 
@@ -558,22 +558,22 @@
   tags:
   - affectsTags: ["aviation"]
     trend: -1.4
-    affectsStockIDs: ["BA"]
+    affectsAssetIDs: ["BA"]
     offset: P3DT22M14S
 
   - affectsTags: ["tech"]
     trend: -0.3
-    affectsStockIDs: ["MSFT", "FB", "NFLX", "AAPL"]
+    affectsAssetIDs: ["MSFT", "FB", "NFLX", "AAPL"]
     offset: P3DT22M14S
 
   - affectsTags: ["health"]
     trend: -0.9
-    affectsStockIDs: ["IDEXX", "ANTM", "DVA"]
+    affectsAssetIDs: ["IDEXX", "ANTM", "DVA"]
     offset: P3DT22M14S
 
   - affectsTags: ["finance", "energy"]
     trend: -0.8
-    affectsStockIDs: ["AXP", "JPM", "GS", "RDS-A", "TSLA", "NEP", "FSLR"]
+    affectsAssetIDs: ["AXP", "JPM", "GS", "RDS-A", "TSLA", "NEP", "FSLR"]
     offset: P3DT22M14S
 
 - eventID: "new-streaming-platform"
@@ -591,17 +591,17 @@
 
   tags:
   - trend: 1.8
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: PT2H22M04S
     duration: P3W
 
   - trend: 1.2
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: P3WT2H22M04S
     duration: P2W
 
   - trend: 0.4
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: P1M1WT22M04S
     duration: P1W
 
@@ -620,7 +620,7 @@
   tags:
   - minTrend: 0.4
     maxTrend: 1.2
-    affectsStockID: ["MSFT"]
+    affectsAssetID: ["MSFT"]
     offset: PT2H
     duration: P2M28D
 
@@ -639,19 +639,19 @@
   tags: 
   - affectsTags: ["tech"]
     trend: 1.3
-    affectsStockIDs: ["MSFT"]
+    affectsAssetIDs: ["MSFT"]
     offset: PT1H22M4S
     duration: P1M
 
   - affectsTags: ["tech"]
     trend: 0.8
-    affectsStockIDs: ["MSFT"]
+    affectsAssetIDs: ["MSFT"]
     offset: P1MT1H22M4S
     duration: P1M
 
   - affectsTags: ["tech"]
     trend: 1.8
-    affectsStockIDs: ["MSFT"]
+    affectsAssetIDs: ["MSFT"]
     offset: P2MT1H22M4S
     duration: P1M
 
@@ -674,31 +674,31 @@
   tags:
   - affectsTags: ["finance"]
     trend: 0.8
-    affectsStockIDs: ["AXP"]
+    affectsAssetIDs: ["AXP"]
     offset: PT2H20M49S
     duration: P1M
   
   - affectsTags: ["finance"]
     trend: 1.4
-    affectsStockIDs: ["AXP"]
+    affectsAssetIDs: ["AXP"]
     offset: P1MT2H20M49S
     duration: P2M
   
   - affectsTags: ["finance"]
     trend: 1.8
-    affectsStockIDs: ["AXP"]
+    affectsAssetIDs: ["AXP"]
     offset: P3MT2H20M49S
     duration: P1M
 
   - affectsTags: ["finance"]
     trend: 1.3
-    affectsStockIDs: ["AXP"]
+    affectsAssetIDs: ["AXP"]
     offset: P4MT2H20M49S
     duration: P1M
   
   - affectsTags: ["finance"]
     trend: 0.6
-    affectsStockIDs: ["AXP"]
+    affectsAssetIDs: ["AXP"]
     offset: P5MT2H20M49S
     duration: P1M
 
@@ -717,17 +717,17 @@
   
   tags:
   - trend: -0.6
-    affectsStockIDs: ["JPM"]
+    affectsAssetIDs: ["JPM"]
     offset: PT2H44M49S
     duration: P1M5D
 
   - trend: -0.2
-    affectsStockIDs: ["GS"]
+    affectsAssetIDs: ["GS"]
     offset: PT2H44M49S
     duration: P1M5D
 
   - trend: -1.4
-    affectsStockIDs: ["AXP"]
+    affectsAssetIDs: ["AXP"]
     offset: PT2H44M49S
     duration: P1M5D
 
@@ -749,17 +749,17 @@
 
   tags:
   - trend: -1.2
-    affectsStockIDs: ["FB"]
+    affectsAssetIDs: ["FB"]
     offset: PT39M22S
     duration: P1W
 
   - trend: -1.7
-    affectsStockIDs: ["FB"]
+    affectsAssetIDs: ["FB"]
     offset: P1WT39M22S
     duration: P1W
 
   - trend: -0.4
-    affectsStockIDs: ["FB"]
+    affectsAssetIDs: ["FB"]
     offset: P2WT39M22S
     duration: P1W
 
@@ -779,7 +779,7 @@
   tags:
   - affectsTags: ["energy"]
     trend: -1.4 
-    affectsStockIDs: ["NEP, FSLR"]
+    affectsAssetIDs: ["NEP, FSLR"]
     offset: PT1H22M44S
     duration: P1M6D
 
@@ -799,25 +799,25 @@
   tags:
   - affectsTags: ["healthcare"]
     trend: -1.1
-    affectsStockIDs: ["DVA"]
+    affectsAssetIDs: ["DVA"]
     offset: PT3H9M06S
     duration: P2W
 
   - affectsTags: ["healthcare"]
     trend: -0.7
-    affectsStockIDs: ["DVA"]
+    affectsAssetIDs: ["DVA"]
     offset: P2WT3H9M06S
     duration: P2W
 
   - affectsTags: ["healthcare"]
     trend: -0.2
-    affectsStockIDs: ["DVA"]
+    affectsAssetIDs: ["DVA"]
     offset: P4WT3H9M06S
     duration: P1W
 
   - affectsTags: ["healthcare"]
     trend: -0.1
-    affectsStockIDs: ["DVA"]
+    affectsAssetIDs: ["DVA"]
     offset: P5WT3H9M06S
     duration: P1W
 
@@ -840,27 +840,27 @@
 
   tags:
   - trend: 0.4
-    affectsStockIDs: ["AXP"]
+    affectsAssetIDs: ["AXP"]
     offset: PT29M44S
     duration: P1W
 
   - trend: 0.9
-    affectsStockIDs: ["AXP"]
+    affectsAssetIDs: ["AXP"]
     offset: P1WT29M44S
     duration: P1W
 
   - trend: 0.5
-    affectsStockIDs: ["AXP"]
+    affectsAssetIDs: ["AXP"]
     offset: P2WT29M44S
     duration: P1W
   
   - trend: 1.2
-    affectsStockIDs: ["AXP"]
+    affectsAssetIDs: ["AXP"]
     offset: P3WT29M44S
     duration: P1M
   
   - trend: 0.2
-    affectsStockIDs: ["AXP"]
+    affectsAssetIDs: ["AXP"]
     offset: P1M3WT29M44S
     duration: P30D
 
@@ -869,7 +869,7 @@
   description: >-
     Boeing Chief David Calhoun has created a deal to sell over 15,000 fighter planes to the U.S army
     as a 'restock plan'. With a potential end revenue of 1.17 trillion USD (not including expenditure), Boeing is 
-    looking for a sharp incline towards growth. Stock values may increase rapidly during the buy-off.
+    looking for a sharp incline towards growth. Asset values may increase rapidly during the buy-off.
 
   type: "fixed"
   fixedDate: 2026-01-09 14:02:00
@@ -881,17 +881,17 @@
 
   tags:
   - trend: 0.4
-    affectsStockIDs: ["BA"]
+    affectsAssetIDs: ["BA"]
     offset: P2DT44M20S
     duration: P22D
 
   - trend: 1.8
-    affectsStockIDs: ["BA"]
+    affectsAssetIDs: ["BA"]
     offset: P22DT44M20S
     duration: P1M
 
   - trend: -0.3
-    affectsStockIDs: ["BA"]
+    affectsAssetIDs: ["BA"]
     offset: P1M22DT44M20S
     duration: P1M
 
@@ -913,32 +913,32 @@
 
   tags:
   - trend: -0.9
-    affectsStockIDs: ["FB"]
+    affectsAssetIDs: ["FB"]
     offset: PT29M44S
     duration: P28D
 
   - trend: 0.8
-    affectsStockIDs: ["MSFT"]
+    affectsAssetIDs: ["MSFT"]
     offset: PT29M44S
     duration: P28D
 
   - trend: -0.5
-    affectsStockIDs: ["FB"]
+    affectsAssetIDs: ["FB"]
     offset: P28DT29M44S
     duration: P1M
 
   - trend: 1.2
-    affectsStockIDs: ["MSFT"]
+    affectsAssetIDs: ["MSFT"]
     offset: P28DT29M44S
     duration: P1M
   
   - trend: 0.2
-    affectsStockIDs: ["FB"]
+    affectsAssetIDs: ["FB"]
     offset: P1M28DT29M44S
     duration: P1M
   
   - trend: 0.8
-    affectsStockIDs: ["MSFT"]
+    affectsAssetIDs: ["MSFT"]
     offset: P1M28DT29M44S
     duration: P1M
 
@@ -959,17 +959,17 @@
 
   tags:
   - trend: 0.3
-    affectsStockIDs: ["NFLX"]
+    affectsAssetIDs: ["NFLX"]
     offset: PT49M22S
     duration: P1M
 
   - trend: 0.9
-    affectsStockIDs: ["NFLX"]
+    affectsAssetIDs: ["NFLX"]
     offset: P1MT49M22S
     duration: P1M
 
   - trend: 0.5
-    affectsStockIDs: ["NFLX"]
+    affectsAssetIDs: ["NFLX"]
     offset: P2MT49M22S
     duration: P1M
 
@@ -992,17 +992,17 @@
 
   tags:
   - trend: -1.2
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: PT44M29S
     duration: P1M
   
   - trend: -0.4
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: P1MT44M29S
     duration: P1M
 
   - trend: -0.9
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: P2MT44M29S
     duration: P1M
 
@@ -1022,27 +1022,27 @@
 
   tags:
   - trend: -1.2
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: PT58M24S
     duration: P1M
 
   - trend: -0.4
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: P1MT58M24S
     duration: P1M
 
   - trend: -0.9
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: P2MT58M24S
     duration: P1M
 
   - trend: 0.1
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: P3MT58M24S
     duration: P1M
 
   - trend: 0.3
-    affectsStockIDs: ["AAPL"]
+    affectsAssetIDs: ["AAPL"]
     offset: P4MT58M24S
     duration: P1M
 
@@ -1064,7 +1064,7 @@
     - affectsTags: ["financial"]
       minTrend: -1.6
       maxTrend: -1
-      affectsStockIDs: ["JPM","AXP", "GS"]
+      affectsAssetIDs: ["JPM","AXP", "GS"]
 
 
 - eventID: "hurricane-hits-caribbean"
@@ -1085,7 +1085,7 @@
     - affectsTags: ["health"]
       minTrend: -1.6
       maxTrend: -1
-      affectsStockIDs: ["DVA","IDEXX","ANTM"]
+      affectsAssetIDs: ["DVA","IDEXX","ANTM"]
 
 
 - eventID: "low-oil-levels"
@@ -1105,11 +1105,11 @@
     - affectsTags: ["energy"]
       minTrend: -1.4
       maxTrend: -0.6
-      affectsStockIDs: ["RDS-A"]
+      affectsAssetIDs: ["RDS-A"]
     - affectsTags: ["energy"]
       minTrend: 0.9
       maxTrend: 2.1
-      affectsStockIDs: ["NEP", "FSLR"]
+      affectsAssetIDs: ["NEP", "FSLR"]
 
 
 
@@ -1148,7 +1148,7 @@
     - affectsTags: ["financial"]
       minTrend: -2
       maxTrend: -1.5
-      affectsStockIDs: ["JPM","AXP", "GS"]
+      affectsAssetIDs: ["JPM","AXP", "GS"]
 
 - eventID: "Nasa-puts-humans-on-the-moon"
   title: "Nasa makes an effort to make the moon habitable and puts the first colony of humans on the moon."
@@ -1167,11 +1167,11 @@
     - affectsTags: ["aviation"]
       minTrend: -0.2
       maxTrend: -0.5
-      affectsStockIDs: ["BA"]
+      affectsAssetIDs: ["BA"]
     - affectsTags: ["real-estate"]
       minTrend: -0.1
       maxTrend: -0.9
-      affectsStockIDs: ["BXP"]
+      affectsAssetIDs: ["BXP"]
 
 
 - eventID: "high-oil-levels"
@@ -1191,11 +1191,11 @@
     - affectsTags: ["energy"]
       minTrend: -0.6
       maxTrend: -1.4
-      affectsStockIDs: ["RDS-A"]
+      affectsAssetIDs: ["RDS-A"]
     - affectsTags: ["energy"]
       minTrend: 1.9
       maxTrend: 0.2
-      affectsStockIDs: ["NEP", "FSLR"]
+      affectsAssetIDs: ["NEP", "FSLR"]
 
 
 - eventID: "cancer-is-cured"
@@ -1216,7 +1216,7 @@
     - affectsTags: ["health"]
       minTrend: -0.1
       maxTrend: -3
-      affectsStockIDs: ["DVA","IDEXX","ANTM"]
+      affectsAssetIDs: ["DVA","IDEXX","ANTM"]
 
 
 - eventID: "big-toe-problem"
@@ -1236,7 +1236,7 @@
     - affectsTags: ["health"]
       minTrend: -0.1
       maxTrend: -1.4
-      affectsStockIDs: ["DVA","IDEXX"]
+      affectsAssetIDs: ["DVA","IDEXX"]
 
 - eventID: "Apple-Microsoft-Facebook-release-revolutionary-vr-experience"
   title: "Big Tech in Silicon Valley release revolutionary VR experience as a joint effort"
@@ -1255,7 +1255,7 @@
     - affectsTags: ["tech"]
       minTrend: -0.1
       maxTrend: -3.4
-      affectsStockIDs: ["AAPL", "MSFT", "FB"]
+      affectsAssetIDs: ["AAPL", "MSFT", "FB"]
 
 
 - eventID: "World-runs-into-recession-after-intense-gamma-rays-reduce-flights"
@@ -1275,7 +1275,7 @@
     - affectsTags: ["financial"]
       minTrend: -2.3
       maxTrend: -0.3
-      affectsStockIDs: ["JPM","AXP", "GS", "FB", "MSFT", "AAPL", "TSLA", "RDS-A", "NEP", "FSLR", "BXP", "BA"]
+      affectsAssetIDs: ["JPM","AXP", "GS", "FB", "MSFT", "AAPL", "TSLA", "RDS-A", "NEP", "FSLR", "BXP", "BA"]
 
 - eventID: "Apple-closes-exclusive-deals-for-its-streaming-platform-with-Warner-Bros."
   title: "Apple TV becomes more interesting for viewers since Apple closed an exclusive deal with Warner Bros."
@@ -1294,7 +1294,7 @@
     - affectsTags: ["tech"]
       minTrend: -0.1
       maxTrend: -2.1
-      affectsStockIDs: ["AAPL"]
+      affectsAssetIDs: ["AAPL"]
 
 
 - eventID: "Bill-Gates-dies"
@@ -1314,7 +1314,7 @@
     - affectsTags: ["tech"]
       minTrend: -0.4
       maxTrend: -0.4
-      affectsStockIDs: ["MSFT"]
+      affectsAssetIDs: ["MSFT"]
 
 
 - eventID: "Mark-Zuckerberg-gets-detained-after-new-privacy-related-violations-come-to-light"
@@ -1334,7 +1334,7 @@
     - affectsTags: ["tech"]
       minTrend: -2.5
       maxTrend: -0.2
-      affectsStockIDs: ["FB"]
+      affectsAssetIDs: ["FB"]
 
 
 - eventID: "Europe-forbids-any-non-electric-cars-due-to-massive-pollution"
@@ -1354,7 +1354,7 @@
     - affectsTags: ["energy"]
       minTrend: 0.1
       maxTrend: 3.4
-      affectsStockIDs: ["TSLA"]
+      affectsAssetIDs: ["TSLA"]
 
 - eventID: "pollution-at-all-time-high"
   title: "Pollution was measured to be at an all time high. World Governments try to find a way to reduce pollution for the next year."
@@ -1373,10 +1373,10 @@
     - affectsTags: ["aviation"]
       minTrend: -1.5
       maxTrend: -0.6
-    - affectsStockIDs: ["TSLA"]
+    - affectsAssetIDs: ["TSLA"]
       minTrend: 1
       maxTrend: 1.4
-    - affectsStockIDs: ["RDS-A"]
+    - affectsAssetIDs: ["RDS-A"]
       minTrend: -1.4
       maxTrend: -1
       
@@ -1430,6 +1430,6 @@
   duration: P2M
 
   tags:
-    - affectsStockIDs: ["GS"]
+    - affectsAssetIDs: ["GS"]
       minTrend: 0.1
       maxTrend: 0.2

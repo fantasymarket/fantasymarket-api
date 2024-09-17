@@ -17,6 +17,14 @@ func (t Time) MarshalJSON() ([]byte, error) {
 	return []byte(stamp), nil
 }
 
+// ParseTime parses a RFC3339 timestamp
+func ParseTime(s string) (time.Time, error) {
+	if strings.ContainsAny(s, "TtZz") {
+		return time.Parse(time.RFC3339, s)
+	}
+	return time.Parse("2006-01-02 15:04:05", s)
+}
+
 // UnmarshalJSON implements `json.Unmarshaler`
 func (t *Time) UnmarshalJSON(b []byte) (err error) {
 
@@ -26,11 +34,7 @@ func (t *Time) UnmarshalJSON(b []byte) (err error) {
 		return
 	}
 
-	if strings.ContainsAny(s, "TtZz") {
-		t.Time, err = time.Parse(time.RFC3339, s)
-	} else {
-		t.Time, err = time.Parse("2006-01-02 15:04:05", s)
-	}
+	t.Time, err = ParseTime(s)
 
 	return
 }

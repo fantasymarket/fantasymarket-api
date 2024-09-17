@@ -7,15 +7,17 @@ import (
 	"time"
 )
 
-// StockDetails is the type for storing information about stocks
-type StockDetails struct {
-	Symbol    string   `yaml:"symbol"`     // Stock Symbol e.g GOOG
-	Name      string   `yaml:"name"`       // Stock Name e.g Alphabet Inc.
-	Index     int64    `yaml:"startPrice"` // Price per share
-	Shares    int64    `yaml:"stockCount"` // Number per share
-	Tags      []string `yaml:"tags"`       // A stock can have up to 5 tags
-	Stability float64  `yaml:"stability"`  // Shows how many fluctuations the stock will have
-	Trend     float64  `yaml:"trend"`      // Shows the generall trend of the Stock
+// AssetDetails is the type for storing information about assets
+type AssetDetails struct {
+	Symbol      string   `yaml:"symbol"`      // Asset Symbol e.g GOOG
+	Name        string   `yaml:"name"`        // Asset Name e.g Alphabet Inc.
+	Type        string   `yaml:"type"`        // Asset Name e.g Alphabet Inc.
+	Description string   `yaml:"description"` // Asset Name e.g Alphabet Inc.
+	Index       int64    `yaml:"startPrice"`  // Price per share
+	Shares      int64    `yaml:"assetCount"`  // Number per share
+	Tags        []string `yaml:"tags"`        // A asset can have up to 5 tags
+	Stability   float64  `yaml:"stability"`   // Shows how many fluctuations the asset will have
+	Trend       float64  `yaml:"trend"`       // Shows the generall trend of the Asset
 }
 
 // EventDetails is the type for storing information about events
@@ -88,16 +90,16 @@ type EventEffect struct {
 
 // TagOptions are more indepth settings for specific event tags only
 type TagOptions struct {
-	// Can be a list of stock tags tags
-	// "all" is a shortcut for all stocks
-	// You can ignore stocks with `!`, e.g ["all", "!healthcare"]
+	// Can be a list of asset tags tags
+	// "all" is a shortcut for all assets
+	// You can ignore assets with `!`, e.g ["all", "!healthcare"]
 	AffectsTags   []string
-	AffectsStocks []string
+	AffectsAssets []string
 
 	// NOTE: An event can only be affected while an event is active
 	// So Offset + Duration cant be larger than EventSettings.Duration
-	Offset   timeutils.Duration // The tag only effects the stock after this duration
-	Duration timeutils.Duration // The tag only effects the stock for this duration
+	Offset   timeutils.Duration // The tag only effects the asset after this duration
+	Duration timeutils.Duration // The tag only effects the asset for this duration
 
 	// How the much the tags are affected, as a decimal percentage
 	Trend float64 // 0.02 => +2% every game-tick
@@ -109,7 +111,7 @@ type TagOptions struct {
 
 // CalculateTrend calculates the trend for a tag
 // If Min and MaxTrend are defined, these take precedent over Trend
-func (t *TagOptions) CalculateTrend(ticksSinceStart int64, stockSymbol string) float64 {
+func (t *TagOptions) CalculateTrend(ticksSinceStart int64, assetSymbol string) float64 {
 	if t.MinTrend == t.MaxTrend {
 		if t.MinTrend != 0 {
 			return t.MinTrend
@@ -117,7 +119,7 @@ func (t *TagOptions) CalculateTrend(ticksSinceStart int64, stockSymbol string) f
 		return t.Trend
 	}
 
-	seed := stockSymbol + strconv.FormatInt(ticksSinceStart, 10)
+	seed := assetSymbol + strconv.FormatInt(ticksSinceStart, 10)
 	trend := hash.Int64HashRange(int64(t.MinTrend*1000), int64(t.MaxTrend*1000), seed)
 	return float64(trend) / 1000
 }

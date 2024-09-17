@@ -10,7 +10,13 @@ func (api *APIHandler) getTime(w http.ResponseWriter, r *http.Request) {
 	t := api.Config.Game.StartDate
 
 	if !t.IsZero() {
-		responses.CustomResponse(w, t.Format(time.RFC3339), 200)
+		responses.CustomResponse(w, map[string]interface{}{
+			"timestamp":          api.Game.GetCurrentDate().Format(time.RFC3339),
+			"ticksPerSecond":     api.Config.Game.TicksPerSecond,
+			"gameSecondsPerTick": api.Config.Game.GameTimePerTick.Seconds(),
+			"startDate":          api.Config.Game.StartDate,
+			"ticksSinceStart":    api.Game.TicksSinceStart,
+		}, 200)
 		return
 	}
 
